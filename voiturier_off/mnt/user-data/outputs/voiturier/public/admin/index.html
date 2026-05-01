@@ -1,0 +1,2130 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Back-office — Voiturier Orly</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --gold: #E8B362;
+  --gold-deep: #C9913B;
+  --gold-pale: #FBF3E0;
+  --ink: #0B1426;
+  --ink-soft: #1a2338;
+  --slate: #4a5576;
+  --muted: #94a3b8;
+  --line: #e5e7eb;
+  --bg: #f8fafc;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  --info: #3b82f6;
+}
+body {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  font-size: 14px;
+}
+button { font-family: inherit; cursor: pointer; border: none; background: none; }
+input, select, textarea { font-family: inherit; }
+
+/* ── Login ── */
+.login-screen {
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #0B1426 0%, #2d1f47 50%, #75234a 100%);
+  padding: 20px;
+}
+.login-box {
+  background: white;
+  border-radius: 22px;
+  padding: 40px 36px;
+  width: 100%; max-width: 380px;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+}
+.login-box .logo {
+  display: flex; align-items: center; gap: 10px; justify-content: center;
+  margin-bottom: 24px;
+}
+.login-box .logo-mark {
+  width: 40px; height: 40px;
+  background: var(--gold); border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+}
+.login-box .logo-mark svg { width: 22px; height: 22px; color: var(--ink); }
+.login-box h1 { font-size: 1.4rem; font-weight: 800; }
+.login-box .sub { font-size: 0.86rem; color: var(--slate); }
+.login-box label { display:block; font-size: 0.78rem; font-weight: 700; color: var(--slate); margin: 18px 0 6px; }
+.login-box input {
+  width: 100%; padding: 13px 14px; background: var(--bg);
+  border: 1.5px solid transparent; border-radius: 10px;
+  font-size: 0.95rem; font-weight: 600; outline: none;
+  transition: all 0.2s;
+}
+.login-box input:focus { border-color: var(--gold); background: white; }
+.login-box button {
+  width: 100%; margin-top: 18px;
+  padding: 13px;
+  background: var(--ink); color: white;
+  border-radius: 100px;
+  font-weight: 700; font-size: 0.95rem;
+  transition: all 0.2s;
+}
+.login-box button:hover { transform: translateY(-1px); background: var(--gold-deep); color: var(--ink); }
+.login-error { color: var(--error); font-size: 0.82rem; margin-top: 12px; font-weight: 600; }
+
+/* ── Layout ── */
+.app { display: none; min-height: 100vh; }
+.app.show { display: flex; }
+.sidebar {
+  width: 240px;
+  background: var(--ink);
+  color: white;
+  display: flex; flex-direction: column;
+  position: fixed; left: 0; top: 0; bottom: 0;
+  z-index: 50;
+  transition: transform 0.3s;
+}
+.sidebar-head {
+  padding: 22px 20px;
+  display: flex; align-items: center; gap: 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.sidebar-head .logo-mark {
+  width: 34px; height: 34px;
+  background: var(--gold); border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+}
+.sidebar-head .logo-mark svg { width: 18px; height: 18px; color: var(--ink); }
+.sidebar-head .name { font-weight: 800; font-size: 1rem; }
+.sidebar-head .tag { font-size: 0.62rem; color: var(--gold); letter-spacing: 0.16em; text-transform: uppercase; }
+.sidebar-nav { flex: 1; padding: 12px 10px; }
+.sidebar-nav button {
+  width: 100%;
+  padding: 11px 14px;
+  display: flex; align-items: center; gap: 12px;
+  color: rgba(255,255,255,0.7);
+  font-size: 0.9rem; font-weight: 600;
+  border-radius: 10px;
+  margin-bottom: 3px;
+  transition: all 0.2s;
+  text-align: left;
+}
+.sidebar-nav button svg { width: 18px; height: 18px; flex-shrink: 0; }
+.sidebar-nav button:hover { background: rgba(255,255,255,0.06); color: white; }
+.sidebar-nav button.active { background: var(--gold); color: var(--ink); }
+.sidebar-foot { padding: 14px; border-top: 1px solid rgba(255,255,255,0.08); }
+.sidebar-foot button {
+  width: 100%; padding: 10px; color: rgba(255,255,255,0.6);
+  font-size: 0.84rem; font-weight: 600;
+  display: flex; align-items: center; gap: 10px;
+}
+.sidebar-foot button:hover { color: white; }
+.sidebar-foot svg { width: 16px; height: 16px; }
+
+.main {
+  flex: 1; margin-left: 240px;
+  padding: 28px 36px;
+  min-height: 100vh;
+}
+
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 28px; flex-wrap: wrap; gap: 16px;
+}
+.topbar h1 { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.02em; }
+.topbar .sub { font-size: 0.86rem; color: var(--slate); margin-top: 2px; }
+
+.btn {
+  padding: 10px 18px;
+  border-radius: 100px;
+  font-size: 0.84rem; font-weight: 700;
+  display: inline-flex; align-items: center; gap: 8px;
+  transition: all 0.2s;
+}
+.btn svg { width: 14px; height: 14px; }
+.btn-primary { background: var(--ink); color: white; }
+.btn-primary:hover { background: var(--gold-deep); color: var(--ink); transform: translateY(-1px); }
+.btn-gold { background: var(--gold); color: var(--ink); }
+.btn-gold:hover { background: var(--gold-deep); }
+.btn-ghost { background: white; color: var(--ink); border: 1.5px solid var(--line); }
+.btn-ghost:hover { border-color: var(--gold); }
+.btn-danger { background: var(--error); color: white; }
+.btn-danger:hover { background: #dc2626; }
+.btn-sm { padding: 7px 13px; font-size: 0.78rem; }
+
+/* ── Cards ── */
+.card {
+  background: white;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.card-pad-0 { padding: 0; overflow: hidden; }
+
+/* ── Stats grid ── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
+.stat {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 18px 20px;
+}
+.stat-label {
+  font-size: 0.7rem; font-weight: 700;
+  color: var(--slate);
+  letter-spacing: 0.1em; text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.stat-val {
+  font-size: 1.8rem; font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.stat-val .cur { font-size: 1rem; color: var(--slate); margin-left: 2px; }
+.stat-trend { font-size: 0.74rem; color: var(--success); margin-top: 4px; font-weight: 600; }
+.stat.gold { background: linear-gradient(135deg, var(--gold-pale), white); border-color: var(--gold); }
+.stat.gold .stat-val { color: var(--gold-deep); }
+
+/* ── Tables ── */
+.table-wrap { overflow-x: auto; border-radius: 12px; }
+table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+th, td { padding: 12px 14px; text-align: left; }
+th {
+  font-size: 0.7rem; font-weight: 700;
+  color: var(--slate); letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-bottom: 2px solid var(--line);
+  background: var(--bg);
+  white-space: nowrap;
+}
+tbody tr { border-bottom: 1px solid var(--line); cursor: pointer; transition: background 0.15s; }
+tbody tr:hover { background: var(--bg); }
+tbody tr:last-child { border-bottom: none; }
+
+/* ── Status badges ── */
+.badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 9px;
+  border-radius: 100px;
+  font-size: 0.72rem; font-weight: 700;
+  white-space: nowrap;
+}
+.badge .dot { width: 6px; height: 6px; border-radius: 50%; }
+.badge-pending     { background: #fef3c7; color: #92400e; }
+.badge-pending .dot { background: #f59e0b; }
+.badge-confirmed   { background: #dbeafe; color: #1e40af; }
+.badge-confirmed .dot { background: #3b82f6; }
+.badge-taken       { background: #ede9fe; color: #5b21b6; }
+.badge-taken .dot  { background: #8b5cf6; }
+.badge-in_storage  { background: #d1fae5; color: #065f46; }
+.badge-in_storage .dot { background: #10b981; }
+.badge-returned    { background: #f3f4f6; color: #374151; }
+.badge-returned .dot { background: #6b7280; }
+.badge-cancelled   { background: #fee2e2; color: #991b1b; }
+.badge-cancelled .dot { background: #ef4444; }
+
+.payment-paid { color: var(--success); font-weight: 700; }
+.payment-pending { color: var(--warning); font-weight: 700; }
+
+/* ── Filters bar ── */
+.filters {
+  display: flex; gap: 10px; flex-wrap: wrap;
+  margin-bottom: 16px; align-items: center;
+}
+.filters input, .filters select {
+  padding: 9px 14px;
+  background: white;
+  border: 1.5px solid var(--line);
+  border-radius: 100px;
+  font-size: 0.86rem; font-weight: 600;
+  outline: none;
+  transition: all 0.2s;
+}
+.filters input:focus, .filters select:focus { border-color: var(--gold); }
+.filters input[type="search"] { min-width: 220px; }
+
+/* ── Calendar ── */
+.cal-toolbar {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 12px;
+  margin-bottom: 18px;
+}
+.cal-nav { display: flex; gap: 8px; align-items: center; }
+.cal-nav button {
+  width: 34px; height: 34px;
+  background: white; border: 1.5px solid var(--line);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+.cal-nav button:hover { border-color: var(--gold); }
+.cal-nav button svg { width: 14px; height: 14px; }
+.cal-title {
+  font-size: 1.2rem; font-weight: 800;
+  letter-spacing: -0.01em;
+  min-width: 200px; text-align: center;
+  text-transform: capitalize;
+}
+.cal-views { display: flex; gap: 4px; background: var(--bg); padding: 4px; border-radius: 100px; }
+.cal-views button {
+  padding: 7px 16px;
+  font-size: 0.82rem; font-weight: 700;
+  border-radius: 100px;
+  color: var(--slate);
+  transition: all 0.2s;
+}
+.cal-views button.active { background: var(--ink); color: white; }
+
+.cal-month {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+  background: var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+}
+.cal-day-header {
+  background: var(--bg);
+  padding: 12px 10px;
+  font-size: 0.72rem; font-weight: 800;
+  color: var(--slate);
+  text-transform: uppercase; letter-spacing: 0.08em;
+  text-align: center;
+}
+.cal-day {
+  background: white;
+  min-height: 110px;
+  padding: 8px 10px;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.cal-day:hover { background: var(--bg); }
+.cal-day.other-month { background: #fafbfc; }
+.cal-day.other-month .cal-day-num { color: var(--muted); }
+.cal-day.today { background: var(--gold-pale); }
+.cal-day.today .cal-day-num {
+  background: var(--gold-deep); color: white;
+  width: 24px; height: 24px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800;
+}
+.cal-day.blocked { background: #fee2e2; }
+.cal-day-num { font-size: 0.85rem; font-weight: 800; color: var(--ink); margin-bottom: 6px; }
+.cal-events { display: flex; flex-direction: column; gap: 3px; }
+.cal-event {
+  font-size: 0.7rem; font-weight: 700;
+  padding: 3px 7px;
+  border-radius: 6px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+.cal-event:hover { transform: translateX(2px); }
+.cal-event.dep { background: #dbeafe; color: #1e40af; border-left: 3px solid #3b82f6; }
+.cal-event.ret { background: #fef3c7; color: #92400e; border-left: 3px solid #f59e0b; }
+.cal-event.dep::before { content: '↗ '; }
+.cal-event.ret::before { content: '↙ '; }
+
+/* Week view */
+.cal-week {
+  display: grid;
+  grid-template-columns: 70px repeat(7, 1fr);
+  background: var(--line);
+  gap: 1px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.cal-week-header { background: var(--bg); padding: 12px 8px; text-align: center; font-size: 0.78rem; font-weight: 800; }
+.cal-week-header.today-h { background: var(--gold-pale); color: var(--gold-deep); }
+.cal-week-header .day { font-size: 0.7rem; color: var(--slate); text-transform: uppercase; letter-spacing: 0.08em; }
+.cal-week-header .num { font-size: 1.2rem; font-weight: 800; }
+.cal-week-row { background: white; padding: 8px; min-height: 80px; font-size: 0.78rem; }
+.cal-week-row.label {
+  background: var(--bg); font-weight: 800; color: var(--slate);
+  display: flex; align-items: center; justify-content: center;
+  text-align: center; font-size: 0.72rem;
+  text-transform: uppercase; letter-spacing: 0.08em;
+}
+.cal-week-cell {
+  display: flex; flex-direction: column; gap: 4px;
+  padding: 6px;
+}
+
+/* ── Modals ── */
+.modal-bg {
+  position: fixed; inset: 0;
+  background: rgba(11,20,38,0.7);
+  backdrop-filter: blur(4px);
+  display: none; align-items: center; justify-content: center;
+  z-index: 100;
+  padding: 20px;
+  overflow-y: auto;
+}
+.modal-bg.show { display: flex; }
+.modal-card {
+  background: white;
+  border-radius: 18px;
+  width: 100%; max-width: 600px;
+  max-height: 92vh;
+  overflow-y: auto;
+  padding: 28px 32px;
+  margin: auto;
+}
+.modal-card.lg { max-width: 760px; }
+.modal-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 22px;
+}
+.modal-head h2 {
+  font-size: 1.3rem; font-weight: 800;
+  letter-spacing: -0.01em;
+}
+.modal-close-btn {
+  width: 32px; height: 32px;
+  border-radius: 50%; background: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+.modal-close-btn:hover { background: var(--ink); color: white; }
+.modal-close-btn svg { width: 16px; height: 16px; }
+
+/* ── Forms ── */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 14px;
+  margin-bottom: 16px;
+}
+.form-grid .full { grid-column: 1 / -1; }
+.field label {
+  display: block;
+  font-size: 0.72rem; font-weight: 700;
+  color: var(--slate);
+  letter-spacing: 0.04em; text-transform: uppercase;
+  margin-bottom: 5px;
+}
+.field input, .field select, .field textarea {
+  width: 100%;
+  padding: 11px 13px;
+  background: var(--bg);
+  border: 1.5px solid transparent;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  outline: none;
+  transition: all 0.2s;
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  background: white;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(232,179,98,0.15);
+}
+.field textarea { min-height: 80px; resize: vertical; }
+.field .hint { font-size: 0.74rem; color: var(--muted); margin-top: 4px; font-weight: 500; }
+
+/* ── Booking detail status flow ── */
+.status-flow {
+  display: flex; gap: 8px; flex-wrap: wrap;
+  margin: 16px 0;
+}
+.status-btn {
+  padding: 8px 14px;
+  border: 1.5px solid var(--line);
+  background: white;
+  border-radius: 100px;
+  font-size: 0.78rem; font-weight: 700;
+  color: var(--slate);
+  display: inline-flex; align-items: center; gap: 6px;
+  transition: all 0.2s;
+}
+.status-btn:hover { border-color: var(--gold); color: var(--ink); }
+.status-btn.confirmed:hover { background: #dbeafe; border-color: #3b82f6; color: #1e40af; }
+.status-btn.taken:hover { background: #ede9fe; border-color: #8b5cf6; color: #5b21b6; }
+.status-btn.in_storage:hover { background: #d1fae5; border-color: #10b981; color: #065f46; }
+.status-btn.returned:hover { background: #f3f4f6; border-color: #6b7280; color: #374151; }
+.status-btn.cancelled:hover { background: #fee2e2; border-color: #ef4444; color: #991b1b; }
+
+/* ── Empty state ── */
+.empty {
+  text-align: center; padding: 50px 20px;
+  color: var(--slate);
+}
+.empty svg { width: 60px; height: 60px; margin: 0 auto 16px; opacity: 0.4; }
+.empty p { font-size: 0.96rem; font-weight: 600; }
+
+/* ── Utility ── */
+.flex { display: flex; }
+.flex-between { display: flex; justify-content: space-between; align-items: center; }
+.gap-sm { gap: 8px; }
+.gap-md { gap: 14px; }
+.mt-sm { margin-top: 10px; }
+.mt-md { margin-top: 16px; }
+.mt-lg { margin-top: 24px; }
+.mb-sm { margin-bottom: 10px; }
+.mb-md { margin-bottom: 16px; }
+.text-muted { color: var(--slate); font-size: 0.84rem; }
+.text-tiny { font-size: 0.74rem; }
+.text-bold { font-weight: 800; }
+.text-gold { color: var(--gold-deep); }
+.text-error { color: var(--error); }
+.text-success { color: var(--success); }
+.text-right { text-align: right; }
+.font-mono { font-family: ui-monospace, 'SF Mono', monospace; }
+
+.toast {
+  position: fixed;
+  bottom: 24px; right: 24px;
+  background: var(--ink); color: white;
+  padding: 13px 20px;
+  border-radius: 12px;
+  font-size: 0.86rem; font-weight: 600;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+  z-index: 200;
+  transform: translateY(100px);
+  opacity: 0;
+  transition: all 0.3s;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.success { background: var(--success); }
+.toast.error { background: var(--error); }
+
+.spinner {
+  width: 16px; height: 16px;
+  border: 2.5px solid rgba(0,0,0,0.1);
+  border-top-color: var(--ink);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loading {
+  padding: 60px;
+  text-align: center;
+  color: var(--slate);
+}
+
+@media (max-width: 900px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+  .sidebar.open { transform: translateX(0); }
+  .main { margin-left: 0; padding: 18px; }
+  .topbar { margin-bottom: 18px; }
+  .form-grid { grid-template-columns: 1fr; }
+  .cal-month .cal-day { min-height: 70px; padding: 5px 6px; }
+  .cal-event { font-size: 0.62rem; padding: 2px 5px; }
+  .modal-card { padding: 22px 18px; }
+  .mobile-menu { display: flex !important; }
+}
+.mobile-menu {
+  display: none;
+  width: 36px; height: 36px;
+  background: var(--ink); color: white;
+  border-radius: 10px;
+  align-items: center; justify-content: center;
+}
+.mobile-menu svg { width: 18px; height: 18px; }
+</style>
+</head>
+<body>
+
+<!-- ─── LOGIN SCREEN ─── -->
+<div class="login-screen" id="loginScreen">
+  <form class="login-box" id="loginForm" onsubmit="event.preventDefault(); doLogin();">
+    <div class="logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
+        </svg>
+      </div>
+      <div>
+        <h1>Voiturier Orly</h1>
+        <p class="sub">Back-office d'administration</p>
+      </div>
+    </div>
+    <label for="adminPass">Mot de passe</label>
+    <input type="password" id="adminPass" autocomplete="current-password" required>
+    <button type="submit" id="loginBtn">Se connecter</button>
+    <div class="login-error" id="loginError" style="display:none"></div>
+  </form>
+</div>
+
+<!-- ─── APP ─── -->
+<div class="app" id="app">
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-head">
+      <div class="logo-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
+        </svg>
+      </div>
+      <div>
+        <div class="name">Voiturier Orly</div>
+        <div class="tag">Admin</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <button data-view="dashboard" class="active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+        Tableau de bord
+      </button>
+      <button data-view="calendar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        Calendrier
+      </button>
+      <button data-view="bookings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18"/></svg>
+        Réservations
+      </button>
+      <button data-view="clients">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Clients
+      </button>
+      <button data-view="pricing">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        Tarifs & dates
+      </button>
+      <button data-view="promos">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+        Codes promo
+      </button>
+      <button data-view="categories">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 16H9m10 0h3v-3.15a1 1 0 0 0-.84-.99L16 11l-2.7-3.6a1 1 0 0 0-.8-.4H5.24a2 2 0 0 0-1.8 1.1l-.8 1.63A6 6 0 0 0 2 12.42V15a1 1 0 0 0 1 1h2"/><circle cx="6.5" cy="16.5" r="2.5"/><circle cx="16.5" cy="16.5" r="2.5"/></svg>
+        Catégories véhicule
+      </button>
+      <button data-view="surcharges">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Suppléments & frais
+      </button>
+      <button data-view="quotes">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Devis
+      </button>
+      <button data-view="templates">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Messages
+      </button>
+    </nav>
+    <div class="sidebar-foot">
+      <button onclick="logout()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+        Déconnexion
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <main class="main">
+    <div id="viewContainer"></div>
+  </main>
+</div>
+
+<!-- Modals container -->
+<div id="modalsContainer"></div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ════════════════════════════════════════════════════════════
+   STATE & API
+═══════════════════════════════════════════════════════════ */
+const STATE = {
+  token: localStorage.getItem('vo_token') || null,
+  view: 'dashboard',
+  bookings: [],
+  clients: [],
+  rules: [],
+  specials: [],
+  blocks: [],
+  promos: [],
+  stats: null,
+  calMode: 'month',     // month | week
+  calDate: new Date(),
+};
+
+async function api(path, opts = {}) {
+  const headers = { 'Content-Type': 'application/json', ...(opts.headers || {}) };
+  if (STATE.token) headers['Authorization'] = `Bearer ${STATE.token}`;
+  const res = await fetch(path, { ...opts, headers });
+  if (res.status === 401) {
+    logout();
+    throw new Error('Session expirée');
+  }
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(json.error || 'Erreur serveur');
+  return json;
+}
+
+function toast(msg, type = 'info') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show ' + type;
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+/* ════════════════════════════════════════════════════════════
+   AUTH
+═══════════════════════════════════════════════════════════ */
+async function doLogin() {
+  const password = document.getElementById('adminPass').value;
+  const errEl = document.getElementById('loginError');
+  const btn = document.getElementById('loginBtn');
+  errEl.style.display = 'none';
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>';
+
+  try {
+    const { token } = await api('/api/admin/login', {
+      method: 'POST',
+      body: JSON.stringify({ password }),
+    });
+    STATE.token = token;
+    localStorage.setItem('vo_token', token);
+    showApp();
+  } catch (err) {
+    errEl.textContent = err.message;
+    errEl.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Se connecter';
+  }
+}
+
+function logout() {
+  STATE.token = null;
+  localStorage.removeItem('vo_token');
+  document.getElementById('app').classList.remove('show');
+  document.getElementById('loginScreen').style.display = 'flex';
+}
+
+function showApp() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('app').classList.add('show');
+  switchView('dashboard');
+}
+
+/* ════════════════════════════════════════════════════════════
+   ROUTING
+═══════════════════════════════════════════════════════════ */
+document.querySelectorAll('.sidebar-nav button').forEach(btn => {
+  btn.addEventListener('click', () => switchView(btn.dataset.view));
+});
+
+async function switchView(view) {
+  STATE.view = view;
+  document.querySelectorAll('.sidebar-nav button').forEach(b => {
+    b.classList.toggle('active', b.dataset.view === view);
+  });
+  const container = document.getElementById('viewContainer');
+  container.innerHTML = '<div class="loading"><span class="spinner"></span> Chargement…</div>';
+
+  try {
+    if (view === 'dashboard') await renderDashboard();
+    else if (view === 'calendar') await renderCalendar();
+    else if (view === 'bookings') await renderBookings();
+    else if (view === 'clients') await renderClients();
+    else if (view === 'pricing') await renderPricing();
+    else if (view === 'promos') await renderPromos();
+    else if (view === 'categories') await renderCategories();
+    else if (view === 'surcharges') await renderSurcharges();
+    else if (view === 'quotes') await renderQuotes();
+    else if (view === 'templates') await renderTemplates();
+  } catch (err) {
+    container.innerHTML = `<div class="empty"><p>Erreur : ${err.message}</p></div>`;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════════════════════════ */
+function escapeHtml(s) {
+  if (s == null) return '';
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+}
+function fmtDate(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+function fmtDateLong(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  return d.toLocaleDateString('fr-FR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
+}
+function fmtMonth(d) {
+  return d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+}
+function todayISO() { return new Date().toISOString().slice(0, 10); }
+function statusLabel(s) {
+  return ({
+    pending: 'En attente',
+    confirmed: 'Confirmée',
+    taken: 'Prise en charge',
+    in_storage: 'En stock',
+    returned: 'Restituée',
+    cancelled: 'Annulée',
+  })[s] || s;
+}
+function statusBadge(s) {
+  return `<span class="badge badge-${s}"><span class="dot"></span>${statusLabel(s)}</span>`;
+}
+function washLabel(t) {
+  return ({
+    none: 'Aucun', exterieur: 'Extérieur', interieur: 'Intérieur',
+    complet: 'Complet', premium: 'Premium',
+  })[t] || '—';
+}
+
+/* ════════════════════════════════════════════════════════════
+   VIEW: DASHBOARD
+═══════════════════════════════════════════════════════════ */
+async function renderDashboard() {
+  const { stats } = { stats: await api('/api/admin/stats') };
+  STATE.stats = stats;
+  const c = document.getElementById('viewContainer');
+  c.innerHTML = `
+    <div class="topbar">
+      <div>
+        <h1>Tableau de bord</h1>
+        <p class="sub">Vue d'ensemble de l'activité — ${fmtDateLong(todayISO())}</p>
+      </div>
+      <button class="btn btn-gold" onclick="openBookingForm()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        Nouvelle réservation
+      </button>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat gold">
+        <div class="stat-label">Revenus du mois</div>
+        <div class="stat-val">${stats.month_revenue}<span class="cur">€</span></div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Total réservations</div>
+        <div class="stat-val">${stats.total_bookings}</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Départs aujourd'hui</div>
+        <div class="stat-val">${stats.today_departures}</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Retours aujourd'hui</div>
+        <div class="stat-val">${stats.today_returns}</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Voitures en stock</div>
+        <div class="stat-val">${stats.in_storage}</div>
+      </div>
+    </div>
+
+    <div class="card card-pad-0">
+      <div style="padding:18px 22px; border-bottom: 1px solid var(--line); display:flex; justify-content:space-between; align-items:center;">
+        <h2 style="font-size:1rem; font-weight:800;">Prochaines arrivées</h2>
+        <button class="btn btn-ghost btn-sm" onclick="switchView('calendar')">
+          Voir le calendrier
+        </button>
+      </div>
+      ${stats.upcoming.length === 0 ? `
+        <div class="empty">
+          <p>Aucune arrivée prévue</p>
+        </div>
+      ` : `
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Date</th><th>Heure</th><th>Client</th><th>Véhicule</th><th>Terminal</th><th>Réf.</th></tr>
+            </thead>
+            <tbody>
+              ${stats.upcoming.map(b => `
+                <tr onclick="openBookingDetail('${b.reference}')">
+                  <td><strong>${fmtDate(b.departure_date)}</strong></td>
+                  <td>${b.departure_time?.slice(0,5) || ''}</td>
+                  <td>${escapeHtml(b.customer_firstname)} ${escapeHtml(b.customer_lastname)}</td>
+                  <td>${escapeHtml(b.car_brand)} ${escapeHtml(b.car_model)} <span class="text-muted text-tiny">${escapeHtml(b.car_plate)}</span></td>
+                  <td>${escapeHtml(b.departure_terminal || '—')}</td>
+                  <td class="font-mono text-tiny">${b.reference}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `}
+    </div>
+  `;
+}
+
+/* ════════════════════════════════════════════════════════════
+   VIEW: BOOKINGS
+═══════════════════════════════════════════════════════════ */
+async function renderBookings(filters = {}) {
+  const params = new URLSearchParams(filters).toString();
+  const { bookings } = await api('/api/admin/bookings' + (params ? '?' + params : ''));
+  STATE.bookings = bookings;
+
+  const c = document.getElementById('viewContainer');
+  c.innerHTML = `
+    <div class="topbar">
+      <div>
+        <h1>Réservations</h1>
+        <p class="sub">${bookings.length} réservation(s) trouvée(s)</p>
+      </div>
+      <button class="btn btn-gold" onclick="openBookingForm()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        Nouvelle
+      </button>
+    </div>
+
+    <div class="filters">
+      <input type="search" id="bkSearch" placeholder="Référence, nom, plaque, email…" value="${escapeHtml(filters.q || '')}">
+      <select id="bkStatus">
+        <option value="">Tous les statuts</option>
+        <option value="pending"${filters.status==='pending'?' selected':''}>En attente</option>
+        <option value="confirmed"${filters.status==='confirmed'?' selected':''}>Confirmée</option>
+        <option value="taken"${filters.status==='taken'?' selected':''}>Prise en charge</option>
+        <option value="in_storage"${filters.status==='in_storage'?' selected':''}>En stock</option>
+        <option value="returned"${filters.status==='returned'?' selected':''}>Restituée</option>
+        <option value="cancelled"${filters.status==='cancelled'?' selected':''}>Annulée</option>
+      </select>
+      <input type="date" id="bkFrom" value="${filters.from || ''}" placeholder="Du">
+      <input type="date" id="bkTo" value="${filters.to || ''}" placeholder="Au">
+      <button class="btn btn-primary btn-sm" onclick="applyBookingFilters()">Filtrer</button>
+      <button class="btn btn-ghost btn-sm" onclick="renderBookings({})">Réinitialiser</button>
+    </div>
+
+    <div class="card card-pad-0">
+      ${bookings.length === 0 ? `
+        <div class="empty">
+          <p>Aucune réservation trouvée</p>
+        </div>
+      ` : `
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Réf.</th><th>Aller</th><th>Retour</th><th>Client</th>
+                <th>Véhicule</th><th>Statut</th><th>Total</th><th>Paiement</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${bookings.map(b => `
+                <tr onclick="openBookingDetail('${b.reference}')">
+                  <td class="font-mono text-tiny text-bold">${b.reference}</td>
+                  <td>
+                    <div>${fmtDate(b.departure_date)}</div>
+                    <div class="text-muted text-tiny">${b.departure_time?.slice(0,5) || ''} · ${escapeHtml(b.departure_terminal || '—')}</div>
+                  </td>
+                  <td>
+                    <div>${fmtDate(b.return_date)}</div>
+                    <div class="text-muted text-tiny">${b.return_time?.slice(0,5) || ''}</div>
+                  </td>
+                  <td>
+                    <div class="text-bold">${escapeHtml(b.customer_firstname)} ${escapeHtml(b.customer_lastname)}</div>
+                    <div class="text-muted text-tiny">${escapeHtml(b.customer_phone)}</div>
+                  </td>
+                  <td>
+                    <div>${escapeHtml(b.car_brand)} ${escapeHtml(b.car_model)}</div>
+                    <div class="text-muted text-tiny">${escapeHtml(b.car_plate)}${b.parking_spot ? ' · 📍 '+escapeHtml(b.parking_spot) : ''}</div>
+                  </td>
+                  <td>${statusBadge(b.status)}</td>
+                  <td class="text-bold">${b.total_price}€</td>
+                  <td><span class="${b.payment_status==='paid'?'payment-paid':'payment-pending'}">${b.payment_status==='paid'?'✓ Payé':'⏳ En attente'}</span></td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `}
+    </div>
+  `;
+}
+
+function applyBookingFilters() {
+  const filters = {
+    q: document.getElementById('bkSearch').value,
+    status: document.getElementById('bkStatus').value,
+    from: document.getElementById('bkFrom').value,
+    to: document.getElementById('bkTo').value,
+  };
+  Object.keys(filters).forEach(k => !filters[k] && delete filters[k]);
+  renderBookings(filters);
+}
+
+/* ════════════════════════════════════════════════════════════
+   BOOKING DETAIL & STATUS FLOW
+═══════════════════════════════════════════════════════════ */
+async function openBookingDetail(ref) {
+  const { bookings } = await api('/api/admin/bookings?q=' + encodeURIComponent(ref));
+  const b = bookings.find(x => x.reference === ref);
+  if (!b) return toast('Réservation introuvable', 'error');
+
+  const html = `
+    <div class="modal-bg show" onclick="if(event.target.classList.contains('modal-bg'))closeModal()">
+      <div class="modal-card lg">
+        <div class="modal-head">
+          <div>
+            <h2>Réservation ${b.reference}</h2>
+            <div class="mt-sm">${statusBadge(b.status)}
+              <span class="${b.payment_status==='paid'?'payment-paid':'payment-pending'} text-tiny" style="margin-left:8px;">${b.payment_status==='paid'?'✓ Payé':'⏳ Paiement en attente'}</span>
+            </div>
+          </div>
+          <button class="modal-close-btn" onclick="closeModal()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:24px;" class="bk-detail-grid">
+          <div>
+            <h3 class="text-tiny text-bold" style="text-transform:uppercase; letter-spacing:0.1em; color:var(--slate); margin-bottom:8px;">👤 Client</h3>
+            <div class="text-bold">${escapeHtml(b.customer_firstname)} ${escapeHtml(b.customer_lastname)}</div>
+            <div class="text-muted">${escapeHtml(b.customer_email)}</div>
+            <div class="text-muted">${escapeHtml(b.customer_phone)}</div>
+            ${b.customer_flight ? `<div class="text-muted">Vol : ${escapeHtml(b.customer_flight)}</div>` : ''}
+
+            <h3 class="text-tiny text-bold mt-md" style="text-transform:uppercase; letter-spacing:0.1em; color:var(--slate); margin-bottom:8px;">🚗 Véhicule</h3>
+            <div class="text-bold">${escapeHtml(b.car_brand)} ${escapeHtml(b.car_model)}</div>
+            <div class="text-muted">${escapeHtml(b.car_color)} · <strong>${escapeHtml(b.car_plate)}</strong></div>
+            <div class="text-muted">${b.car_size === 'suv' ? 'Gros véhicule (+10€)' : 'Standard'}</div>
+          </div>
+          <div>
+            <h3 class="text-tiny text-bold" style="text-transform:uppercase; letter-spacing:0.1em; color:var(--slate); margin-bottom:8px;">📅 Voyage</h3>
+            <div><strong>Aller :</strong> ${fmtDateLong(b.departure_date)} à ${b.departure_time?.slice(0,5)}${b.departure_terminal ? ' · '+escapeHtml(b.departure_terminal) : ''}</div>
+            <div><strong>Retour :</strong> ${fmtDateLong(b.return_date)} à ${b.return_time?.slice(0,5)}${b.return_terminal ? ' · '+escapeHtml(b.return_terminal) : ''}</div>
+
+            <h3 class="text-tiny text-bold mt-md" style="text-transform:uppercase; letter-spacing:0.1em; color:var(--slate); margin-bottom:8px;">💰 Tarif</h3>
+            <div>Base : ${b.base_price}€</div>
+            <div>Lavage : ${washLabel(b.wash_type)} ${b.wash_price > 0 ? `(${b.wash_price}€)` : ''}</div>
+            ${b.promo_code ? `<div>Code promo : <strong>${escapeHtml(b.promo_code)}</strong> <span class="text-success">(-${b.promo_discount}€)</span></div>` : ''}
+            <div class="text-bold text-gold" style="font-size:1.4rem; margin-top:8px;">${b.total_price}€</div>
+          </div>
+        </div>
+
+        <h3 class="text-tiny text-bold mt-lg" style="text-transform:uppercase; letter-spacing:0.1em; color:var(--slate); margin-bottom:8px;">⚡ Actions rapides</h3>
+        <div class="status-flow">
+          <button class="status-btn confirmed" onclick="updateBookingStatus('${b.id}','confirmed')">✓ Confirmer</button>
+          <button class="status-btn taken" onclick="updateBookingStatus('${b.id}','taken')">📥 Prise en charge</button>
+          <button class="status-btn in_storage" onclick="updateBookingStatus('${b.id}','in_storage')">🅿️ En stock</button>
+          <button class="status-btn returned" onclick="updateBookingStatus('${b.id}','returned')">📤 Restituer</button>
+          <button class="status-btn cancelled" onclick="if(confirm('Annuler cette réservation ?'))updateBookingStatus('${b.id}','cancelled')">✕ Annuler</button>
+          ${b.payment_status !== 'paid' ? `<button class="status-btn" onclick="markPaid('${b.id}')">💰 Marquer payé</button>` : ''}
+        </div>
+
+        <div class="form-grid mt-md">
+          <div class="field">
+            <label>📍 Emplacement parking</label>
+            <input type="text" id="parkingSpot" value="${escapeHtml(b.parking_spot || '')}" placeholder="Ex. B-12">
+          </div>
+          <div class="field">
+            <label>Numéro de vol</label>
+            <input type="text" id="customerFlight" value="${escapeHtml(b.customer_flight || '')}">
+          </div>
+          <div class="field full">
+            <label>Notes internes</label>
+            <textarea id="internalNotes" placeholder="Notes opérationnelles…">${escapeHtml(b.internal_notes || '')}</textarea>
+          </div>
+        </div>
+
+        <div class="flex-between mt-md">
+          <button class="btn btn-danger btn-sm" onclick="if(confirm('Supprimer définitivement cette réservation ?'))deleteBooking('${b.id}')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            Supprimer
+          </button>
+          <div class="flex gap-sm">
+            <button class="btn btn-gold" onclick="openShareBooking('${b.reference}')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+              Partager
+            </button>
+            <button class="btn btn-ghost" onclick="closeModal()">Fermer</button>
+            <button class="btn btn-primary" onclick="saveBookingDetails('${b.id}')">Enregistrer</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  document.getElementById('modalsContainer').innerHTML = html;
+}
+
+async function updateBookingStatus(id, status) {
+  try {
+    await api(`/api/admin/bookings?id=${id}`, { method: 'PATCH', body: JSON.stringify({ status }) });
+    toast('Statut mis à jour', 'success');
+    closeModal();
+    if (STATE.view === 'bookings') renderBookings();
+    if (STATE.view === 'calendar') renderCalendar();
+    if (STATE.view === 'dashboard') renderDashboard();
+  } catch (err) {
+    toast(err.message, 'error');
+  }
+}
+
+async function markPaid(id) {
+  try {
+    await api(`/api/admin/bookings?id=${id}`, { method: 'PATCH', body: JSON.stringify({ payment_status: 'paid' }) });
+    toast('Marqué comme payé', 'success');
+    closeModal();
+    if (STATE.view === 'bookings') renderBookings();
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+async function saveBookingDetails(id) {
+  try {
+    const updates = {
+      parking_spot: document.getElementById('parkingSpot').value.trim(),
+      internal_notes: document.getElementById('internalNotes').value.trim(),
+      customer_flight: document.getElementById('customerFlight').value.trim(),
+    };
+    await api(`/api/admin/bookings?id=${id}`, { method: 'PATCH', body: JSON.stringify(updates) });
+    toast('Réservation mise à jour', 'success');
+    closeModal();
+    if (STATE.view === 'bookings') renderBookings();
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+async function deleteBooking(id) {
+  try {
+    await api(`/api/admin/bookings?id=${id}`, { method: 'DELETE' });
+    toast('Réservation supprimée', 'success');
+    closeModal();
+    if (STATE.view === 'bookings') renderBookings();
+    if (STATE.view === 'calendar') renderCalendar();
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+/* ════════════════════════════════════════════════════════════
+   BOOKING FORM (création)
+═══════════════════════════════════════════════════════════ */
+function openBookingForm() {
+  const html = `
+    <div class="modal-bg show" onclick="if(event.target.classList.contains('modal-bg'))closeModal()">
+      <div class="modal-card lg">
+        <div class="modal-head">
+          <h2>Nouvelle réservation</h2>
+          <button class="modal-close-btn" onclick="closeModal()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        <h3 class="text-tiny text-bold" style="text-transform:uppercase; letter-spacing:0.1em; color:var(--slate); margin-bottom:8px;">Client</h3>
+        <div class="form-grid">
+          <div class="field"><label>Prénom *</label><input id="nf-firstname" required></div>
+          <div class="field"><label>Nom *</label><input id="nf-lastname" required></div>
+          <div class="field"><label>Email *</label><input id="nf-email" type="email" required></div>
+          <div class="field"><label>Téléphone *</label><input id="nf-phone" type="tel" required></div>
+          <div class="field full"><label>N° vol retour</label><input id="nf-flight"></div>
+        </div>
+
+        <h3 class="text-tiny text-bold mt-md" style="text-transform:uppercase; letter-spacing:0.1em; color:var(--slate); margin-bottom:8px;">Voyage</h3>
+        <div class="form-grid">
+          <div class="field"><label>Date départ *</label><input id="nf-dep-date" type="date" required></div>
+          <div class="field"><label>Heure départ *</label><input id="nf-dep-time" type="time" value="08:00" required></div>
+          <div class="field"><label>Terminal aller</label>
+            <select id="nf-dep-terminal"><option value="">—</option><option>Orly 1-2</option><option>Orly 3</option><option>Orly 4</option></select>
+          </div>
+          <div class="field"></div>
+          <div class="field"><label>Date retour *</label><input id="nf-ret-date" type="date" required></div>
+          <div class="field"><label>Heure retour *</label><input id="nf-ret-time" type="time" value="20:00" required></div>
+          <div class="field"><label>Terminal retour</label>
+            <select id="nf-ret-terminal"><option value="">—</option><option>Orly 1-2</option><option>Orly 3</option><option>Orly 4</option></select>
+          </div>
+        </div>
+
+        <h3 class="text-tiny text-bold mt-md" style="text-transform:uppercase; letter-spacing:0.1em; color:var(--slate); margin-bottom:8px;">Véhicule</h3>
+        <div class="form-grid">
+          <div class="field"><label>Marque *</label><input id="nf-brand" required></div>
+          <div class="field"><label>Modèle *</label><input id="nf-model" required></div>
+          <div class="field"><label>Couleur *</label><input id="nf-color" required></div>
+          <div class="field"><label>Plaque *</label><input id="nf-plate" required style="text-transform:uppercase"></div>
+          <div class="field full"><label>Type</label>
+            <select id="nf-size"><option value="standard">Standard</option><option value="suv">Gros véhicule (+10€)</option></select>
+          </div>
+        </div>
+
+        <h3 class="text-tiny text-bold mt-md" style="text-transform:uppercase; letter-spacing:0.1em; color:var(--slate); margin-bottom:8px;">Service</h3>
+        <div class="form-grid">
+          <div class="field"><label>Lavage</label>
+            <select id="nf-wash">
+              <option value='{"type":"none","price":0}'>Aucun</option>
+              <option value='{"type":"exterieur","price":29}'>Extérieur (29€)</option>
+              <option value='{"type":"interieur","price":49}'>Intérieur (49€)</option>
+              <option value='{"type":"complet","price":69}'>Complet (69€)</option>
+              <option value='{"type":"premium","price":99}'>Premium (99€)</option>
+            </select>
+          </div>
+          <div class="field"><label>Code promo</label><input id="nf-promo" style="text-transform:uppercase"></div>
+          <div class="field"><label>Statut</label>
+            <select id="nf-status">
+              <option value="confirmed">Confirmée</option>
+              <option value="pending">En attente</option>
+              <option value="taken">Prise en charge</option>
+              <option value="in_storage">En stock</option>
+            </select>
+          </div>
+          <div class="field"><label>Paiement</label>
+            <select id="nf-payment-method">
+              <option value="onsite">Sur place</option>
+              <option value="cash">Espèces</option>
+              <option value="card_onsite">CB sur place</option>
+              <option value="stripe">Stripe (en ligne)</option>
+            </select>
+          </div>
+          <div class="field"><label>Statut paiement</label>
+            <select id="nf-payment-status">
+              <option value="pending">En attente</option>
+              <option value="paid">Payé</option>
+            </select>
+          </div>
+          <div class="field"><label>Emplacement parking</label><input id="nf-parking-spot"></div>
+        </div>
+
+        <div class="flex-between mt-lg">
+          <div class="text-muted text-tiny">Le tarif sera calculé automatiquement</div>
+          <div class="flex gap-sm">
+            <button class="btn btn-ghost" onclick="closeModal()">Annuler</button>
+            <button class="btn btn-primary" onclick="submitNewBooking()">Créer la réservation</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  document.getElementById('modalsContainer').innerHTML = html;
+
+  const today = new Date(); const tom = new Date(today); tom.setDate(tom.getDate()+1);
+  const wk = new Date(today); wk.setDate(wk.getDate()+8);
+  document.getElementById('nf-dep-date').value = tom.toISOString().slice(0,10);
+  document.getElementById('nf-ret-date').value = wk.toISOString().slice(0,10);
+}
+
+async function submitNewBooking() {
+  try {
+    const wash = JSON.parse(document.getElementById('nf-wash').value);
+    const payload = {
+      customer: {
+        firstname: document.getElementById('nf-firstname').value.trim(),
+        lastname: document.getElementById('nf-lastname').value.trim(),
+        email: document.getElementById('nf-email').value.trim(),
+        phone: document.getElementById('nf-phone').value.trim(),
+        flight: document.getElementById('nf-flight').value.trim(),
+      },
+      car: {
+        brand: document.getElementById('nf-brand').value.trim(),
+        model: document.getElementById('nf-model').value.trim(),
+        color: document.getElementById('nf-color').value.trim(),
+        plate: document.getElementById('nf-plate').value.trim().toUpperCase(),
+        size: document.getElementById('nf-size').value,
+      },
+      departure: {
+        date: document.getElementById('nf-dep-date').value,
+        time: document.getElementById('nf-dep-time').value,
+        terminal: document.getElementById('nf-dep-terminal').value,
+      },
+      return: {
+        date: document.getElementById('nf-ret-date').value,
+        time: document.getElementById('nf-ret-time').value,
+        terminal: document.getElementById('nf-ret-terminal').value,
+      },
+      wash,
+      promoCode: document.getElementById('nf-promo').value.trim() || null,
+      status: document.getElementById('nf-status').value,
+      payment_method: document.getElementById('nf-payment-method').value,
+      payment_status: document.getElementById('nf-payment-status').value,
+      parking_spot: document.getElementById('nf-parking-spot').value.trim(),
+    };
+    if (!payload.customer.firstname || !payload.customer.email || !payload.car.brand) {
+      return toast('Champs requis manquants', 'error');
+    }
+    const { booking } = await api('/api/admin/bookings', { method: 'POST', body: JSON.stringify(payload) });
+    toast(`Réservation ${booking.reference} créée`, 'success');
+    closeModal();
+    if (STATE.view === 'bookings') renderBookings();
+    if (STATE.view === 'dashboard') renderDashboard();
+    if (STATE.view === 'calendar') renderCalendar();
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+/* ════════════════════════════════════════════════════════════
+   VIEW: CLIENTS
+═══════════════════════════════════════════════════════════ */
+async function renderClients(q = '') {
+  const { clients } = await api('/api/admin/clients' + (q ? '?q=' + encodeURIComponent(q) : ''));
+  STATE.clients = clients;
+  const c = document.getElementById('viewContainer');
+  c.innerHTML = `
+    <div class="topbar">
+      <div>
+        <h1>Clients</h1>
+        <p class="sub">${clients.length} client(s)</p>
+      </div>
+    </div>
+
+    <div class="filters">
+      <input type="search" id="clSearch" placeholder="Nom, email, téléphone…" value="${escapeHtml(q)}" oninput="if(this.value.length>2||this.value.length===0)renderClients(this.value)">
+    </div>
+
+    <div class="card card-pad-0">
+      ${clients.length === 0 ? '<div class="empty"><p>Aucun client</p></div>' : `
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Nom</th><th>Email</th><th>Téléphone</th><th>Réservations</th><th>Total dépensé</th><th>Inscrit</th></tr>
+            </thead>
+            <tbody>
+              ${clients.map(c => `
+                <tr onclick="openClientDetail('${c.id}')">
+                  <td>
+                    <div class="text-bold">${escapeHtml(c.firstname)} ${escapeHtml(c.lastname)} ${c.is_vip ? '⭐' : ''}</div>
+                  </td>
+                  <td>${escapeHtml(c.email)}</td>
+                  <td>${escapeHtml(c.phone)}</td>
+                  <td><strong>${c.total_bookings}</strong></td>
+                  <td class="text-bold">${c.total_spent}€</td>
+                  <td class="text-tiny text-muted">${fmtDate(c.created_at)}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `}
+    </div>
+  `;
+}
+
+async function openClientDetail(id) {
+  const { client, bookings } = await api('/api/admin/clients?id=' + id);
+  const html = `
+    <div class="modal-bg show" onclick="if(event.target.classList.contains('modal-bg'))closeModal()">
+      <div class="modal-card lg">
+        <div class="modal-head">
+          <h2>${escapeHtml(client.firstname)} ${escapeHtml(client.lastname)} ${client.is_vip ? '⭐' : ''}</h2>
+          <button class="modal-close-btn" onclick="closeModal()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        <div class="stats-grid" style="margin-bottom:18px;">
+          <div class="stat"><div class="stat-label">Réservations</div><div class="stat-val">${client.total_bookings}</div></div>
+          <div class="stat gold"><div class="stat-label">Total dépensé</div><div class="stat-val">${client.total_spent}<span class="cur">€</span></div></div>
+          <div class="stat"><div class="stat-label">Client depuis</div><div class="stat-val text-tiny" style="font-size:0.92rem; padding-top:8px;">${fmtDate(client.created_at)}</div></div>
+        </div>
+
+        <div class="form-grid">
+          <div class="field"><label>Prénom</label><input id="cl-firstname" value="${escapeHtml(client.firstname)}"></div>
+          <div class="field"><label>Nom</label><input id="cl-lastname" value="${escapeHtml(client.lastname)}"></div>
+          <div class="field"><label>Email</label><input id="cl-email" type="email" value="${escapeHtml(client.email)}"></div>
+          <div class="field"><label>Téléphone</label><input id="cl-phone" value="${escapeHtml(client.phone)}"></div>
+          <div class="field full">
+            <label>
+              <input type="checkbox" id="cl-vip" ${client.is_vip ? 'checked' : ''} style="width:auto; margin-right:6px;">
+              Client VIP ⭐
+            </label>
+          </div>
+          <div class="field full"><label>Notes internes</label><textarea id="cl-notes">${escapeHtml(client.notes || '')}</textarea></div>
+        </div>
+
+        <h3 class="text-tiny text-bold mt-md" style="text-transform:uppercase; letter-spacing:0.1em; color:var(--slate); margin-bottom:8px;">Historique de réservations</h3>
+        ${bookings.length === 0 ? '<div class="text-muted">Aucune réservation</div>' : `
+          <div class="table-wrap" style="max-height:240px; overflow-y:auto; border:1px solid var(--line); border-radius:10px;">
+            <table>
+              <tbody>
+                ${bookings.map(b => `
+                  <tr onclick="closeModal();setTimeout(()=>openBookingDetail('${b.reference}'),100)">
+                    <td class="font-mono text-tiny">${b.reference}</td>
+                    <td>${fmtDate(b.departure_date)}</td>
+                    <td>${escapeHtml(b.car_brand)} ${escapeHtml(b.car_model)}</td>
+                    <td>${statusBadge(b.status)}</td>
+                    <td class="text-bold">${b.total_price}€</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `}
+
+        <div class="flex-between mt-md">
+          <button class="btn btn-danger btn-sm" onclick="if(confirm('Supprimer ce client ?'))deleteClient('${client.id}')">Supprimer</button>
+          <div class="flex gap-sm">
+            <button class="btn btn-ghost" onclick="closeModal()">Fermer</button>
+            <button class="btn btn-primary" onclick="saveClient('${client.id}')">Enregistrer</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  document.getElementById('modalsContainer').innerHTML = html;
+}
+
+async function saveClient(id) {
+  try {
+    const updates = {
+      firstname: document.getElementById('cl-firstname').value.trim(),
+      lastname: document.getElementById('cl-lastname').value.trim(),
+      email: document.getElementById('cl-email').value.trim(),
+      phone: document.getElementById('cl-phone').value.trim(),
+      is_vip: document.getElementById('cl-vip').checked,
+      notes: document.getElementById('cl-notes').value.trim(),
+    };
+    await api('/api/admin/clients?id=' + id, { method: 'PATCH', body: JSON.stringify(updates) });
+    toast('Client mis à jour', 'success');
+    closeModal();
+    renderClients();
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+async function deleteClient(id) {
+  try {
+    await api('/api/admin/clients?id=' + id, { method: 'DELETE' });
+    toast('Client supprimé', 'success');
+    closeModal();
+    renderClients();
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+/* ════════════════════════════════════════════════════════════
+   VIEW: PRICING (rules, specials, blocks)
+═══════════════════════════════════════════════════════════ */
+async function renderPricing() {
+  const { rules, specials, blocks } = await api('/api/admin/pricing');
+  STATE.rules = rules; STATE.specials = specials; STATE.blocks = blocks;
+
+  const c = document.getElementById('viewContainer');
+  c.innerHTML = `
+    <div class="topbar">
+      <div>
+        <h1>Tarifs & dates</h1>
+        <p class="sub">Grille tarifaire, périodes spéciales et dates bloquées</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="flex-between mb-md">
+        <h2 style="font-size:1.05rem; font-weight:800;">📊 Grille tarifaire (par paliers de jours)</h2>
+        <button class="btn btn-primary btn-sm" onclick="openPricingForm('rule')">+ Ajouter un palier</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Min jours</th><th>Max jours</th><th>Prix (€)</th><th>Libellé</th><th></th></tr></thead>
+          <tbody>
+            ${rules.map(r => `
+              <tr>
+                <td><strong>${r.days_min}</strong></td>
+                <td><strong>${r.days_max}</strong></td>
+                <td class="text-bold text-gold">${r.price_eur}€</td>
+                <td>${escapeHtml(r.label || '—')}</td>
+                <td class="text-right">
+                  <button class="btn btn-ghost btn-sm" onclick="openPricingForm('rule','${r.id}')">Modifier</button>
+                  <button class="btn btn-danger btn-sm" onclick="deletePricing('rule','${r.id}')">×</button>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="flex-between mb-md">
+        <h2 style="font-size:1.05rem; font-weight:800;">🌟 Tarifs spéciaux (périodes)</h2>
+        <button class="btn btn-primary btn-sm" onclick="openPricingForm('special')">+ Ajouter une période</button>
+      </div>
+      ${specials.length === 0 ? '<div class="text-muted">Aucune période spéciale</div>' : `
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Nom</th><th>Du</th><th>Au</th><th>Multiplicateur</th><th>Supplément</th><th>Statut</th><th></th></tr></thead>
+            <tbody>
+              ${specials.map(s => `
+                <tr>
+                  <td class="text-bold">${escapeHtml(s.name)}</td>
+                  <td>${fmtDate(s.date_start)}</td>
+                  <td>${fmtDate(s.date_end)}</td>
+                  <td>×${s.multiplier}</td>
+                  <td>${s.flat_extra > 0 ? '+'+s.flat_extra+'€' : '—'}</td>
+                  <td>${s.active ? '<span class="text-success">✓ Actif</span>' : '<span class="text-muted">Inactif</span>'}</td>
+                  <td class="text-right">
+                    <button class="btn btn-ghost btn-sm" onclick="openPricingForm('special','${s.id}')">Modifier</button>
+                    <button class="btn btn-danger btn-sm" onclick="deletePricing('special','${s.id}')">×</button>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `}
+    </div>
+
+    <div class="card">
+      <div class="flex-between mb-md">
+        <h2 style="font-size:1.05rem; font-weight:800;">🚫 Dates bloquées (complet, fermeture)</h2>
+        <button class="btn btn-primary btn-sm" onclick="openPricingForm('block')">+ Bloquer des dates</button>
+      </div>
+      ${blocks.length === 0 ? '<div class="text-muted">Aucune date bloquée</div>' : `
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Du</th><th>Au</th><th>Raison</th><th></th></tr></thead>
+            <tbody>
+              ${blocks.map(b => `
+                <tr>
+                  <td>${fmtDate(b.date_start)}</td>
+                  <td>${fmtDate(b.date_end)}</td>
+                  <td>${escapeHtml(b.reason || '—')}</td>
+                  <td class="text-right">
+                    <button class="btn btn-ghost btn-sm" onclick="openPricingForm('block','${b.id}')">Modifier</button>
+                    <button class="btn btn-danger btn-sm" onclick="deletePricing('block','${b.id}')">×</button>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `}
+    </div>
+  `;
+}
+
+function openPricingForm(type, id) {
+  let item = {};
+  if (id) {
+    if (type === 'rule')    item = STATE.rules.find(x => x.id === id) || {};
+    if (type === 'special') item = STATE.specials.find(x => x.id === id) || {};
+    if (type === 'block')   item = STATE.blocks.find(x => x.id === id) || {};
+  }
+
+  let formHTML = '';
+  let titleStr = '';
+  if (type === 'rule') {
+    titleStr = id ? 'Modifier un palier' : 'Nouveau palier tarifaire';
+    formHTML = `
+      <div class="form-grid">
+        <div class="field"><label>Min jours *</label><input type="number" id="pf-days_min" min="1" value="${item.days_min || 1}" required></div>
+        <div class="field"><label>Max jours *</label><input type="number" id="pf-days_max" min="1" value="${item.days_max || 1}" required></div>
+        <div class="field"><label>Prix (€) *</label><input type="number" id="pf-price_eur" step="0.01" value="${item.price_eur || ''}" required></div>
+        <div class="field"><label>Libellé</label><input id="pf-label" value="${escapeHtml(item.label || '')}"></div>
+      </div>
+    `;
+  } else if (type === 'special') {
+    titleStr = id ? 'Modifier une période' : 'Nouvelle période spéciale';
+    formHTML = `
+      <div class="form-grid">
+        <div class="field full"><label>Nom *</label><input id="pf-name" value="${escapeHtml(item.name || '')}" placeholder="Ex. Vacances de Noël 2026" required></div>
+        <div class="field"><label>Date début *</label><input type="date" id="pf-date_start" value="${item.date_start || ''}" required></div>
+        <div class="field"><label>Date fin *</label><input type="date" id="pf-date_end" value="${item.date_end || ''}" required></div>
+        <div class="field"><label>Multiplicateur</label><input type="number" step="0.05" id="pf-multiplier" value="${item.multiplier || 1}"><div class="hint">Ex. 1.20 = +20%</div></div>
+        <div class="field"><label>Supplément fixe (€)</label><input type="number" step="0.01" id="pf-flat_extra" value="${item.flat_extra || 0}"></div>
+        <div class="field full"><label><input type="checkbox" id="pf-active" ${item.active !== false ? 'checked' : ''} style="width:auto;margin-right:6px"> Actif</label></div>
+      </div>
+    `;
+  } else {
+    titleStr = id ? 'Modifier des dates bloquées' : 'Bloquer des dates';
+    formHTML = `
+      <div class="form-grid">
+        <div class="field"><label>Date début *</label><input type="date" id="pf-date_start" value="${item.date_start || ''}" required></div>
+        <div class="field"><label>Date fin *</label><input type="date" id="pf-date_end" value="${item.date_end || ''}" required></div>
+        <div class="field full"><label>Raison</label><input id="pf-reason" value="${escapeHtml(item.reason || '')}" placeholder="Complet, congés, etc."></div>
+      </div>
+    `;
+  }
+
+  const html = `
+    <div class="modal-bg show" onclick="if(event.target.classList.contains('modal-bg'))closeModal()">
+      <div class="modal-card">
+        <div class="modal-head">
+          <h2>${titleStr}</h2>
+          <button class="modal-close-btn" onclick="closeModal()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+        ${formHTML}
+        <div class="flex-between mt-md">
+          <button class="btn btn-ghost" onclick="closeModal()">Annuler</button>
+          <button class="btn btn-primary" onclick="submitPricing('${type}'${id ? `,'${id}'` : ''})">Enregistrer</button>
+        </div>
+      </div>
+    </div>
+  `;
+  document.getElementById('modalsContainer').innerHTML = html;
+}
+
+async function submitPricing(type, id) {
+  try {
+    let payload = {};
+    if (type === 'rule') {
+      payload = {
+        days_min: parseInt(document.getElementById('pf-days_min').value, 10),
+        days_max: parseInt(document.getElementById('pf-days_max').value, 10),
+        price_eur: parseFloat(document.getElementById('pf-price_eur').value),
+        label: document.getElementById('pf-label').value.trim(),
+      };
+    } else if (type === 'special') {
+      payload = {
+        name: document.getElementById('pf-name').value.trim(),
+        date_start: document.getElementById('pf-date_start').value,
+        date_end: document.getElementById('pf-date_end').value,
+        multiplier: parseFloat(document.getElementById('pf-multiplier').value) || 1,
+        flat_extra: parseFloat(document.getElementById('pf-flat_extra').value) || 0,
+        active: document.getElementById('pf-active').checked,
+      };
+    } else {
+      payload = {
+        date_start: document.getElementById('pf-date_start').value,
+        date_end: document.getElementById('pf-date_end').value,
+        reason: document.getElementById('pf-reason').value.trim(),
+      };
+    }
+    const url = `/api/admin/pricing?type=${type}` + (id ? `&id=${id}` : '');
+    await api(url, { method: id ? 'PATCH' : 'POST', body: JSON.stringify(payload) });
+    toast('Enregistré', 'success');
+    closeModal();
+    renderPricing();
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+async function deletePricing(type, id) {
+  if (!confirm('Supprimer cet élément ?')) return;
+  try {
+    await api(`/api/admin/pricing?type=${type}&id=${id}`, { method: 'DELETE' });
+    toast('Supprimé', 'success');
+    renderPricing();
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+/* ════════════════════════════════════════════════════════════
+   VIEW: PROMOS
+═══════════════════════════════════════════════════════════ */
+async function renderPromos() {
+  const { codes } = await api('/api/admin/promos');
+  STATE.promos = codes;
+  const c = document.getElementById('viewContainer');
+  c.innerHTML = `
+    <div class="topbar">
+      <div>
+        <h1>Codes promo</h1>
+        <p class="sub">${codes.length} code(s)</p>
+      </div>
+      <button class="btn btn-gold" onclick="openPromoForm()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        Nouveau code
+      </button>
+    </div>
+
+    <div class="card card-pad-0">
+      ${codes.length === 0 ? '<div class="empty"><p>Aucun code promo</p></div>' : `
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Code</th><th>Réduction</th><th>Validité</th><th>Utilisations</th><th>Statut</th><th></th></tr></thead>
+            <tbody>
+              ${codes.map(c => `
+                <tr>
+                  <td class="font-mono text-bold">${escapeHtml(c.code)}</td>
+                  <td><strong>${c.discount_type === 'percent' ? '-'+c.discount_val+'%' : '-'+c.discount_val+'€'}</strong></td>
+                  <td class="text-tiny">${c.valid_from ? fmtDate(c.valid_from) : '∞'} → ${c.valid_until ? fmtDate(c.valid_until) : '∞'}</td>
+                  <td>${c.uses_count}${c.max_uses ? ' / '+c.max_uses : ''}</td>
+                  <td>${c.active ? '<span class="text-success">✓ Actif</span>' : '<span class="text-muted">Inactif</span>'}</td>
+                  <td class="text-right">
+                    <button class="btn btn-ghost btn-sm" onclick="openPromoForm('${c.id}')">Modifier</button>
+                    <button class="btn btn-danger btn-sm" onclick="deletePromo('${c.id}')">×</button>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `}
+    </div>
+  `;
+}
+
+function openPromoForm(id) {
+  const item = id ? STATE.promos.find(x => x.id === id) : {};
+  const html = `
+    <div class="modal-bg show" onclick="if(event.target.classList.contains('modal-bg'))closeModal()">
+      <div class="modal-card">
+        <div class="modal-head">
+          <h2>${id ? 'Modifier le code' : 'Nouveau code promo'}</h2>
+          <button class="modal-close-btn" onclick="closeModal()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div class="form-grid">
+          <div class="field full"><label>Code *</label><input id="prf-code" value="${escapeHtml(item.code || '')}" style="text-transform:uppercase" placeholder="Ex. ETE2026" required></div>
+          <div class="field"><label>Type</label>
+            <select id="prf-discount_type">
+              <option value="percent" ${item.discount_type==='percent'?'selected':''}>Pourcentage (%)</option>
+              <option value="fixed" ${item.discount_type==='fixed'?'selected':''}>Montant fixe (€)</option>
+            </select>
+          </div>
+          <div class="field"><label>Valeur *</label><input type="number" step="0.01" id="prf-discount_val" value="${item.discount_val || ''}" required></div>
+          <div class="field"><label>Date début</label><input type="date" id="prf-valid_from" value="${item.valid_from || ''}"></div>
+          <div class="field"><label>Date fin</label><input type="date" id="prf-valid_until" value="${item.valid_until || ''}"></div>
+          <div class="field full"><label>Utilisations max (vide = illimité)</label><input type="number" id="prf-max_uses" value="${item.max_uses || ''}"></div>
+          <div class="field full"><label><input type="checkbox" id="prf-active" ${item.active !== false ? 'checked' : ''} style="width:auto;margin-right:6px"> Actif</label></div>
+        </div>
+        <div class="flex-between mt-md">
+          <button class="btn btn-ghost" onclick="closeModal()">Annuler</button>
+          <button class="btn btn-primary" onclick="submitPromo(${id ? `'${id}'` : ''})">Enregistrer</button>
+        </div>
+      </div>
+    </div>
+  `;
+  document.getElementById('modalsContainer').innerHTML = html;
+}
+
+async function submitPromo(id) {
+  try {
+    const payload = {
+      code: document.getElementById('prf-code').value.trim().toUpperCase(),
+      discount_type: document.getElementById('prf-discount_type').value,
+      discount_val: parseFloat(document.getElementById('prf-discount_val').value),
+      valid_from: document.getElementById('prf-valid_from').value || null,
+      valid_until: document.getElementById('prf-valid_until').value || null,
+      max_uses: parseInt(document.getElementById('prf-max_uses').value, 10) || null,
+      active: document.getElementById('prf-active').checked,
+    };
+    const url = '/api/admin/promos' + (id ? '?id=' + id : '');
+    await api(url, { method: id ? 'PATCH' : 'POST', body: JSON.stringify(payload) });
+    toast('Enregistré', 'success');
+    closeModal();
+    renderPromos();
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+async function deletePromo(id) {
+  if (!confirm('Supprimer ce code promo ?')) return;
+  try {
+    await api('/api/admin/promos?id=' + id, { method: 'DELETE' });
+    toast('Supprimé', 'success');
+    renderPromos();
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+/* ════════════════════════════════════════════════════════════
+   VIEW: CALENDAR
+═══════════════════════════════════════════════════════════ */
+async function renderCalendar() {
+  const start = new Date(STATE.calDate.getFullYear(), STATE.calDate.getMonth() - 1, 1);
+  const end = new Date(STATE.calDate.getFullYear(), STATE.calDate.getMonth() + 2, 0);
+  const fromIso = start.toISOString().slice(0,10);
+  const toIso = end.toISOString().slice(0,10);
+
+  const [{ bookings }, { blocks }] = await Promise.all([
+    api(`/api/admin/bookings?from=${fromIso}&to=${toIso}&limit=500`),
+    api('/api/admin/pricing'),
+  ]);
+  STATE.bookings = bookings;
+  STATE.blocks = blocks;
+
+  const c = document.getElementById('viewContainer');
+  c.innerHTML = `
+    <div class="topbar">
+      <div>
+        <h1>Calendrier</h1>
+        <p class="sub">Vue ${STATE.calMode === 'month' ? 'mensuelle' : 'hebdomadaire'} des arrivées et départs</p>
+      </div>
+      <button class="btn btn-gold" onclick="openBookingForm()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        Nouvelle
+      </button>
+    </div>
+
+    <div class="cal-toolbar">
+      <div class="cal-nav">
+        <button onclick="calPrev()" aria-label="Précédent">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <div class="cal-title" id="calTitle"></div>
+        <button onclick="calNext()" aria-label="Suivant">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+      </div>
+      <div class="flex gap-sm">
+        <button class="btn btn-ghost btn-sm" onclick="calToday()">Aujourd'hui</button>
+        <div class="cal-views">
+          <button class="${STATE.calMode==='month'?'active':''}" onclick="calSetMode('month')">Mois</button>
+          <button class="${STATE.calMode==='week'?'active':''}" onclick="calSetMode('week')">Semaine</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="padding:8px;">
+      <div style="display:flex; gap:14px; padding:8px 14px; font-size:0.78rem; flex-wrap:wrap;">
+        <span class="flex" style="align-items:center; gap:6px;"><span style="width:12px; height:12px; background:#3b82f6; border-radius:3px;"></span>Départ (aller)</span>
+        <span class="flex" style="align-items:center; gap:6px;"><span style="width:12px; height:12px; background:#f59e0b; border-radius:3px;"></span>Retour</span>
+        <span class="flex" style="align-items:center; gap:6px;"><span style="width:12px; height:12px; background:#fee2e2; border-radius:3px;"></span>Bloqué</span>
+        <span class="flex" style="align-items:center; gap:6px;"><span style="width:12px; height:12px; background:#FBF3E0; border-radius:3px;"></span>Aujourd'hui</span>
+      </div>
+      <div id="calBody"></div>
+    </div>
+  `;
+
+  drawCalendar();
+}
+
+function calPrev() {
+  if (STATE.calMode === 'month') {
+    STATE.calDate.setMonth(STATE.calDate.getMonth() - 1);
+  } else {
+    STATE.calDate.setDate(STATE.calDate.getDate() - 7);
+  }
+  renderCalendar();
+}
+function calNext() {
+  if (STATE.calMode === 'month') {
+    STATE.calDate.setMonth(STATE.calDate.getMonth() + 1);
+  } else {
+    STATE.calDate.setDate(STATE.calDate.getDate() + 7);
+  }
+  renderCalendar();
+}
+function calToday() {
+  STATE.calDate = new Date();
+  renderCalendar();
+}
+function calSetMode(mode) {
+  STATE.calMode = mode;
+  renderCalendar();
+}
+
+function drawCalendar() {
+  document.getElementById('calTitle').textContent = STATE.calMode === 'month'
+    ? fmtMonth(STATE.calDate)
+    : weekRangeLabel(STATE.calDate);
+
+  if (STATE.calMode === 'month') {
+    drawMonthView();
+  } else {
+    drawWeekView();
+  }
+}
+
+function isDateBlocked(iso) {
+  return STATE.blocks.some(b => iso >= b.date_start && iso <= b.date_end);
+}
+
+function drawMonthView() {
+  const year = STATE.calDate.getFullYear();
+  const month = STATE.calDate.getMonth();
+  const first = new Date(year, month, 1);
+  const last = new Date(year, month + 1, 0);
+  const startDay = (first.getDay() + 6) % 7; // lundi = 0
+  const total = startDay + last.getDate();
+  const rows = Math.ceil(total / 7);
+
+  const todayIso = todayISO();
+
+  const days = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+  let html = '<div class="cal-month">';
+  days.forEach(d => html += `<div class="cal-day-header">${d}</div>`);
+
+  for (let i = 0; i < rows * 7; i++) {
+    const dayNum = i - startDay + 1;
+    const cur = new Date(year, month, dayNum);
+    const iso = cur.toISOString().slice(0, 10);
+    const inMonth = cur.getMonth() === month;
+    const isToday = iso === todayIso;
+    const isBlocked = isDateBlocked(iso);
+
+    const deps = STATE.bookings.filter(b => b.departure_date === iso && b.status !== 'cancelled');
+    const rets = STATE.bookings.filter(b => b.return_date === iso && b.status !== 'cancelled');
+
+    let classes = 'cal-day';
+    if (!inMonth) classes += ' other-month';
+    if (isToday) classes += ' today';
+    if (isBlocked) classes += ' blocked';
+
+    html += `<div class="${classes}">
+      <div class="cal-day-num">${cur.getDate()}</div>
+      <div class="cal-events">
+        ${deps.slice(0, 3).map(b => `<div class="cal-event dep" onclick="event.stopPropagation();openBookingDetail('${b.reference}')" title="${escapeHtml(b.customer_lastname)} - ${escapeHtml(b.car_plate)} - ${b.departure_time?.slice(0,5)}">${b.departure_time?.slice(0,5) || ''} ${escapeHtml(b.customer_lastname)}</div>`).join('')}
+        ${rets.slice(0, 3).map(b => `<div class="cal-event ret" onclick="event.stopPropagation();openBookingDetail('${b.reference}')" title="${escapeHtml(b.customer_lastname)} - ${escapeHtml(b.car_plate)} - ${b.return_time?.slice(0,5)}">${b.return_time?.slice(0,5) || ''} ${escapeHtml(b.customer_lastname)}</div>`).join('')}
+        ${(deps.length + rets.length) > 6 ? `<div class="text-tiny text-muted">+${deps.length + rets.length - 6} autres</div>` : ''}
+      </div>
+    </div>`;
+  }
+  html += '</div>';
+  document.getElementById('calBody').innerHTML = html;
+}
+
+function weekRangeLabel(d) {
+  const start = new Date(d);
+  start.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+  const end = new Date(start); end.setDate(start.getDate() + 6);
+  return `${start.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })} → ${end.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}`;
+}
+
+function drawWeekView() {
+  const start = new Date(STATE.calDate);
+  start.setDate(start.getDate() - ((start.getDay() + 6) % 7));
+  const todayIso = todayISO();
+  const days = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(start); d.setDate(start.getDate() + i);
+    days.push(d);
+  }
+
+  const dayNames = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+
+  let html = '<div class="cal-week">';
+  html += '<div class="cal-week-header"></div>';
+  days.forEach((d, i) => {
+    const iso = d.toISOString().slice(0,10);
+    const isToday = iso === todayIso;
+    html += `<div class="cal-week-header${isToday ? ' today-h' : ''}">
+      <div class="day">${dayNames[i]}</div>
+      <div class="num">${d.getDate()}</div>
+    </div>`;
+  });
+
+  // Ligne Départs
+  html += '<div class="cal-week-row label">↗ Départs</div>';
+  days.forEach(d => {
+    const iso = d.toISOString().slice(0,10);
+    const deps = STATE.bookings.filter(b => b.departure_date === iso && b.status !== 'cancelled');
+    html += `<div class="cal-week-row cal-week-cell">
+      ${deps.map(b => `<div class="cal-event dep" onclick="openBookingDetail('${b.reference}')" title="${escapeHtml(b.customer_lastname)} - ${escapeHtml(b.car_plate)}">
+        ${b.departure_time?.slice(0,5)} ${escapeHtml(b.customer_lastname)} <span class="text-tiny" style="opacity:0.7">${escapeHtml(b.car_plate)}</span>
+      </div>`).join('')}
+    </div>`;
+  });
+
+  // Ligne Retours
+  html += '<div class="cal-week-row label">↙ Retours</div>';
+  days.forEach(d => {
+    const iso = d.toISOString().slice(0,10);
+    const rets = STATE.bookings.filter(b => b.return_date === iso && b.status !== 'cancelled');
+    html += `<div class="cal-week-row cal-week-cell">
+      ${rets.map(b => `<div class="cal-event ret" onclick="openBookingDetail('${b.reference}')" title="${escapeHtml(b.customer_lastname)} - ${escapeHtml(b.car_plate)}">
+        ${b.return_time?.slice(0,5)} ${escapeHtml(b.customer_lastname)} <span class="text-tiny" style="opacity:0.7">${escapeHtml(b.car_plate)}</span>
+      </div>`).join('')}
+    </div>`;
+  });
+
+  // Ligne En stock
+  html += '<div class="cal-week-row label">🅿️ En stock</div>';
+  days.forEach(d => {
+    const iso = d.toISOString().slice(0,10);
+    const inStorage = STATE.bookings.filter(b =>
+      b.status !== 'cancelled' &&
+      b.departure_date <= iso && b.return_date >= iso
+    );
+    html += `<div class="cal-week-row cal-week-cell">
+      ${inStorage.length > 0 ? `<div class="text-bold text-gold" style="font-size:1.2rem;">${inStorage.length}</div><div class="text-tiny text-muted">véhicule(s)</div>` : ''}
+    </div>`;
+  });
+
+  html += '</div>';
+  document.getElementById('calBody').innerHTML = html;
+}
+
+/* ════════════════════════════════════════════════════════════
+   MODAL HELPERS
+═══════════════════════════════════════════════════════════ */
+function closeModal() {
+  document.getElementById('modalsContainer').innerHTML = '';
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+});
+
+/* ════════════════════════════════════════════════════════════
+   SHARE BOOKING — Email / SMS / WhatsApp
+═══════════════════════════════════════════════════════════ */
+async function openShareBooking(ref) {
+  const { bookings } = await api('/api/admin/bookings?q=' + encodeURIComponent(ref));
+  const b = bookings.find(x => x.reference === ref);
+  if (!b) return toast('Introuvable', 'error');
+  STATE.shareBooking = b;
+
+  // Texte par défaut formaté pour partage
+  const sharePlain = buildShareText(b, 'plain');
+
+  const html = `
+    <div class="modal-bg show" onclick="if(event.target.classList.contains('modal-bg'))closeModal()">
+      <div class="modal-card lg">
+        <div class="modal-head">
+          <div>
+            <h2>Partager la réservation ${b.reference}</h2>
+            <p class="sub">Envoie toutes les infos à un collègue, le voiturier, ou un proche</p>
+          </div>
+          <button class="modal-close-btn" onclick="closeModal()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        <h3 class="text-tiny text-bold" style="text-transform:uppercase; letter-spacing:0.1em; color:var(--slate); margin-bottom:8px;">Aperçu du message</h3>
+        <textarea id="shareText" rows="14" style="width:100%; padding:14px; background:var(--bg-soft); border:1.5px solid transparent; border-radius:10px; font-family:inherit; font-size:0.86rem; line-height:1.55; color:var(--ink); outline:none; transition:all 0.2s;" oninput="this.style.borderColor='var(--gold)'">${escapeHtml(sharePlain)}</textarea>
+        <p class="hint mt-sm">Tu peux modifier le texte avant d'envoyer</p>
+
+        <h3 class="text-tiny text-bold mt-md" style="text-transform:uppercase; letter-spacing:0.1em; color:var(--slate); margin-bottom:8px;">Choisis le canal</h3>
+
+        <div class="share-grid" style="display:grid; grid-template-columns:repeat(2, 1fr); gap:10px; margin-bottom:14px;">
+          <button class="share-btn" onclick="shareViaWhatsApp()" style="display:flex; align-items:center; gap:12px; padding:14px 16px; background:#25D366; color:white; border-radius:12px; font-weight:700; transition:all 0.2s; cursor:pointer; border:none;">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="width:24px; height:24px; flex-shrink:0;"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.297-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413"/></svg>
+            <span>WhatsApp</span>
+          </button>
+
+          <button class="share-btn" onclick="shareViaSMS()" style="display:flex; align-items:center; gap:12px; padding:14px 16px; background:#0EA5E9; color:white; border-radius:12px; font-weight:700; cursor:pointer; border:none;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px; height:22px; flex-shrink:0;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <span>SMS</span>
+          </button>
+
+          <button class="share-btn" onclick="shareViaEmail()" style="display:flex; align-items:center; gap:12px; padding:14px 16px; background:var(--ink); color:white; border-radius:12px; font-weight:700; cursor:pointer; border:none;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px; height:22px; flex-shrink:0;"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <span>Email (mailto)</span>
+          </button>
+
+          <button class="share-btn" onclick="copyShareText()" style="display:flex; align-items:center; gap:12px; padding:14px 16px; background:var(--bg-soft); color:var(--ink); border-radius:12px; font-weight:700; cursor:pointer; border:2px solid var(--line);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px; height:22px; flex-shrink:0;"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <span>Copier le texte</span>
+          </button>
+        </div>
+
+        <h3 class="text-tiny text-bold mt-md" style="text-transform:uppercase; letter-spacing:0.1em; color:var(--slate); margin-bottom:8px;">📧 Envoyer par email à une adresse spécifique</h3>
+        <div style="display:flex; gap:8px; align-items:flex-end;">
+          <div style="flex:1;">
+            <input type="email" id="shareEmailTo" placeholder="destinataire@email.com" style="width:100%; padding:11px 14px; background:var(--bg-soft); border:1.5px solid transparent; border-radius:10px; font-size:0.9rem; outline:none;">
+          </div>
+          <button class="btn btn-gold" onclick="sendShareEmail('${b.reference}')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:14px; height:14px;"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            Envoyer
+          </button>
+        </div>
+        <p class="hint mt-sm">Email envoyé via Resend, format HTML soigné</p>
+      </div>
+    </div>
+  `;
+  document.getElementById('modalsContainer').innerHTML = html;
+}
+
+function buildShareText(b, format = 'plain') {
+  const fmtD = (iso) => {
+    if (!iso) return '—';
+    return new Date(iso).toLocaleDateString('fr-FR', { weekday:'long', day:'2-digit', month:'long', year:'numeric' });
+  };
+  const t = (s) => (s || '').slice(0,5);
+  const status = ({pending:'En attente', confirmed:'Confirmée', taken:'Prise en charge', in_storage:'En stock', returned:'Restituée', cancelled:'Annulée'})[b.status] || b.status;
+
+  const lines = [];
+  lines.push(`🚗 RÉSERVATION ${b.reference}`);
+  lines.push(`Statut : ${status}${b.payment_status === 'paid' ? ' · ✓ Payé' : ' · ⏳ Paiement en attente'}`);
+  lines.push('');
+  lines.push('👤 CLIENT');
+  lines.push(`${b.customer_firstname} ${b.customer_lastname}`);
+  lines.push(`📱 ${b.customer_phone}`);
+  lines.push(`📧 ${b.customer_email}`);
+  if (b.customer_flight) lines.push(`✈️ Vol : ${b.customer_flight}`);
+  lines.push('');
+  lines.push('📅 VOYAGE');
+  lines.push(`Aller : ${fmtD(b.departure_date)} à ${t(b.departure_time)}${b.departure_terminal ? ' · Terminal ' + b.departure_terminal : ''}`);
+  lines.push(`Retour : ${fmtD(b.return_date)} à ${t(b.return_time)}${b.return_terminal ? ' · Terminal ' + b.return_terminal : ''}`);
+  lines.push('');
+  lines.push('🚙 VÉHICULE');
+  lines.push(`${b.car_brand} ${b.car_model}${b.car_color ? ' · ' + b.car_color : ''}`);
+  lines.push(`Plaque : ${b.car_plate}`);
+  const catNames = {citadine:'Citadine', berline:'Berline / Break', suv:'SUV / 4×4 / Monospace', utilitaire:'Van / Utilitaire'};
+  lines.push(`Catégorie : ${catNames[b.car_category_code] || b.car_category_code || 'Citadine'}`);
+  lines.push('');
+  lines.push('💰 TARIF');
+  if (b.wash_type && b.wash_type !== 'none') {
+    const wlbl = {exterieur:'Lavage extérieur', interieur:'Lavage intérieur', complet:'Lavage complet', premium:'Lavage premium'}[b.wash_type] || b.wash_type;
+    lines.push(`${wlbl} : ${b.wash_price}€`);
+  }
+  if (b.has_covered_parking) lines.push(`🅿️ Parking couvert : +20€`);
+  if (b.has_priority_access) lines.push(`⚡ Accès prioritaire : +20€`);
+  if (b.promo_code) lines.push(`Code promo ${b.promo_code} : -${b.promo_discount}€`);
+  lines.push(`💵 TOTAL : ${b.total_price}€`);
+
+  if (b.parking_spot) {
+    lines.push('');
+    lines.push(`📍 Emplacement parking : ${b.parking_spot}`);
+  }
+  if (b.internal_notes) {
+    lines.push('');
+    lines.push(`📝 Notes : ${b.internal_notes}`);
+  }
+  lines.push('');
+  lines.push('— Voiturier Orly');
+
+  return lines.join('\n');
+}
+
+function shareViaWhatsApp() {
+  const text = document.getElementById('shareText').value;
+  const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+  window.open(url, '_blank');
+}
+
+function shareViaSMS() {
+  const text = document.getElementById('shareText').value;
+  // Format SMS universel (iOS et Android)
+  const url = `sms:?&body=${encodeURIComponent(text)}`;
+  window.location.href = url;
+}
+
+function shareViaEmail() {
+  const text = document.getElementById('shareText').value;
+  const b = STATE.shareBooking;
+  const subject = `Réservation Voiturier Orly — ${b.reference} — ${b.customer_firstname} ${b.customer_lastname}`;
+  const url = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text)}`;
+  window.location.href = url;
+}
+
+async function copyShareText() {
+  const text = document.getElementById('shareText').value;
+  try {
+    await navigator.clipboard.writeText(text);
+    toast('Copié ! Tu peux le coller où tu veux.', 'success');
+  } catch {
+    // Fallback pour navigateurs anciens
+    const ta = document.getElementById('shareText');
+    ta.select();
+    document.execCommand('copy');
+    toast('Copié !', 'success');
+  }
+}
+
+async function sendShareEmail(ref) {
+  const to = document.getElementById('shareEmailTo').value.trim();
+  const text = document.getElementById('shareText').value;
+  if (!to || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) {
+    toast('Email invalide', 'error');
+    return;
+  }
+  try {
+    await api('/api/admin/share-booking', {
+      method: 'POST',
+      body: JSON.stringify({ reference: ref, to, text }),
+    });
+    toast(`Email envoyé à ${to}`, 'success');
+  } catch (err) {
+    toast(err.message, 'error');
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   BOOT
+═══════════════════════════════════════════════════════════ */
+if (STATE.token) {
+  showApp();
+} else {
+  document.getElementById('loginScreen').style.display = 'flex';
+}
+</script>
+</body>
+</html>

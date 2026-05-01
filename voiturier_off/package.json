@@ -1,0 +1,20 @@
+{
+  "name": "voiturier-orly",
+  "version": "1.0.0",
+  "description": "Site officiel et back-office Voiturier Orly — Service voiturier premium à Paris-Orly",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "npx serve public",
+    "build": "mkdir -p public",
+    "deploy": "vercel --prod"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.4",
+    "resend": "^4.0.0",
+    "stripe": "^16.12.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
