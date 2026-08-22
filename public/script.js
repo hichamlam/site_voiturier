@@ -553,9 +553,50 @@ function closeCGV() {
   document.body.classList.remove('modal-open');
 }
 
+/* Moyens de paiement réellement disponibles sur ce déploiement.
+   Tant que Stripe n'est pas configuré (clé + webhook), on retire le paiement
+   par carte au lieu d'afficher un bouton qui échouerait, et on bascule le
+   tunnel sur « Sur place ». Aucune promesse affichée qui ne soit tenable. */
+async function applyPaymentConfig() {
+  let cfg;
+  try {
+    const res = await fetch('/api/config');
+    if (!res.ok) return;
+    cfg = await res.json();
+  } catch { return; }
+  if (cfg.paiementEnLigne !== false) return;
+
+  const stripeOpt = document.getElementById('payment-option-stripe');
+  const onsiteOpt = document.getElementById('payment-option-onsite');
+  if (stripeOpt) {
+    stripeOpt.hidden = true;
+    stripeOpt.classList.remove('selected');
+    const radio = stripeOpt.querySelector('input[type="radio"]');
+    if (radio) { radio.checked = false; radio.disabled = true; }
+  }
+  if (onsiteOpt) {
+    onsiteOpt.classList.add('selected');
+    const radio = onsiteOpt.querySelector('input[type="radio"]');
+    if (radio) radio.checked = true;
+  }
+  STATE.booking.payment = 'onsite';
+
+  const trust = document.getElementById('trust-payment');
+  if (trust) {
+    trust.innerHTML = '<strong>Paiement sur place</strong>' +
+      '<span>Espèces ou carte bancaire le jour du départ</span>';
+  }
+  const faq = document.getElementById('faq-payment');
+  if (faq) {
+    faq.textContent = 'Sur place, le jour du départ, en espèces ou par carte bancaire. ' +
+      'Rien à régler au moment de la réservation.';
+  }
+}
+
 /* Init */
 document.addEventListener('DOMContentLoaded', () => {
   simInit();
+  applyPaymentConfig();
   // Init dates du tunnel aussi (au cas où ouvert sans simulateur)
   const today = new Date();
   const tom = new Date(today); tom.setDate(tom.getDate()+1);
