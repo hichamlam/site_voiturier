@@ -4,44 +4,51 @@ Site vitrine + tunnel de réservation Stripe + back-office complet, prêt à dé
 
 ---
 
-## ✅ CE QUI EST DÉJÀ FAIT POUR TOI
+## ⚠️ AVANT TOUT — LA BASE DE DONNÉES
 
-J'ai pré-configuré ton **Supabase** automatiquement. Tu n'as RIEN à faire dessus, sauf récupérer **une seule clé secrète** (étape 1 ci-dessous).
+Une ancienne version de ce README annonçait un projet Supabase déjà prêt
+(`menkykunwhevlkbthubj.supabase.co`). **Ce projet n'appartient pas au compte Supabase du
+propriétaire du site** : son dashboard renvoie une erreur de permission, et la clé
+`service_role` ne peut donc pas être récupérée. Il faut repartir d'un projet neuf.
 
-**Projet Supabase créé :**
-- Nom : `voiturier-orly`
-- URL : `https://menkykunwhevlkbthubj.supabase.co`
-- Région : Paris (eu-west-3)
-- Toutes les tables créées et pré-remplies :
-  - ✅ Tarifs (10 paliers)
-  - ✅ Catégories véhicule (4 par défaut)
-  - ✅ Suppléments horaires (4 tranches)
-  - ✅ Options (parking couvert, accès prioritaire)
-  - ✅ Jours fériés 2026 (11)
-  - ✅ Templates messages (6 SMS/emails)
-  - ✅ Sécurité RLS activée
-
-Tu peux voir ton projet ici : https://supabase.com/dashboard/project/menkykunwhevlkbthubj
+Rien n'est perdu : `supabase/schema.sql` contient l'intégralité du schéma (tarifs,
+catégories de véhicule, suppléments horaires, options, jours fériés, codes promo,
+templates de messages, RLS). Le recréer prend 3 minutes.
 
 ---
 
-## 🚀 DÉPLOIEMENT — 4 ÉTAPES (≈ 25 minutes)
+## 🚀 DÉPLOIEMENT — 5 ÉTAPES (≈ 30 minutes)
 
-### Étape 1️⃣ — Récupérer la clé secrète Supabase (1 min)
+### Étape 1️⃣ — Créer la base Supabase (3 min)
 
-1. Va sur : https://supabase.com/dashboard/project/menkykunwhevlkbthubj/settings/api-keys
-2. Clique sur **Reveal** à côté de la clé `service_role` (la deuxième, marquée "secret")
-3. Copie la valeur (commence par `eyJhbG...`) → ce sera `SUPABASE_SERVICE_ROLE_KEY`
+1. https://supabase.com/dashboard → **New project**
+   - Nom : `voiturier-orly` · Région : **Paris (eu-west-3)** · mot de passe base : au hasard
+   - ⚠️ Le plan Free autorise 2 projets par organisation. Si l'organisation est pleine,
+     crée une **nouvelle organisation** en plan Free plutôt que de payer un projet de plus.
+2. Une fois le projet prêt : **SQL Editor → New query** → copie-colle tout le contenu de
+   `supabase/schema.sql` → **Run**. Toutes les tables sont créées et pré-remplies.
+3. **Settings → API keys** :
+   - `Project URL` (`https://xxxxx.supabase.co`) → ce sera `SUPABASE_URL`
+   - clé `anon` / `publishable` → ce sera `SUPABASE_ANON_KEY`
+   - clé `service_role` (**Reveal**) → ce sera `SUPABASE_SERVICE_ROLE_KEY`
 
-⚠️ Cette clé donne un **accès total** à ta base de données. Ne la partage jamais, ne la mets jamais dans le code front. Elle ne va que dans les variables d'environnement Vercel.
+⚠️ La clé `service_role` donne un **accès total** à la base. Elle ne va JAMAIS dans le code
+front ni dans le dépôt : uniquement dans les variables d'environnement Vercel.
 
 ### Étape 2️⃣ — Resend pour les emails (5 min)
 
+Les emails de confirmation partent via Resend. **Resend refuse d'envoyer depuis un domaine
+non vérifié** : si `FROM_EMAIL` utilise un domaine qui n'est pas validé dans le compte, le
+client ne reçoit ni confirmation ni consignes de prise en charge — alors que la page le promet.
+
 1. Crée un compte gratuit sur https://resend.com (3000 emails/mois)
-2. **Domains → Add Domain** → tape `voiturier-orly.fr`
-3. Resend te donne 3 entrées DNS (TXT, MX, CNAME). Va sur OVH → Zone DNS → ajoute-les
-4. Clique **Verify** sur Resend (5-10 min de propagation DNS)
-5. **API Keys → Create** → copie la clé `re_...` → c'est `RESEND_API_KEY`
+2. **Domains** → vérifie quels domaines sont déjà validés (statut `verified`).
+   - Un domaine déjà vérifié dans le compte peut servir tout de suite :
+     `FROM_EMAIL="Voiturier Orly <voiturier@ce-domaine.fr>"`
+   - Sinon : **Add Domain** → tape le domaine du site → Resend donne 3 entrées DNS
+     (TXT, MX, CNAME) → OVH → Zone DNS → ajoute-les → **Verify** (5-10 min de propagation)
+3. **API Keys → Create** → copie la clé `re_...` → c'est `RESEND_API_KEY`
+   (elle n'est affichée qu'une seule fois)
 
 ### Étape 3️⃣ — Stripe (3 min)
 
@@ -62,11 +69,15 @@ Tu as déjà Stripe pour Gooach. Tu peux soit utiliser le même compte, soit cr�
 
 2. **Vercel → Add New → Project → Import** depuis GitHub
    - Framework Preset : **Other**
+   - ⚠️ **Root Directory : laisser VIDE** (la racine du dépôt). Le front est dans `public/`
+     et les fonctions dans `api/` — c'est `vercel.json` à la racine qui pilote tout. Un
+     projet Vercel existant qui pointe vers un sous-dossier doit être corrigé dans
+     **Settings → General → Root Directory**, sinon le déploiement échoue.
    - **Environment Variables** : ouvre `.env.example` du projet et copie toutes les variables. Les valeurs Supabase y sont déjà pré-remplies. Tu n'as qu'à compléter :
-     - `SUPABASE_SERVICE_ROLE_KEY` (étape 1)
+     - `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` (étape 1)
      - `STRIPE_SECRET_KEY` (étape 3)
      - `RESEND_API_KEY` (étape 2)
-     - `FROM_EMAIL` = `Voiturier Orly <contact@voiturier-orly.fr>`
+     - `FROM_EMAIL` = `Voiturier Orly <une-adresse@domaine-vérifié-dans-resend>` (étape 2)
      - `ADMIN_EMAIL` = ton email perso
      - `SITE_URL` = (mettre l'URL Vercel temporaire d'abord, ex. `https://voiturier-xxx.vercel.app`)
      - `ADMIN_PASSWORD` = un mot de passe long et fort
@@ -89,6 +100,12 @@ Tu as déjà Stripe pour Gooach. Tu peux soit utiliser le même compte, soit cr�
 
 ### Étape 5️⃣ — Test (5 min)
 
+0. **Diagnostic automatique** : ouvre `https://TON_DOMAINE/api/health?key=TON_ADMIN_PASSWORD`.
+   Il répond `pret_a_encaisser: true` quand tout est bon, sinon il liste en clair ce qui
+   bloque (variable manquante, base injoignable, clé Stripe refusée, domaine d'envoi non
+   vérifié dans Resend, SITE_URL qui ne correspond pas au domaine servi). Aucune valeur
+   secrète n'est renvoyée. Tant que `ADMIN_PASSWORD` n'est pas défini, l'URL fonctionne
+   sans le paramètre `key`.
 1. Ouvre `https://TON_DOMAINE`
 2. Clique **Réserver** → fais une résa test (carte test Stripe : `4242 4242 4242 4242`, n'importe quelle date future)
 3. Vérifie que tu reçois les 2 emails (client + admin)
