@@ -5,8 +5,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "npx serve public",
-    "build": "mkdir -p public",
+    "dev": "vercel dev",
     "deploy": "vercel --prod"
   },
   "dependencies": {
