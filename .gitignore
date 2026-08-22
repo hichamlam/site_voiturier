@@ -1,0 +1,22 @@
+# Secrets — JAMAIS sur git
+.env
+.env.local
+.env.*.local
+*.pem
+
+# Dépendances
+node_modules/
+
+# Vercel
+.vercel
+.next/
+
+# OS
+.DS_Store
+Thumbs.db
+*.log
+
+# Editor
+.vscode/
+.idea/
+*.swp

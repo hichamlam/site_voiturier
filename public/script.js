@@ -570,3 +570,170 @@ document.addEventListener('DOMContentLoaded', () => {
     if (el) { el.min = iso(today); el.value = iso(wk); }
   });
 });
+
+/* ════════════════════════════════════════════════
+   ANALYTICS & CONSENTEMENT
+   — Aucun envoi tant que VO_ANALYTICS n'est pas configuré (voir index.html)
+   — Consent Mode v2 : denied par défaut, granted si le visiteur accepte
+═══════════════════════════════════════════════ */
+function trackEvent(name, params = {}) {
+  try {
+    if (typeof gtag !== 'function') return;
+    gtag('event', name, params);
+  } catch {}
+}
+
+function analyticsConfigured() {
+  const A = window.VO_ANALYTICS || {};
+  return !!(A.GA4_ID || A.ADS_ID);
+}
+
+function cookieChoice(accepted) {
+  try { localStorage.setItem('vo_consent', accepted ? 'granted' : 'denied'); } catch {}
+  applyConsent(accepted);
+  const b = document.getElementById('cookieBanner');
+  if (b) b.classList.remove('show');
+}
+
+function applyConsent(accepted) {
+  if (typeof gtag !== 'function') return;
+  const v = accepted ? 'granted' : 'denied';
+  gtag('consent', 'update', {
+    ad_storage: v, ad_user_data: v, ad_personalization: v, analytics_storage: v,
+  });
+}
+
+(function initConsent() {
+  if (!analyticsConfigured()) return; // pas de traceur → pas de bandeau
+  let stored = null;
+  try { stored = localStorage.getItem('vo_consent'); } catch {}
+  if (stored === 'granted') applyConsent(true);
+  else if (stored === 'denied') applyConsent(false);
+  else {
+    const b = document.getElementById('cookieBanner');
+    if (b) b.classList.add('show');
+  }
+})();
+
+/* Conversion "réservation payée" — envoyée au retour de Stripe (?paid=1) */
+function trackPurchase(ref, value) {
+  trackEvent('purchase', {
+    transaction_id: ref || undefined,
+    value: value || undefined,
+    currency: 'EUR',
+  });
+  const A = window.VO_ANALYTICS || {};
+  if (A.ADS_ID && A.ADS_CONVERSION_LABEL) {
+    trackEvent('conversion', {
+      send_to: A.ADS_ID + '/' + A.ADS_CONVERSION_LABEL,
+      transaction_id: ref || undefined,
+      value: value || undefined,
+      currency: 'EUR',
+    });
+  }
+}
+
+/* ════════════════════════════════════════════════
+   RETOUR STRIPE — /?paid=1&ref=XX ou /?canceled=1
+   Avant : le client payait puis revenait sur la home sans AUCUNE confirmation.
+═══════════════════════════════════════════════ */
+(function handleStripeReturn() {
+  const q = new URLSearchParams(window.location.search);
+  const ref = q.get('ref') || '';
+  if (q.get('paid') === '1') {
+    // Écran de confirmation (étape 4 du tunnel)
+    document.getElementById('bookingModal').classList.add('open');
+    document.body.classList.add('modal-open');
+    document.getElementById('bk-confirm-name').textContent = '';
+    document.getElementById('bk-confirm-ref').textContent = ref ? 'RÉF — ' + ref : '';
+    bkGoToStep(4);
+    // Conversion : une seule fois par référence
+    let already = null;
+    try { already = sessionStorage.getItem('vo_paid_' + ref); } catch {}
+    if (!already) {
+      try { sessionStorage.setItem('vo_paid_' + ref, '1'); } catch {}
+      trackPurchase(ref);
+    }
+    history.replaceState(null, '', window.location.pathname);
+  } else if (q.get('canceled') === '1') {
+    // Paiement abandonné : réouvrir le tunnel pour laisser une 2e chance
+    trackEvent('checkout_abandoned', { reference: ref });
+    openBookingModal();
+    history.replaceState(null, '', window.location.pathname);
+  }
+})();
+
+/* ════════════════════════════════════════════════
+   ÉVÉNEMENTS DE CONVERSION (hooks non intrusifs)
+═══════════════════════════════════════════════ */
+(function wrapForTracking() {
+  // Début de devis (simulateur)
+  const _simNext = window.simNext;
+  window.simNext = function() { trackEvent('quote_started'); return _simNext.apply(this, arguments); };
+
+  // Tarif affiché
+  const _simSelectCategory = window.simSelectCategory;
+  window.simSelectCategory = async function(code, btn) {
+    const r = await _simSelectCategory.apply(this, arguments);
+    if (STATE.sim.quotedPrice > 0) {
+      trackEvent('quote_shown', { value: STATE.sim.quotedPrice, currency: 'EUR', category: code });
+    }
+    return r;
+  };
+
+  // Début de réservation (ouverture du tunnel)
+  const _openBookingModal = window.openBookingModal;
+  window.openBookingModal = function(prefilled) {
+    trackEvent('begin_checkout', { prefilled: !!prefilled });
+    return _openBookingModal.apply(this, arguments);
+  };
+
+  // Coordonnées complétées (étape 2 → 3)
+  const _bkNext2 = window.bkNext2;
+  window.bkNext2 = async function() { 
+    const before = STATE.booking.step;
+    const r = await _bkNext2.apply(this, arguments);
+    if (STATE.booking.step === 3 && before !== 3) trackEvent('add_contact_info');
+    return r;
+  };
+
+  // Confirmation cliquée (paiement sur place = conversion directe ici ;
+  // paiement Stripe = conversion au retour ?paid=1)
+  const _bkConfirm = window.bkConfirm;
+  window.bkConfirm = async function() {
+    const total = STATE.booking.serverPrice ? STATE.booking.serverPrice.total : undefined;
+    trackEvent('confirm_clicked', { payment: STATE.booking.payment, value: total, currency: 'EUR' });
+    const r = await _bkConfirm.apply(this, arguments);
+    if (STATE.booking.payment !== 'stripe' && STATE.booking.step === 4) {
+      trackEvent('reservation_sur_place', { value: total, currency: 'EUR' });
+    }
+    return r;
+  };
+})();
+
+/* Clics tel: / WhatsApp / mailto (délégation — couvre les liens futurs) */
+document.addEventListener('click', e => {
+  const a = e.target.closest('a[href]');
+  if (!a) return;
+  const h = a.getAttribute('href') || '';
+  if (h.startsWith('tel:')) trackEvent('phone_click', { number: h.slice(4) });
+  else if (h.includes('wa.me') || h.includes('whatsapp')) trackEvent('whatsapp_click');
+  else if (h.startsWith('mailto:')) trackEvent('email_click');
+});
+
+/* ════════════════════════════════════════════════
+   CTA MOBILE COLLANT — apparaît une fois le hero dépassé
+═══════════════════════════════════════════════ */
+(function stickyCtaInit() {
+  const bar = document.getElementById('stickyCta');
+  const hero = document.querySelector('.hero');
+  if (!bar || !hero) return;
+  const io2 = new IntersectionObserver(entries => {
+    entries.forEach(en => {
+      const show = !en.isIntersecting;
+      bar.classList.toggle('show', show);
+      bar.setAttribute('aria-hidden', show ? 'false' : 'true');
+    });
+  }, { threshold: 0.05 });
+  io2.observe(hero);
+})();

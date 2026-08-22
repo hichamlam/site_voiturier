@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Voiturier Orly — Service voiturier premium à Paris-Orly · Dès 29€</title>
-<meta name="description" content="Service voiturier premium à l'aéroport Paris-Orly. Vous descendez de voiture, on s'occupe du reste. +9 000 voyageurs · 4,9/5 sur Google · Dès 29€. Sans navette, parking surveillé 24/7.">
+<title>Voiturier Orly — Réservez votre voiturier à l'aéroport d'Orly · Dès 29€</title>
+<meta name="description" content="Voiturier à l'aéroport d'Orly : obtenez votre tarif en 30 secondes et réservez votre prise en charge en ligne. Prix total affiché avant paiement, confirmation immédiate par email. Dès 29€.">
 <meta name="keywords" content="voiturier orly, parking orly, voiturier aéroport orly, service voiturier paris, parking longue durée orly, valet parking orly">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <link rel="canonical" href="https://www.voiturier-orly.fr/">
@@ -25,6 +25,47 @@
 
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"LocalBusiness","name":"Voiturier Orly","url":"https://www.voiturier-orly.fr","telephone":"+33600000000","priceRange":"29€-299€","address":{"@type":"PostalAddress","addressLocality":"Athis-Mons","postalCode":"91200","addressCountry":"FR"},"geo":{"@type":"GeoCoordinates","latitude":"48.7233","longitude":"2.3795"},"aggregateRating":{"@type":"AggregateRating","ratingValue":"4.9","reviewCount":"487","bestRating":"5"},"areaServed":{"@type":"Airport","name":"Aéroport Paris-Orly","iataCode":"ORY"}}
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SUIVI GOOGLE ADS / GA4 — PRÊT MAIS DÉSACTIVÉ
+     Aucun traceur ne se charge tant que les 2 IDs ci-dessous sont vides.
+     Pour activer :
+       1. Crée une propriété GA4 → remplace GA4_ID (format G-XXXXXXX)
+       2. Crée le compte Google Ads → remplace ADS_ID (format AW-XXXXXXXXX)
+       3. Dans Google Ads, crée une action de conversion "Réservation payée"
+          → remplace ADS_CONVERSION_LABEL par le label fourni
+     Consentement : Consent Mode v2 démarre tout en "denied" ; le bandeau
+     cookies (géré dans script.js) passe en "granted" si le visiteur accepte.
+     Les événements envoyés par script.js : quote_started, quote_shown,
+     begin_checkout, add_contact_info, purchase (réservation payée),
+     reservation_sur_place, phone_click, whatsapp_click.
+     ═══════════════════════════════════════════════════════════════ -->
+<script>
+window.VO_ANALYTICS = {
+  GA4_ID: '',                 // ex: 'G-XXXXXXXXXX'
+  ADS_ID: '',                 // ex: 'AW-XXXXXXXXXXX'
+  ADS_CONVERSION_LABEL: '',   // ex: 'AbCdEfGhIj'
+};
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+// Consent Mode v2 — tout refusé par défaut (RGPD)
+gtag('consent', 'default', {
+  ad_storage: 'denied', ad_user_data: 'denied',
+  ad_personalization: 'denied', analytics_storage: 'denied',
+});
+(function(){
+  var A = window.VO_ANALYTICS;
+  var id = A.GA4_ID || A.ADS_ID;
+  if (!id) return; // rien ne se charge tant qu'aucun ID n'est renseigné
+  var sc = document.createElement('script');
+  sc.async = true;
+  sc.src = 'https://www.googletagmanager.com/gtag/js?id=' + id;
+  document.head.appendChild(sc);
+  gtag('js', new Date());
+  if (A.GA4_ID) gtag('config', A.GA4_ID);
+  if (A.ADS_ID) gtag('config', A.ADS_ID, { allow_enhanced_conversions: true });
+})();
 </script>
 </head>
 <body>
@@ -47,6 +88,7 @@
     <a href="#prix">Tarifs</a>
     <a href="#lavages">Lavages</a>
     <a href="#avis">Avis</a>
+    <a href="#faq">FAQ</a>
   </div>
   <button class="nav-cta" onclick="openBookingModal()">
     <span>Réserver</span>
@@ -117,8 +159,8 @@
 
   <div class="hero-content">
     <div class="hero-text">
-      <h1 class="hero-title">Voyagez<br><span class="accent">l'esprit léger</span></h1>
-      <p class="hero-sub">Vous descendez au dépose-minute. On prend les clés. À votre retour, votre voiture vous attend, exactement où vous l'avez laissée.</p>
+      <h1 class="hero-title">Voiturier à l'aéroport d'Orly<br><span class="accent">Voyagez l'esprit léger</span></h1>
+      <p class="hero-sub">Réservez votre prise en charge : vous descendez au dépose-minute d'Orly, on prend les clés. À votre retour, votre voiture vous attend, exactement où vous l'avez laissée. Obtenez votre tarif avant de réserver et recevez vos consignes de prise en charge par email.</p>
       <div class="hero-perks">
         <div class="hero-perk">
           <div class="hero-perk-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg></div>
@@ -337,6 +379,36 @@
   </div>
 </section>
 
+
+<!-- CONFIANCE — éléments vérifiables dans le produit et les CGV -->
+<section class="trust" id="confiance" aria-label="Garanties de réservation">
+  <div class="container">
+    <div class="trust-grid reveal">
+      <div class="trust-item">
+        <div class="trust-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+        <div class="trust-txt"><strong>Prix total avant paiement</strong><span>Le récapitulatif détaille chaque ligne avant de payer</span></div>
+      </div>
+      <div class="trust-item">
+        <div class="trust-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+        <div class="trust-txt"><strong>Paiement sécurisé Stripe</strong><span>Carte bancaire en ligne, ou paiement sur place</span></div>
+      </div>
+      <div class="trust-item">
+        <div class="trust-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg></div>
+        <div class="trust-txt"><strong>Confirmation par email</strong><span>Récapitulatif et consignes de rendez-vous à Orly</span></div>
+      </div>
+      <div class="trust-item">
+        <div class="trust-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg></div>
+        <div class="trust-txt"><strong>État des lieux à la prise en charge</strong><span>Contradictoire et signé, sur demande (voir CGV)</span></div>
+      </div>
+      <!-- TODO CONFIANCE (à compléter avec les VRAIES infos avant d'afficher) :
+           - Assurance / RC professionnelle : ajouter un .trust-item avec le nom
+             de l'assureur et le n° de contrat une fois souscrite. NE PAS afficher sans.
+           - Téléphone service client : ajouter ici + footer quand le numéro pro existe.
+           - Lien fiche Google Business Profile quand elle est créée. -->
+    </div>
+  </div>
+</section>
+
 <!-- PRICING TEASER -->
 <section class="pricing-teaser" id="prix">
   <div class="container">
@@ -443,6 +515,43 @@
   </div>
   <div class="reviews-track-wrap">
     <div class="reviews-track" id="reviewsTrack"></div>
+  </div>
+</section>
+
+
+<!-- FAQ — transparence tarifs / retards / annulation (alignée sur les CGV) -->
+<section class="faq" id="faq">
+  <div class="container">
+    <div class="section-head reveal">
+      <p class="section-eyebrow">Questions fréquentes</p>
+      <h2 class="section-title">Tout est clair<br><span class="accent">avant de réserver</span></h2>
+    </div>
+    <div class="faq-list reveal">
+      <details class="faq-item">
+        <summary>Le prix affiché est-il vraiment le prix final ?</summary>
+        <div class="faq-body">Oui. Le tarif calculé inclut la prise en charge et la restitution à Orly ainsi que le gardiennage. Les seuls suppléments possibles sont ceux que vous choisissez (lavage, parking couvert, accès prioritaire) et d'éventuels suppléments horaires ou jours fériés — ils sont tous détaillés ligne par ligne dans le récapitulatif <strong>avant</strong> le paiement.</div>
+      </details>
+      <details class="faq-item">
+        <summary>Mon vol est retardé, que se passe-t-il ?</summary>
+        <div class="faq-body">Prévenez-nous par téléphone dès que vous connaissez le retard : nous nous adaptons. Une tolérance de 30 minutes s'applique au retour ; au-delà et sans préavis, des frais de retard s'appliquent (10€ la première heure entamée, puis 15€ par heure — détail complet dans les CGV). Indiquer votre numéro de vol lors de la réservation nous aide à anticiper.</div>
+      </details>
+      <details class="faq-item">
+        <summary>Puis-je annuler ou modifier ma réservation ?</summary>
+        <div class="faq-body">Toute réservation est ferme et définitive (le droit de rétractation de 14 jours ne s'applique pas à ce type de service, article L221-28 12° du Code de la consommation). Pour une annulation signalée au moins 7 jours avant la prise en charge, nous étudions un arrangement à l'amiable. Pour modifier des dates ou horaires, contactez-nous par email : contact@voiturier-orly.fr.</div>
+      </details>
+      <details class="faq-item">
+        <summary>Comment se passe la prise en charge à Orly ?</summary>
+        <div class="faq-body">Après la réservation, vous recevez un email de confirmation avec les consignes de rendez-vous. Le jour du départ, votre voiturier vous retrouve au dépose-minute de votre terminal (Orly 1-2, 3 ou 4) à l'horaire convenu. Un état des lieux contradictoire signé peut être réalisé à votre demande (15€, réglé sur place — voir CGV).</div>
+      </details>
+      <details class="faq-item">
+        <summary>Comment payer ?</summary>
+        <div class="faq-body">En ligne par carte bancaire via Stripe (paiement sécurisé, confirmation immédiate) ou sur place en carte ou espèces. Le montant est identique dans les deux cas.</div>
+      </details>
+      <details class="faq-item">
+        <summary>Où est garée ma voiture pendant mon voyage ?</summary>
+        <div class="faq-body">Votre véhicule est gardé sur notre parking à quelques minutes d'Orly. Une option parking couvert est proposée à la réservation si vous souhaitez un emplacement à l'abri des intempéries.</div>
+      </details>
+    </div>
   </div>
 </section>
 
@@ -876,6 +985,26 @@
       <p class="legal-fineprint">Voiturier Orly · Aéroport Paris-Orly · 91200 Athis-Mons · contact@voiturier-orly.fr</p>
     </div>
   </div>
+</div>
+
+
+
+<!-- BANDEAU COOKIES — ne s'affiche que si un ID analytics est configuré -->
+<div class="cookie-banner" id="cookieBanner" role="dialog" aria-label="Consentement cookies">
+  <p>Nous utilisons des cookies de mesure d'audience et de publicité pour améliorer notre service. Vous pouvez accepter ou refuser — le site fonctionne dans les deux cas.</p>
+  <div class="cookie-banner-actions">
+    <button class="cookie-refuse" onclick="cookieChoice(false)">Refuser</button>
+    <button class="cookie-accept" onclick="cookieChoice(true)">Accepter</button>
+  </div>
+</div>
+
+<!-- CTA MOBILE COLLANT -->
+<div class="sticky-cta" id="stickyCta" aria-hidden="true">
+  <div class="sticky-cta-price"><span class="from">Dès</span> <strong>29€</strong></div>
+  <button class="sticky-cta-btn" onclick="trackEvent('begin_checkout',{cta:'sticky'});openBookingModal()">
+    Réserver mon voiturier
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+  </button>
 </div>
 
 <script src="/script.js"></script>

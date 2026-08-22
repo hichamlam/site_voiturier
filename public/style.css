@@ -521,3 +521,66 @@ section { position:relative; }
   body.modal-open { overflow:hidden; }
   .cgv-content { padding:22px 18px; }
 }
+
+/* ═══ CONFIANCE (badges de réassurance) ═══ */
+.trust { background:var(--bg-soft); padding:34px 0; border-bottom:1px solid var(--line); }
+.trust-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:18px; }
+.trust-item { display:flex; align-items:flex-start; gap:12px; }
+.trust-ico { flex:0 0 auto; width:40px; height:40px; border-radius:12px;
+  background:var(--gold-pale); color:var(--gold-deep);
+  display:flex; align-items:center; justify-content:center; }
+.trust-ico svg { width:20px; height:20px; }
+.trust-txt { display:flex; flex-direction:column; gap:2px; }
+.trust-txt strong { font-size:0.88rem; font-weight:700; color:var(--ink); line-height:1.3; }
+.trust-txt span { font-size:0.76rem; color:var(--slate); line-height:1.4; }
+@media (max-width:1024px) { .trust-grid { grid-template-columns:repeat(2,1fr); } }
+@media (max-width:700px) { .trust { padding:26px 0; } .trust-grid { gap:14px; } }
+
+/* ═══ FAQ ═══ */
+.faq { padding:90px 0; background:var(--bg); }
+.faq-list { max-width:760px; margin:0 auto; display:flex; flex-direction:column; gap:12px; }
+.faq-item { background:var(--bg-soft); border:1px solid var(--line); border-radius:var(--r);
+  overflow:hidden; transition:box-shadow 0.3s; }
+.faq-item[open] { box-shadow:var(--sh); background:var(--bg); }
+.faq-item summary { list-style:none; cursor:pointer; padding:18px 48px 18px 20px;
+  font-weight:700; font-size:0.95rem; color:var(--ink); position:relative; user-select:none; }
+.faq-item summary::-webkit-details-marker { display:none; }
+.faq-item summary::after { content:''; position:absolute; right:20px; top:50%;
+  width:10px; height:10px; border-right:2.5px solid var(--gold-deep); border-bottom:2.5px solid var(--gold-deep);
+  transform:translateY(-70%) rotate(45deg); transition:transform 0.3s var(--ease); }
+.faq-item[open] summary::after { transform:translateY(-30%) rotate(225deg); }
+.faq-body { padding:0 20px 18px; font-size:0.88rem; color:var(--slate); line-height:1.65; }
+@media (max-width:700px) { .faq { padding:64px 0; } .faq-item summary { font-size:0.9rem; } }
+
+/* ═══ CTA MOBILE COLLANT ═══ */
+.sticky-cta { position:fixed; left:0; right:0; bottom:0; z-index:90;
+  display:none; align-items:center; gap:12px; padding:10px 14px calc(10px + env(safe-area-inset-bottom));
+  background:rgba(255,255,255,0.97); backdrop-filter:blur(16px) saturate(1.4);
+  box-shadow:0 -8px 32px rgba(11,20,38,0.14); border-top:1px solid var(--line);
+  transform:translateY(110%); transition:transform 0.4s var(--ease); }
+.sticky-cta.show { transform:translateY(0); }
+.sticky-cta-price { flex:0 0 auto; display:flex; flex-direction:column; line-height:1.1; }
+.sticky-cta-price .from { font-size:0.62rem; font-weight:700; text-transform:uppercase;
+  letter-spacing:0.1em; color:var(--slate); }
+.sticky-cta-price strong { font-size:1.25rem; font-weight:800; color:var(--ink); }
+.sticky-cta-btn { flex:1; display:flex; align-items:center; justify-content:center; gap:8px;
+  padding:14px 18px; background:var(--gold); color:var(--ink); border-radius:100px;
+  font-weight:800; font-size:0.95rem; box-shadow:0 6px 18px rgba(232,179,98,0.5); }
+.sticky-cta-btn svg { width:15px; height:15px; }
+@media (max-width:700px) {
+  .sticky-cta { display:flex; }
+  body.modal-open .sticky-cta { display:none; }
+}
+
+/* ═══ BANDEAU COOKIES (consentement analytics/ads) ═══ */
+.cookie-banner { position:fixed; left:14px; right:14px; bottom:14px; z-index:200;
+  max-width:420px; margin:0 auto; padding:18px; border-radius:var(--r-lg);
+  background:var(--ink); color:white; box-shadow:var(--sh-lg);
+  display:none; flex-direction:column; gap:12px; }
+.cookie-banner.show { display:flex; }
+.cookie-banner p { font-size:0.8rem; line-height:1.5; color:rgba(255,255,255,0.85); }
+.cookie-banner-actions { display:flex; gap:10px; }
+.cookie-banner-actions button { flex:1; padding:11px; border-radius:100px; font-weight:700; font-size:0.82rem; }
+.cookie-accept { background:var(--gold); color:var(--ink); }
+.cookie-refuse { background:rgba(255,255,255,0.12); color:white; }
+@media (max-width:700px) { .cookie-banner { bottom:calc(78px + env(safe-area-inset-bottom)); } }
