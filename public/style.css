@@ -584,3 +584,24 @@ section { position:relative; }
 .cookie-accept { background:var(--gold); color:var(--ink); }
 .cookie-refuse { background:rgba(255,255,255,0.12); color:white; }
 @media (max-width:700px) { .cookie-banner { bottom:calc(78px + env(safe-area-inset-bottom)); } }
+
+/* ═══ CONTACT DIRECT — TÉLÉPHONE NAV + WHATSAPP FLOTTANT ═══ */
+.nav-phone { display:inline-flex; align-items:center; gap:8px; padding:11px 18px;
+  border:1px solid var(--line); border-radius:100px; font-weight:700; font-size:0.86rem;
+  color:var(--ink); transition:all 0.3s; }
+.nav-phone:hover { border-color:var(--gold); transform:translateY(-2px); }
+.nav-phone svg { width:14px; height:14px; }
+.nav-phone[hidden] { display:none; }
+.wa-float { position:fixed; right:16px; bottom:16px; z-index:95;
+  width:54px; height:54px; border-radius:50%; background:#25D366; color:white;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 8px 24px rgba(37,211,102,0.45); transition:transform 0.3s; }
+.wa-float:hover { transform:scale(1.08); }
+.wa-float svg { width:28px; height:28px; }
+.wa-float[hidden] { display:none; }
+body.modal-open .wa-float { display:none; }
+@media (max-width:700px) {
+  .nav-phone { padding:9px 12px; }
+  .nav-phone span { display:none; }
+  .wa-float { bottom:calc(84px + env(safe-area-inset-bottom)); }
+}
