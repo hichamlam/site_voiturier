@@ -711,6 +711,44 @@ function trackPurchase(ref, value) {
   };
 })();
 
+/* Contact direct — active les boutons tél/WhatsApp dès que VO_CONTACT est rempli */
+(function(){
+  const C = window.VO_CONTACT || {};
+  const phoneRaw = (C.PHONE || '').trim();
+  if (phoneRaw) {
+    const tel = phoneRaw.replace(/[^+0-9]/g, '');
+    const nav = document.getElementById('navPhone');
+    if (nav) {
+      nav.href = 'tel:' + tel;
+      nav.querySelector('span').textContent = phoneRaw;
+      nav.hidden = false;
+    }
+    // Remplace le numéro du schema.org par le vrai
+    const ld = document.querySelector('script[type="application/ld+json"]');
+    if (ld) {
+      try {
+        const data = JSON.parse(ld.textContent);
+        data.telephone = tel;
+        ld.textContent = JSON.stringify(data);
+      } catch (e) {}
+    }
+  }
+  const gp = (C.GOOGLE_PROFILE || '').trim();
+  if (gp) {
+    const l = document.getElementById('gsLink');
+    if (l) { l.href = gp; l.hidden = false; }
+  }
+  const wa = (C.WHATSAPP || '').replace(/[^0-9]/g, '');
+  if (wa) {
+    const f = document.getElementById('waFloat');
+    if (f) {
+      f.href = 'https://wa.me/' + wa + '?text='
+        + encodeURIComponent('Bonjour, je souhaite réserver un voiturier à Orly.');
+      f.hidden = false;
+    }
+  }
+})();
+
 /* Clics tel: / WhatsApp / mailto (délégation — couvre les liens futurs) */
 document.addEventListener('click', e => {
   const a = e.target.closest('a[href]');
