@@ -605,3 +605,11 @@ body.modal-open .wa-float { display:none; }
   .nav-phone span { display:none; }
   .wa-float { bottom:calc(84px + env(safe-area-inset-bottom)); }
 }
+
+/* ═══ LIEN VERS LA FICHE GOOGLE (bande avis) ═══ */
+.gs-link { display:inline-flex; align-items:center; gap:6px; margin-top:6px;
+  font-size:0.78rem; font-weight:700; color:var(--slate);
+  text-decoration:underline; text-underline-offset:3px; transition:color 0.25s; }
+.gs-link:hover { color:var(--ink); }
+.gs-link svg { width:12px; height:12px; }
+.gs-link[hidden] { display:none; }

@@ -733,6 +733,11 @@ function trackPurchase(ref, value) {
       } catch (e) {}
     }
   }
+  const gp = (C.GOOGLE_PROFILE || '').trim();
+  if (gp) {
+    const l = document.getElementById('gsLink');
+    if (l) { l.href = gp; l.hidden = false; }
+  }
   const wa = (C.WHATSAPP || '').replace(/[^0-9]/g, '');
   if (wa) {
     const f = document.getElementById('waFloat');

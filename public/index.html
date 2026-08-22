@@ -80,6 +80,10 @@ gtag('consent', 'default', {
 window.VO_CONTACT = {
   PHONE: '',      // ex: '06 12 34 56 78'
   WHATSAPP: '',   // ex: '33612345678' (sans +, sans espaces)
+
+  // Lien public de la fiche Google Business Profile (bouton "Voir les avis").
+  // Où le trouver : Google Maps → ta fiche → Partager → Copier le lien.
+  GOOGLE_PROFILE: '',   // ex: 'https://maps.app.goo.gl/xxxxxxxx'
 };
 </script>
 </head>
@@ -389,6 +393,10 @@ window.VO_CONTACT = {
           </div>
         </div>
         <div class="gs-rating-text">396 avis Google</div>
+        <a class="gs-link" id="gsLink" href="#" hidden target="_blank" rel="noopener">
+          Voir les avis sur Google
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg>
+        </a>
       </div>
     </div>
     <div class="gs-divider"></div>
