@@ -390,7 +390,7 @@ gtag('consent', 'default', {
       </div>
       <div class="trust-item">
         <div class="trust-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
-        <div class="trust-txt"><strong>Paiement sécurisé Stripe</strong><span>Carte bancaire en ligne, ou paiement sur place</span></div>
+        <div class="trust-txt" id="trust-payment"><strong>Paiement sécurisé Stripe</strong><span>Carte bancaire en ligne, ou paiement sur place</span></div>
       </div>
       <div class="trust-item">
         <div class="trust-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg></div>
@@ -545,7 +545,7 @@ gtag('consent', 'default', {
       </details>
       <details class="faq-item">
         <summary>Comment payer ?</summary>
-        <div class="faq-body">En ligne par carte bancaire via Stripe (paiement sécurisé, confirmation immédiate) ou sur place en carte ou espèces. Le montant est identique dans les deux cas.</div>
+        <div class="faq-body" id="faq-payment">En ligne par carte bancaire via Stripe (paiement sécurisé, confirmation immédiate) ou sur place en carte ou espèces. Le montant est identique dans les deux cas.</div>
       </details>
       <details class="faq-item">
         <summary>Où est garée ma voiture pendant mon voyage ?</summary>
@@ -867,7 +867,7 @@ gtag('consent', 'default', {
         <p class="modal-section-title">Mode de paiement</p>
 
         <div class="payment-options">
-          <label class="payment-option selected" data-payment="stripe">
+          <label class="payment-option selected" id="payment-option-stripe" data-payment="stripe">
             <input type="radio" name="payment" checked>
             <div class="payment-option-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="14" rx="2"/><path d="M2 11h20"/></svg>
@@ -877,7 +877,7 @@ gtag('consent', 'default', {
               <div class="payment-option-desc">Paiement Stripe sécurisé</div>
             </div>
           </label>
-          <label class="payment-option" data-payment="onsite">
+          <label class="payment-option" id="payment-option-onsite" data-payment="onsite">
             <input type="radio" name="payment">
             <div class="payment-option-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>

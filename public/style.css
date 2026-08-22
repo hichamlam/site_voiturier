@@ -407,6 +407,7 @@ section { position:relative; }
 .payment-options { display:flex; flex-direction:column; gap:10px; margin-bottom:16px; }
 .payment-option { display:flex; align-items:center; padding:14px 16px; background:var(--bg-soft);
   border:2px solid transparent; border-radius:var(--r); cursor:pointer; transition:all 0.2s; }
+.payment-option[hidden] { display:none; }
 .payment-option:hover { background:white; border-color:var(--gold-light); }
 .payment-option.selected { background:var(--gold-pale); border-color:var(--gold); }
 .payment-option input[type="radio"] { appearance:none; -webkit-appearance:none; width:20px; height:20px;

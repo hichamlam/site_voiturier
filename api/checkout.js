@@ -4,10 +4,17 @@
 import Stripe from 'stripe';
 import { supabase, calculatePrice, checkDatesAvailable, upsertClient } from './_lib.js';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2024-06-20' });
-
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
+
+  // Sans clé Stripe, on refuse tout de suite plutôt que d'enregistrer une
+  // réservation « pending » qui n'aboutira jamais.
+  if (!process.env.STRIPE_SECRET_KEY) {
+    return res.status(503).json({
+      error: "Le paiement en ligne n'est pas encore disponible. Choisissez « Sur place ».",
+    });
+  }
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2024-06-20' });
 
   try {
     const { reference, data } = req.body;

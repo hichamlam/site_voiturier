@@ -1,8 +1,11 @@
 /**
  * GET /api/health — diagnostic de configuration
  *
- * Répond à la seule question qui compte avant d'ouvrir les réservations :
- * « est-ce que ce déploiement peut réellement encaisser une réservation ? »
+ * Répond aux deux questions qui comptent avant d'ouvrir les réservations :
+ * « ce déploiement peut-il enregistrer une réservation ? » (pret_a_reserver)
+ * et « propose-t-il le paiement par carte ? » (paiement_en_ligne).
+ * Les clés Stripe manquantes ne sont donc pas un blocage mais un avertissement :
+ * le site continue de réserver en paiement sur place.
  *
  * Vérifie, sans jamais renvoyer la moindre valeur secrète :
  *   1. présence des variables d'environnement
@@ -16,11 +19,11 @@
  * et il le signale dans sa réponse.
  */
 
+// Sans ces variables, aucune réservation n'est possible, quel que soit le
+// mode de paiement.
 const REQUIRED = [
   'SUPABASE_URL',
   'SUPABASE_SERVICE_ROLE_KEY',
-  'STRIPE_SECRET_KEY',
-  'STRIPE_WEBHOOK_SECRET',
   'RESEND_API_KEY',
   'FROM_EMAIL',
   'ADMIN_EMAIL',
@@ -28,6 +31,10 @@ const REQUIRED = [
   'ADMIN_PASSWORD',
   'ADMIN_SESSION_SECRET',
 ];
+
+// Sans celles-ci, seul le paiement en ligne est indisponible : le site
+// continue de prendre des réservations réglées sur place.
+const STRIPE_VARS = ['STRIPE_SECRET_KEY', 'STRIPE_WEBHOOK_SECRET'];
 
 const PLACEHOLDER = /^(COLLER_ICI|TON_|change_moi|ton-email@)/i;
 
@@ -44,7 +51,8 @@ export default async function handler(req, res) {
     if (key !== adminPassword) return res.status(404).json({ error: 'Not found' });
   }
 
-  const problemes = [];
+  const problemes = [];     // bloque toute réservation
+  const avertissements = []; // n'empêche pas de réserver, mais limite le site
   const rapport = {
     ouvert_sans_mot_de_passe: !guarded || undefined,
     variables: {},
@@ -55,7 +63,9 @@ export default async function handler(req, res) {
   };
 
   // ─── 1. Variables d'environnement ───
-  for (const name of REQUIRED) rapport.variables[name] = isSet(name) ? 'ok' : 'MANQUANTE';
+  for (const name of [...REQUIRED, ...STRIPE_VARS]) {
+    rapport.variables[name] = isSet(name) ? 'ok' : 'MANQUANTE';
+  }
   const manquantes = REQUIRED.filter((n) => !isSet(n));
   if (manquantes.length) {
     problemes.push(`Variables d'environnement manquantes sur Vercel : ${manquantes.join(', ')}`);
@@ -103,10 +113,16 @@ export default async function handler(req, res) {
       problemes.push(`Clé Stripe refusée (${err.message}). Aucun paiement possible.`);
     }
   }
-  if (!isSet('STRIPE_WEBHOOK_SECRET')) {
-    problemes.push(
-      "STRIPE_WEBHOOK_SECRET absent : les paiements aboutiront mais le webhook ne pourra pas " +
-        'confirmer les réservations (Stripe → Developers → Webhooks → endpoint /api/webhook, ' +
+  if (!isSet('STRIPE_SECRET_KEY')) {
+    avertissements.push(
+      "STRIPE_SECRET_KEY absent : le paiement par carte est masqué sur le site. " +
+        'Les réservations restent possibles, réglées sur place.'
+    );
+  } else if (!isSet('STRIPE_WEBHOOK_SECRET')) {
+    avertissements.push(
+      "STRIPE_WEBHOOK_SECRET absent : le paiement par carte reste masqué, car sans webhook " +
+        'le client paierait sans que la réservation soit confirmée ' +
+        '(Stripe → Developers → Webhooks → endpoint /api/webhook, ' +
         "événement checkout.session.completed)."
     );
   }
@@ -162,9 +178,18 @@ export default async function handler(req, res) {
     }
   }
 
+  const reservationsOk = problemes.length === 0;
+  const paiementEnLigne = isSet('STRIPE_SECRET_KEY') && isSet('STRIPE_WEBHOOK_SECRET');
+
   return res.status(200).json({
-    pret_a_encaisser: problemes.length === 0,
+    // Le site peut-il prendre une réservation, paiement sur place ?
+    pret_a_reserver: reservationsOk,
+    // Le paiement par carte est-il proposé aux clients ?
+    paiement_en_ligne: paiementEnLigne,
+    // Conservé pour compatibilité : tout est prêt, carte comprise.
+    pret_a_encaisser: reservationsOk && paiementEnLigne,
     problemes,
+    avertissements,
     rapport,
   });
 }
