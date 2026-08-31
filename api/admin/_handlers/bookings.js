@@ -6,7 +6,7 @@
  * PATCH ?id=  : maj (incluant pénalités retard)
  * DELETE ?id= : suppression
  */
-import { supabase, requireAdmin, calculatePrice, upsertClient, calculateLateFee } from '../_lib.js';
+import { supabase, requireAdmin, calculatePrice, upsertClient, calculateLateFee } from '../../_lib.js';
 
 export default async function handler(req, res) {
   if (!requireAdmin(req, res)) return;

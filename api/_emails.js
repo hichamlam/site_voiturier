@@ -78,13 +78,13 @@ export function clientEmailHTML(ctx) {
 
 <tr><td style="padding:0 40px 24px;">
   <h3 style="margin:0 0 12px;font-size:16px;font-weight:800;color:#0F172A;">📍 Le jour J</h3>
-  <p style="margin:0 0 8px;font-size:14px;color:#475569;line-height:1.6;">Présentez-vous au moins <strong style="color:#0F172A;">2h à 3h avant votre embarquement</strong> au dépose-minute du Terminal ${escapeHtml(dep.terminal || 'indiqué')}. Notre voiturier vous accueille avec un panneau "Voiturier Orly".</p>
+  <p style="margin:0 0 8px;font-size:14px;color:#475569;line-height:1.6;">Présentez-vous au moins <strong style="color:#0F172A;">2h à 3h avant votre embarquement</strong> au dépose-minute du Terminal ${escapeHtml(dep.terminal || 'indiqué')}. Notre voiturier vous accueille avec un panneau "Direct Voiturier".</p>
   <p style="margin:8px 0 0;font-size:14px;color:#475569;line-height:1.6;">Au retour, on vous appelle dès l'atterrissage. Le temps de récupérer vos bagages, votre voiture est devant le terminal.</p>
 </td></tr>
 
 <tr><td style="padding:0 40px 24px;">
   <div style="padding:14px 18px;background:#f8fafc;border-left:3px solid #E8B362;border-radius:6px;">
-    <p style="margin:0 0 6px;font-size:13px;color:#475569;line-height:1.5;"><strong style="color:#0F172A;">Annulation</strong> : étudiée à l'amiable au moins 7 jours avant la date prévue. Pour toute modification : <a href="mailto:contact@voiturier-orly.fr" style="color:#C9913B;text-decoration:none;font-weight:700;">contact@voiturier-orly.fr</a></p>
+    <p style="margin:0 0 6px;font-size:13px;color:#475569;line-height:1.5;"><strong style="color:#0F172A;">Annulation</strong> : étudiée à l'amiable au moins 7 jours avant la date prévue. Pour toute modification : <a href="mailto:contact@directvoiturier.com" style="color:#C9913B;text-decoration:none;font-weight:700;">contact@directvoiturier.com</a></p>
     <p style="margin:0;font-size:13px;color:#475569;line-height:1.5;"><strong style="color:#0F172A;">Retard</strong> : tolérance 30 min. Au-delà, des frais peuvent s'appliquer (10€ pour la 1re heure, 15€/h ensuite).</p>
   </div>
 </td></tr>
@@ -97,7 +97,7 @@ export function clientEmailHTML(ctx) {
 </td></tr>
 
 <tr><td style="background:#0B1426;padding:24px 40px;text-align:center;">
-  <p style="margin:0 0 6px;color:#E8B362;font-weight:800;font-size:15px;">Voiturier Orly</p>
+  <p style="margin:0 0 6px;color:#E8B362;font-weight:800;font-size:15px;">Direct Voiturier</p>
   <p style="margin:0;color:rgba(255,255,255,0.5);font-size:12px;">Service voiturier premium · Aéroport Paris-Orly · 6 ans à Orly</p>
 </td></tr>
 </table>

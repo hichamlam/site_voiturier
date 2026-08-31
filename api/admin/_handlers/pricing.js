@@ -6,7 +6,7 @@
  * PATCH ?type=rule|special|block&id  : maj
  * DELETE ?type=rule|special|block&id : suppression
  */
-import { supabase, requireAdmin } from '../_lib.js';
+import { supabase, requireAdmin } from '../../_lib.js';
 
 const TABLES = {
   rule:    'pricing_rules',

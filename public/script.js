@@ -537,7 +537,7 @@ async function bkConfirm() {
     document.getElementById('bk-confirm-ref').textContent = 'RÉF — ' + ref;
     bkGoToStep(4);
   } catch (err) {
-    alert('Erreur : ' + err.message + '\nContactez-nous : contact@voiturier-orly.fr');
+    alert('Erreur : ' + err.message + '\nContactez-nous : contact@directvoiturier.com');
     btn.disabled = false;
     btnText.innerHTML = original;
   }

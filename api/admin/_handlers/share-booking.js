@@ -4,9 +4,15 @@
  * Envoie un email HTML soigné avec toutes les infos de la réservation
  */
 import { Resend } from 'resend';
-import { supabase, requireAdmin } from '../_lib.js';
+import { supabase, requireAdmin } from '../../_lib.js';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Instanciation paresseuse : ce module est importé avec les 11 autres routes
+// admin par le répartiteur `api/admin/[...slug].js`. Si RESEND_API_KEY était
+// lu au chargement du module (comme avant), une clé absente ferait planter
+// tout le back-office et pas seulement le partage de réservation.
+function getResend() {
+  return new Resend(process.env.RESEND_API_KEY);
+}
 
 function escapeHtml(s) {
   if (s == null) return '';
@@ -105,7 +111,7 @@ ${customNote ? `<tr><td style="padding:18px 40px 0;">
 </td></tr>
 
 <tr><td style="background:#0B1426;padding:22px 40px;text-align:center;">
-  <p style="margin:0;color:#E8B362;font-weight:800;font-size:13px;">Voiturier Orly</p>
+  <p style="margin:0;color:#E8B362;font-weight:800;font-size:13px;">Direct Voiturier</p>
   <p style="margin:4px 0 0;color:rgba(255,255,255,0.5);font-size:11px;">Partage interne — réservation ${b.reference}</p>
 </td></tr>
 </table>
@@ -129,13 +135,13 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Resend non configuré' });
     }
 
-    const FROM = process.env.FROM_EMAIL || 'Voiturier Orly <contact@voiturier-orly.fr>';
+    const FROM = process.env.FROM_EMAIL || 'Direct Voiturier <contact@directvoiturier.com>';
     const html = buildHTML(b, text);
 
-    await resend.emails.send({
+    await getResend().emails.send({
       from: FROM,
       to,
-      subject: `[Voiturier Orly] Réservation ${b.reference} — ${b.customer_firstname} ${b.customer_lastname}`,
+      subject: `[Direct Voiturier] Réservation ${b.reference} — ${b.customer_firstname} ${b.customer_lastname}`,
       html,
       text: text || `Réservation ${b.reference} — ${b.customer_firstname} ${b.customer_lastname}`,
     });

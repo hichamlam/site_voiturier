@@ -91,8 +91,8 @@ export default async function handler(req, res) {
 
     // Emails
     if (process.env.RESEND_API_KEY) {
-      const FROM = process.env.FROM_EMAIL || 'Voiturier Orly <contact@voiturier-orly.fr>';
-      const ADMIN = process.env.ADMIN_EMAIL || 'contact@voiturier-orly.fr';
+      const FROM = process.env.FROM_EMAIL || 'Direct Voiturier <contact@directvoiturier.com>';
+      const ADMIN = process.env.ADMIN_EMAIL || 'contact@directvoiturier.com';
       const ctx = {
         reference, total: price.total, customer, car, dep: departure, ret, wash: wash || { type: 'none' },
         options, surchargesDetail: price.surchargesDetail, paymentMode: 'sur place',

@@ -1,4 +1,4 @@
-# 🚗 Voiturier Orly — v2 finale
+# 🚗 Direct Voiturier — v2 finale
 
 Site vitrine + tunnel de réservation Stripe + back-office complet, prêt à déployer.
 
@@ -22,7 +22,7 @@ templates de messages, RLS). Le recréer prend 3 minutes.
 ### Étape 1️⃣ — Créer la base Supabase (3 min)
 
 1. https://supabase.com/dashboard → **New project**
-   - Nom : `voiturier-orly` · Région : **Paris (eu-west-3)** · mot de passe base : au hasard
+   - Nom : `direct-voiturier` · Région : **Paris (eu-west-3)** · mot de passe base : au hasard
    - ⚠️ Le plan Free autorise 2 projets par organisation. Si l'organisation est pleine,
      crée une **nouvelle organisation** en plan Free plutôt que de payer un projet de plus.
 2. Une fois le projet prêt : **SQL Editor → New query** → copie-colle tout le contenu de
@@ -44,15 +44,17 @@ client ne reçoit ni confirmation ni consignes de prise en charge — alors que 
 1. Crée un compte gratuit sur https://resend.com (3000 emails/mois)
 2. **Domains** → vérifie quels domaines sont déjà validés (statut `verified`).
    - Un domaine déjà vérifié dans le compte peut servir tout de suite :
-     `FROM_EMAIL="Voiturier Orly <voiturier@ce-domaine.fr>"`
-   - Sinon : **Add Domain** → tape le domaine du site → Resend donne 3 entrées DNS
-     (TXT, MX, CNAME) → OVH → Zone DNS → ajoute-les → **Verify** (5-10 min de propagation)
+     `FROM_EMAIL="Direct Voiturier <voiturier@ce-domaine.fr>"`
+   - Sinon : **Add Domain** → tape `directvoiturier.com` → Resend donne 3 entrées DNS
+     (TXT, MX, CNAME) → comme le domaine est acheté sur Vercel, ajoute-les dans
+     **Vercel → Domains → directvoiturier.com → DNS Records** (pas besoin d'OVH) →
+     retour Resend → **Verify** (5-10 min de propagation)
 3. **API Keys → Create** → copie la clé `re_...` → c'est `RESEND_API_KEY`
    (elle n'est affichée qu'une seule fois)
 
 ### Étape 3️⃣ — Stripe (3 min)
 
-Tu as déjà Stripe pour Gooach. Tu peux soit utiliser le même compte, soit créer un compte séparé pour Voiturier Orly.
+Tu as déjà Stripe pour Gooach. Tu peux soit utiliser le même compte, soit créer un compte séparé pour Direct Voiturier.
 
 1. https://dashboard.stripe.com → **Developers → API keys** → copie la **Secret key** (`sk_live_...`)
 2. Le webhook se fait **après** Vercel (étape 4) — saute pour l'instant
@@ -63,7 +65,7 @@ Tu as déjà Stripe pour Gooach. Tu peux soit utiliser le même compte, soit cr�
    ```bash
    cd voiturier
    git init && git add . && git commit -m "Initial"
-   git remote add origin https://github.com/TON_USER/voiturier-orly.git
+   git remote add origin https://github.com/TON_USER/direct-voiturier.git
    git push -u origin main
    ```
 
@@ -77,7 +79,7 @@ Tu as déjà Stripe pour Gooach. Tu peux soit utiliser le même compte, soit cr�
      - `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` (étape 1)
      - `STRIPE_SECRET_KEY` (étape 3)
      - `RESEND_API_KEY` (étape 2)
-     - `FROM_EMAIL` = `Voiturier Orly <une-adresse@domaine-vérifié-dans-resend>` (étape 2)
+     - `FROM_EMAIL` = `Direct Voiturier <une-adresse@domaine-vérifié-dans-resend>` (étape 2)
      - `ADMIN_EMAIL` = ton email perso
      - `SITE_URL` = (mettre l'URL Vercel temporaire d'abord, ex. `https://voiturier-xxx.vercel.app`)
      - `ADMIN_PASSWORD` = un mot de passe long et fort
@@ -92,11 +94,14 @@ Tu as déjà Stripe pour Gooach. Tu peux soit utiliser le même compte, soit cr�
    - **Add** → page du webhook → **Signing secret → Reveal** → `whsec_...`
    - Retour Vercel → Settings → Env Variables → édite `STRIPE_WEBHOOK_SECRET` → **Redeploy**
 
-4. **Domaine voiturier-orly.fr (OVH → Vercel)**
-   - Vercel → **Settings → Domains** → ajoute `voiturier-orly.fr` et `www.voiturier-orly.fr`
-   - Vercel te donne 2 entrées DNS (A pour la racine, CNAME pour www)
-   - OVH → Zone DNS → ajoute-les → attends 10-30 min
-   - Une fois propagé : Vercel → édite `SITE_URL` = `https://www.voiturier-orly.fr` → Redeploy
+4. **Domaine directvoiturier.com**
+   - Le domaine est déjà acheté **directement sur Vercel** (compte hichamlam) : pas de DNS
+     à configurer chez un registrar tiers, Vercel gère tout automatiquement.
+   - Sur le projet `voiturier-github` → **Settings → Domains → Add** → `directvoiturier.com`
+     → Vercel le relie tout seul (même compte). Ajoute aussi `www.directvoiturier.com` si tu
+     veux que les deux fonctionnent (Vercel te proposera une redirection automatique vers l'apex).
+   - Une fois actif : Vercel → **Settings → Environment Variables** → édite `SITE_URL` =
+     `https://directvoiturier.com` → **Redeploy**
 
 ### Étape 5️⃣ — Test (5 min)
 
@@ -204,7 +209,7 @@ voiturier/
 ## 🔧 GESTION QUOTIDIENNE
 
 ### Ouvrir l'admin
-`https://www.voiturier-orly.fr/admin` puis ton mot de passe
+`https://directvoiturier.com/admin` puis ton mot de passe
 
 ### Modifier un tarif
 Admin → **Tarifs & dates** → modifier la grille par paliers (1 jour 29€, 2 jours 49€, etc.)
@@ -285,7 +290,7 @@ Voici la checklist exhaustive de ce que tu dois faire à la main :
 
 ### Avant déploiement
 - [ ] Récupérer la `SUPABASE_SERVICE_ROLE_KEY` (étape 1)
-- [ ] Créer un compte Resend + valider domaine voiturier-orly.fr (DNS sur OVH)
+- [ ] Créer un compte Resend + valider domaine directvoiturier.com (DNS via Vercel, domaine déjà acheté là-bas)
 - [ ] Récupérer la `STRIPE_SECRET_KEY` depuis ton dashboard Stripe
 
 ### Déploiement
@@ -297,9 +302,8 @@ Voici la checklist exhaustive de ce que tu dois faire à la main :
 - [ ] Récupérer le `STRIPE_WEBHOOK_SECRET` et l'ajouter à Vercel + redeploy
 
 ### Domaine
-- [ ] OVH → Zone DNS → ajouter les entrées DNS de Vercel pour voiturier-orly.fr
-- [ ] Vercel → Settings → Domains → ajouter voiturier-orly.fr
-- [ ] Modifier `SITE_URL` sur Vercel pour pointer vers ton domaine
+- [ ] Vercel → Settings → Domains → ajouter directvoiturier.com (déjà acheté sur Vercel, DNS auto)
+- [ ] Modifier `SITE_URL` sur Vercel pour pointer vers `https://directvoiturier.com`
 
 ### Tests
 - [ ] Tester une réservation Stripe (carte test 4242…)

@@ -4,9 +4,15 @@
  * Envoie le devis par email au client
  */
 import { Resend } from 'resend';
-import { supabase, requireAdmin } from '../_lib.js';
+import { supabase, requireAdmin } from '../../_lib.js';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Instanciation paresseuse : ce module est importé avec les 11 autres routes
+// admin par le répartiteur `api/admin/[...slug].js`. Si RESEND_API_KEY était
+// lu au chargement du module (comme avant), une clé absente ferait planter
+// tout le back-office et pas seulement l'envoi de devis.
+function getResend() {
+  return new Resend(process.env.RESEND_API_KEY);
+}
 
 function fmtDate(iso) {
   if (!iso) return '—';
@@ -35,7 +41,7 @@ export default async function handler(req, res) {
     if (!q) return res.status(404).json({ error: 'Devis introuvable' });
     if (!q.customer_email) return res.status(400).json({ error: 'Email client requis' });
 
-    const FROM = process.env.FROM_EMAIL || 'Voiturier Orly <contact@voiturier-orly.fr>';
+    const FROM = process.env.FROM_EMAIL || 'Direct Voiturier <contact@directvoiturier.com>';
 
     const detailRows = (q.surcharges_detail || []).map(d => `
       <tr>
@@ -52,7 +58,7 @@ export default async function handler(req, res) {
 <tr><td style="background:linear-gradient(135deg,#0B1426,#75234a,#e8732e);padding:42px 40px;text-align:center;">
   <div style="display:inline-block;background:#E8B362;color:#0B1426;font-weight:800;font-size:13px;padding:7px 16px;border-radius:100px;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:16px;">Devis personnalisé</div>
   <h1 style="margin:0;color:#fff;font-size:28px;font-weight:800;">Bonjour ${escapeHtml(q.customer_firstname || '')}</h1>
-  <p style="margin:10px 0 0;color:rgba(255,255,255,0.85);font-size:15px;">Voici votre devis Voiturier Orly</p>
+  <p style="margin:10px 0 0;color:rgba(255,255,255,0.85);font-size:15px;">Voici votre devis Direct Voiturier</p>
 </td></tr>
 <tr><td style="padding:24px 40px 8px;text-align:center;">
   <div style="display:inline-block;background:#0B1426;color:#E8B362;padding:9px 20px;border-radius:100px;font-weight:800;font-size:14px;">${q.reference}</div>
@@ -78,13 +84,13 @@ export default async function handler(req, res) {
   <p style="margin:18px 0 0;font-size:13px;color:#475569;text-align:center;">Devis valable jusqu'au <strong>${fmtDate(q.valid_until)}</strong></p>
 
   <div style="margin-top:24px;text-align:center;">
-    <a href="${process.env.SITE_URL || 'https://www.voiturier-orly.fr'}" style="display:inline-block;padding:14px 30px;background:#0B1426;color:#E8B362;text-decoration:none;border-radius:100px;font-weight:800;font-size:14px;">Réserver maintenant →</a>
+    <a href="${process.env.SITE_URL || 'https://directvoiturier.com'}" style="display:inline-block;padding:14px 30px;background:#0B1426;color:#E8B362;text-decoration:none;border-radius:100px;font-weight:800;font-size:14px;">Réserver maintenant →</a>
   </div>
 
   ${q.notes ? `<div style="margin-top:24px;padding:14px 18px;background:#f8fafc;border-left:3px solid #E8B362;border-radius:6px;"><p style="margin:0;font-size:13px;color:#475569;line-height:1.6;">${escapeHtml(q.notes)}</p></div>` : ''}
 </td></tr>
 <tr><td style="background:#0B1426;padding:22px 40px;text-align:center;">
-  <p style="margin:0;color:#E8B362;font-weight:800;font-size:14px;">Voiturier Orly</p>
+  <p style="margin:0;color:#E8B362;font-weight:800;font-size:14px;">Direct Voiturier</p>
   <p style="margin:4px 0 0;color:rgba(255,255,255,0.5);font-size:11px;">Service voiturier premium · Aéroport Paris-Orly</p>
 </td></tr>
 </table>
@@ -92,10 +98,10 @@ export default async function handler(req, res) {
 </table>
 </body></html>`;
 
-    await resend.emails.send({
+    await getResend().emails.send({
       from: FROM,
       to: q.customer_email,
-      subject: `Votre devis Voiturier Orly — ${q.reference}`,
+      subject: `Votre devis Direct Voiturier — ${q.reference}`,
       html,
     });
 

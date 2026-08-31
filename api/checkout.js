@@ -89,7 +89,7 @@ export default async function handler(req, res) {
         price_data: {
           currency: 'eur',
           product_data: {
-            name: `Voiturier Orly — ${reference}`,
+            name: `Direct Voiturier — ${reference}`,
             description: `${departure.date} → ${ret.date} · ${car.brand} ${car.model} (${car.plate})`.substring(0, 500),
           },
           unit_amount: Math.round(price.total * 100),

@@ -6,7 +6,7 @@
  * PATCH /?id=xxx         : maj client (notes, vip, infos)
  * DELETE /?id=xxx        : suppression
  */
-import { supabase, requireAdmin } from '../_lib.js';
+import { supabase, requireAdmin } from '../../_lib.js';
 
 export default async function handler(req, res) {
   if (!requireAdmin(req, res)) return;
