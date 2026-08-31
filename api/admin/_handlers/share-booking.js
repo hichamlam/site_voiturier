@@ -4,9 +4,15 @@
  * Envoie un email HTML soigné avec toutes les infos de la réservation
  */
 import { Resend } from 'resend';
-import { supabase, requireAdmin } from '../_lib.js';
+import { supabase, requireAdmin } from '../../_lib.js';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Instanciation paresseuse : ce module est importé avec les 11 autres routes
+// admin par le répartiteur `api/admin/[...slug].js`. Si RESEND_API_KEY était
+// lu au chargement du module (comme avant), une clé absente ferait planter
+// tout le back-office et pas seulement le partage de réservation.
+function getResend() {
+  return new Resend(process.env.RESEND_API_KEY);
+}
 
 function escapeHtml(s) {
   if (s == null) return '';
@@ -132,7 +138,7 @@ export default async function handler(req, res) {
     const FROM = process.env.FROM_EMAIL || 'Direct Voiturier <contact@directvoiturier.com>';
     const html = buildHTML(b, text);
 
-    await resend.emails.send({
+    await getResend().emails.send({
       from: FROM,
       to,
       subject: `[Direct Voiturier] Réservation ${b.reference} — ${b.customer_firstname} ${b.customer_lastname}`,

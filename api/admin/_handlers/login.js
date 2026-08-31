@@ -3,7 +3,7 @@
  * Body : { password }
  * Returns : { token } (à stocker en localStorage côté admin)
  */
-import { signToken } from '../_lib.js';
+import { signToken } from '../../_lib.js';
 import crypto from 'crypto';
 
 export default async function handler(req, res) {

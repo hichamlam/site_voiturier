@@ -4,9 +4,15 @@
  * Envoie le devis par email au client
  */
 import { Resend } from 'resend';
-import { supabase, requireAdmin } from '../_lib.js';
+import { supabase, requireAdmin } from '../../_lib.js';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Instanciation paresseuse : ce module est importé avec les 11 autres routes
+// admin par le répartiteur `api/admin/[...slug].js`. Si RESEND_API_KEY était
+// lu au chargement du module (comme avant), une clé absente ferait planter
+// tout le back-office et pas seulement l'envoi de devis.
+function getResend() {
+  return new Resend(process.env.RESEND_API_KEY);
+}
 
 function fmtDate(iso) {
   if (!iso) return '—';
@@ -92,7 +98,7 @@ export default async function handler(req, res) {
 </table>
 </body></html>`;
 
-    await resend.emails.send({
+    await getResend().emails.send({
       from: FROM,
       to: q.customer_email,
       subject: `Votre devis Direct Voiturier — ${q.reference}`,

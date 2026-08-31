@@ -1,7 +1,7 @@
 /**
  * /api/admin/vehicle-categories — CRUD catégories véhicule
  */
-import { supabase, requireAdmin } from '../_lib.js';
+import { supabase, requireAdmin } from '../../_lib.js';
 
 export default async function handler(req, res) {
   if (!requireAdmin(req, res)) return;

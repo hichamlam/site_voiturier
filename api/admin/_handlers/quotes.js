@@ -8,7 +8,7 @@
  * DELETE ?id=            : supprimer
  * POST ?action=convert&id= : convertir en réservation
  */
-import { supabase, requireAdmin, calculatePrice } from '../_lib.js';
+import { supabase, requireAdmin, calculatePrice } from '../../_lib.js';
 
 export default async function handler(req, res) {
   if (!requireAdmin(req, res)) return;
