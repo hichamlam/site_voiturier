@@ -672,7 +672,7 @@ async function api(path, opts = {}) {
     throw new Error('Session expirée');
   }
   const json = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(json.error || 'Erreur serveur');
+  if (!res.ok) throw new Error(json.error || `Erreur serveur (HTTP ${res.status} sur ${path})`);
   return json;
 }
 
