@@ -4,4 +4,4 @@ Disallow: /admin
 Disallow: /admin/
 Disallow: /api/
 
-Sitemap: https://www.voiturier-orly.fr/sitemap.xml
+Sitemap: https://directvoiturier.com/sitemap.xml

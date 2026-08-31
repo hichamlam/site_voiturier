@@ -54,8 +54,8 @@ export default async function handler(req, res) {
       }
     }
 
-    const FROM = process.env.FROM_EMAIL || 'Voiturier Orly <contact@voiturier-orly.fr>';
-    const ADMIN = process.env.ADMIN_EMAIL || 'contact@voiturier-orly.fr';
+    const FROM = process.env.FROM_EMAIL || 'Direct Voiturier <contact@directvoiturier.com>';
+    const ADMIN = process.env.ADMIN_EMAIL || 'contact@directvoiturier.com';
     const ctx = {
       reference: booking.reference,
       total: Number(booking.total_price),

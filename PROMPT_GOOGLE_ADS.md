@@ -21,14 +21,14 @@ et ma première campagne.
 - Activité : service de voiturier à l'aéroport de Paris-Orly (le client dépose
   sa voiture au dépose-minute, je la garde pendant son voyage, je la lui ramène
   à son retour). Je propose aussi des lavages en option.
-- Site : voiturier-orly.fr — la réservation et le paiement se font en ligne
+- Site : directvoiturier.com — la réservation et le paiement se font en ligne
   (Stripe), avec aussi une option paiement sur place.
 - Prix : à partir de 29 €, jusqu'à environ 300 € pour les longs séjours.
 - J'ai déjà une fiche Google Business Profile : 4,6 étoiles, 396 avis,
   située à Paray-Vieille-Poste (91).
 - Budget publicitaire : 10 € par jour, pas plus.
 - Zone : rayon de 40 km autour d'Orly + départements 91, 94, 77, 78.
-- Mes mots-clés cibles : "voiturier orly", "voiturier aéroport orly",
+- Mes mots-clés cibles : "direct voiturier", "voiturier aéroport orly",
   "parking orly voiturier".
 - Je suis DÉBUTANT total sur Google Ads. Je n'ai jamais créé de campagne.
 

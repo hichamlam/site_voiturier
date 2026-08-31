@@ -1,4 +1,4 @@
-# Campagne Google Ads — 10 €/jour — Voiturier Orly
+# Campagne Google Ads — 10 €/jour — Direct Voiturier
 
 Objectif : **des réservations payées**, pas des clics. Tout est réglé pour un
 petit budget : peu de mots-clés, très ciblés, zone géographique serrée, et un
@@ -43,11 +43,11 @@ suivi de conversion branché sur la vraie réservation payée (retour Stripe).
 En **exact** et **expression** uniquement (jamais de requête large avec 10 €/jour) :
 
 ```
-[voiturier orly]
+[direct voiturier]
 [voiturier aéroport orly]
 [parking orly voiturier]
 [parking orly avec voiturier]
-"voiturier orly"
+"direct voiturier"
 "voiturier aéroport orly"
 "parking orly voiturier"
 ```
@@ -80,7 +80,7 @@ c'est quoi
 
 **Titres** (Google en combine 3) :
 1. Voiturier à l'Aéroport d'Orly
-2. Réservez Votre Voiturier Orly
+2. Réservez Votre Direct Voiturier
 3. Dès 29€ — Prix Total Affiché
 4. Déposez Votre Voiture à Orly
 5. Prise en Charge au Dépose-Minute

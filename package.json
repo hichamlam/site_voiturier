@@ -1,7 +1,7 @@
 {
-  "name": "voiturier-orly",
+  "name": "direct-voiturier",
   "version": "1.0.0",
-  "description": "Site officiel et back-office Voiturier Orly — Service voiturier premium à Paris-Orly",
+  "description": "Site officiel et back-office Direct Voiturier — Service voiturier premium à Paris-Orly",
   "type": "module",
   "private": true,
   "scripts": {

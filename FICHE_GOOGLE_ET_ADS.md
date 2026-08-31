@@ -11,11 +11,11 @@ second est payant et ne doit démarrer qu'une fois le suivi de conversion posé.
 ### 1.1 Changer la catégorie principale ⚠️ le point le plus important
 
 Aujourd'hui votre fiche est classée **« Parking »**. Google ne vous propose donc
-pas — ou très mal — à quelqu'un qui tape « voiturier orly ». La catégorie
+pas — ou très mal — à quelqu'un qui tape « direct voiturier ». La catégorie
 principale est le premier critère de tri du référencement local : c'est elle qui
 décide des recherches sur lesquelles vous apparaissez.
 
-1. Ouvrez Google Maps (ou tapez « voiturier orly » sur Google en étant connecté
+1. Ouvrez Google Maps (ou tapez « direct voiturier » sur Google en étant connecté
    au compte qui gère la fiche), puis ouvrez votre fiche
 2. Cliquez **Modifier le profil** → onglet **À propos**
 3. Section **Catégorie d'activité** → **Catégorie principale**
@@ -33,7 +33,7 @@ Le changement est parfois relu par Google : comptez de quelques heures à
 ### 1.2 Le champ Site Web
 
 Toujours dans **Modifier le profil** → **Coordonnées** → **Site Web** :
-mettez `https://www.voiturier-orly.fr`
+mettez `https://directvoiturier.com`
 
 C'est ce lien qui transfère la crédibilité de vos 396 avis vers le site.
 
@@ -99,7 +99,7 @@ partout, sans mots-clés négatifs, et brûle 10 €/jour en clics inutiles.
 
 1. Menu **Objectifs** → **Conversions** → **Actions de conversion**
 2. **+ Nouvelle action de conversion** → **Site Web**
-3. Saisissez `voiturier-orly.fr` → **Analyser**. Google ne trouvera rien
+3. Saisissez `directvoiturier.com` → **Analyser**. Google ne trouvera rien
    (normal, aucune balise n'est encore posée) → choisissez **« Ajouter
    manuellement une action de conversion »**
 4. Réglages :

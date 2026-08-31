@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * 🚗 VOITURIER ORLY — Script de setup interactif
+ * 🚗 DIRECT VOITURIER — Script de setup interactif
  *
  * Lance avec : node setup.js
  *
@@ -80,9 +80,9 @@ async function testResend(key) {
 // ─── Workflow ────────────────────────────────────────────────
 async function main() {
   console.clear();
-  log(`${c.b}${c.y}╔═══════════════════════════════════════════════╗${c.r}`);
-  log(`${c.b}${c.y}║   🚗  VOITURIER ORLY — Setup interactif      ║${c.r}`);
-  log(`${c.b}${c.y}╚═══════════════════════════════════════════════╝${c.r}`);
+  log(`${c.b}${c.y}╔══════════════════════════════════════════════════╗${c.r}`);
+  log(`${c.b}${c.y}║   🚗  DIRECT VOITURIER — Setup interactif         ║${c.r}`);
+  log(`${c.b}${c.y}╚══════════════════════════════════════════════════╝${c.r}`);
   log(`\n${c.dim}Ce script va te guider pour configurer ton projet.${c.r}`);
   log(`${c.dim}Tu peux faire Ctrl+C à tout moment et relancer plus tard.${c.r}\n`);
 
@@ -111,7 +111,7 @@ async function main() {
   // ─── ÉTAPE 3 : Resend ───────────────────────────────────
   title('3/5 — Resend (envoi des emails)');
   log(`Crée un compte gratuit sur ${c.cy}https://resend.com${c.r} (3000 emails/mois)`);
-  log(`Puis : ${c.b}Domains → Add → voiturier-orly.fr${c.r}, ajoute les DNS sur OVH, attends la validation`);
+  log(`Puis : ${c.b}Domains → Add → directvoiturier.com${c.r}, ajoute les DNS dans Vercel (domaine acheté là-bas), attends la validation`);
   log(`Enfin : ${c.b}API Keys → Create${c.r} → copie la clé "re_..."`);
   log(`${c.dim}(Tu peux mettre une clé bidon pour l'instant et changer plus tard sur Vercel)${c.r}`);
   const resendKey = (await ask(`\n${c.b}Colle ta clé Resend :${c.r} `)).trim();
@@ -124,7 +124,7 @@ async function main() {
     log(`${c.y}⚠${c.r} Format inattendu, à valider plus tard`);
   }
 
-  const fromEmail = (await ask(`${c.b}Email expéditeur${c.r} ${c.dim}[par défaut: contact@voiturier-orly.fr]${c.r} : `)).trim() || 'contact@voiturier-orly.fr';
+  const fromEmail = (await ask(`${c.b}Email expéditeur${c.r} ${c.dim}[par défaut: contact@directvoiturier.com]${c.r} : `)).trim() || 'contact@directvoiturier.com';
   const adminEmail = (await ask(`${c.b}Ton email perso (pour recevoir les notifications)${c.r} : `)).trim();
 
   // ─── ÉTAPE 4 : Stripe ───────────────────────────────────
@@ -155,7 +155,7 @@ async function main() {
   const sessionSecret = crypto.randomBytes(32).toString('base64url');
   ok('Secret de session généré automatiquement');
 
-  const siteUrl = (await ask(`${c.b}URL du site${c.r} ${c.dim}[https://www.voiturier-orly.fr]${c.r} : `)).trim() || 'https://www.voiturier-orly.fr';
+  const siteUrl = (await ask(`${c.b}URL du site${c.r} ${c.dim}[https://directvoiturier.com]${c.r} : `)).trim() || 'https://directvoiturier.com';
 
   // ─── Génération du fichier .env.local ───────────────────
   const envContent = `# Généré automatiquement par setup.js le ${new Date().toISOString()}
@@ -171,7 +171,7 @@ STRIPE_WEBHOOK_SECRET=${stripeWebhook}
 
 # ─── RESEND ─────────────────────────────────────────────────
 RESEND_API_KEY=${resendKey || 're_TO_FILL'}
-FROM_EMAIL="Voiturier Orly <${fromEmail}>"
+FROM_EMAIL="Direct Voiturier <${fromEmail}>"
 ADMIN_EMAIL=${adminEmail || 'admin@example.com'}
 
 # ─── SITE ───────────────────────────────────────────────────
@@ -200,11 +200,11 @@ ADMIN_SESSION_SECRET=${sessionSecret}
 
   log(`${c.b}📋 Ce qu'il te reste à faire :${c.r}\n`);
   log(`  ${c.b}1.${c.r} ${c.cy}Validation domaine Resend${c.r}`);
-  log(`     → Resend → Domains → ajoute voiturier-orly.fr → ajoute DNS sur OVH`);
+  log(`     → Resend → Domains → ajoute directvoiturier.com → ajoute les DNS dans Vercel (Domains → DNS Records)`);
   log(`     → Sans ça, les emails ne partiront pas\n`);
   log(`  ${c.b}2.${c.r} ${c.cy}Push GitHub${c.r}`);
   log(`     ${c.dim}git init && git add . && git commit -m "Initial"${c.r}`);
-  log(`     ${c.dim}git remote add origin https://github.com/TON_USER/voiturier-orly.git${c.r}`);
+  log(`     ${c.dim}git remote add origin https://github.com/TON_USER/direct-voiturier.git${c.r}`);
   log(`     ${c.dim}git push -u origin main${c.r}\n`);
   log(`  ${c.b}3.${c.r} ${c.cy}Déploiement Vercel${c.r}`);
   log(`     → vercel.com → Add New → Import depuis GitHub`);
@@ -215,9 +215,8 @@ ADMIN_SESSION_SECRET=${sessionSecret}
   log(`     → URL : https://TON-URL.vercel.app/api/webhook`);
   log(`     → Event : checkout.session.completed`);
   log(`     → Signing secret → copie → Vercel → édite STRIPE_WEBHOOK_SECRET → Redeploy\n`);
-  log(`  ${c.b}5.${c.r} ${c.cy}Domaine OVH${c.r}`);
-  log(`     → Vercel → Settings → Domains → ajoute voiturier-orly.fr et www.`);
-  log(`     → OVH → Zone DNS → ajoute les DNS données par Vercel`);
+  log(`  ${c.b}5.${c.r} ${c.cy}Domaine${c.r}`);
+  log(`     → Domaine déjà acheté sur Vercel : Settings → Domains → ajoute directvoiturier.com`);
   log(`     → Mets à jour SITE_URL sur Vercel → Redeploy\n`);
   log(`  ${c.b}6.${c.r} ${c.cy}Tests${c.r}`);
   log(`     → Carte test Stripe : 4242 4242 4242 4242 (n'importe quelle date future)`);

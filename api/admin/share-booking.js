@@ -105,7 +105,7 @@ ${customNote ? `<tr><td style="padding:18px 40px 0;">
 </td></tr>
 
 <tr><td style="background:#0B1426;padding:22px 40px;text-align:center;">
-  <p style="margin:0;color:#E8B362;font-weight:800;font-size:13px;">Voiturier Orly</p>
+  <p style="margin:0;color:#E8B362;font-weight:800;font-size:13px;">Direct Voiturier</p>
   <p style="margin:4px 0 0;color:rgba(255,255,255,0.5);font-size:11px;">Partage interne — réservation ${b.reference}</p>
 </td></tr>
 </table>
@@ -129,13 +129,13 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Resend non configuré' });
     }
 
-    const FROM = process.env.FROM_EMAIL || 'Voiturier Orly <contact@voiturier-orly.fr>';
+    const FROM = process.env.FROM_EMAIL || 'Direct Voiturier <contact@directvoiturier.com>';
     const html = buildHTML(b, text);
 
     await resend.emails.send({
       from: FROM,
       to,
-      subject: `[Voiturier Orly] Réservation ${b.reference} — ${b.customer_firstname} ${b.customer_lastname}`,
+      subject: `[Direct Voiturier] Réservation ${b.reference} — ${b.customer_firstname} ${b.customer_lastname}`,
       html,
       text: text || `Réservation ${b.reference} — ${b.customer_firstname} ${b.customer_lastname}`,
     });

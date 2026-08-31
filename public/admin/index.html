@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
-<title>Back-office — Voiturier Orly</title>
+<title>Back-office — Direct Voiturier</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
@@ -556,7 +556,7 @@ tbody tr:last-child { border-bottom: none; }
         </svg>
       </div>
       <div>
-        <h1>Voiturier Orly</h1>
+        <h1>Direct Voiturier</h1>
         <p class="sub">Back-office d'administration</p>
       </div>
     </div>
@@ -579,7 +579,7 @@ tbody tr:last-child { border-bottom: none; }
         </svg>
       </div>
       <div>
-        <div class="name">Voiturier Orly</div>
+        <div class="name">Direct Voiturier</div>
         <div class="tag">Admin</div>
       </div>
     </div>
@@ -2059,7 +2059,7 @@ function buildShareText(b, format = 'plain') {
     lines.push(`📝 Notes : ${b.internal_notes}`);
   }
   lines.push('');
-  lines.push('— Voiturier Orly');
+  lines.push('— Direct Voiturier');
 
   return lines.join('\n');
 }
@@ -2080,7 +2080,7 @@ function shareViaSMS() {
 function shareViaEmail() {
   const text = document.getElementById('shareText').value;
   const b = STATE.shareBooking;
-  const subject = `Réservation Voiturier Orly — ${b.reference} — ${b.customer_firstname} ${b.customer_lastname}`;
+  const subject = `Réservation Direct Voiturier — ${b.reference} — ${b.customer_firstname} ${b.customer_lastname}`;
   const url = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text)}`;
   window.location.href = url;
 }
