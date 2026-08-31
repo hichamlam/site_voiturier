@@ -97,7 +97,7 @@ export default async function handler(req, res) {
         quantity: 1,
       }],
       metadata: { booking_id: booking.id, reference },
-      success_url: `${process.env.SITE_URL}/?paid=1&ref=${reference}`,
+      success_url: `${process.env.SITE_URL}/?paid=1&ref=${reference}&val=${price.total}`,
       cancel_url: `${process.env.SITE_URL}/?canceled=1&ref=${reference}`,
       locale: 'fr',
     });

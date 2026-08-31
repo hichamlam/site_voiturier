@@ -693,7 +693,9 @@ function trackPurchase(ref, value) {
     try { already = sessionStorage.getItem('vo_paid_' + ref); } catch {}
     if (!already) {
       try { sessionStorage.setItem('vo_paid_' + ref, '1'); } catch {}
-      trackPurchase(ref);
+      // Montant payé, transmis par Stripe dans l'URL de retour (&val=)
+      const paidValue = Number(q.get('val'));
+      trackPurchase(ref, Number.isFinite(paidValue) && paidValue > 0 ? paidValue : undefined);
     }
     history.replaceState(null, '', window.location.pathname);
   } else if (q.get('canceled') === '1') {
