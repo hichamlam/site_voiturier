@@ -37,8 +37,28 @@ const routes = {
 };
 
 export default async function handler(req, res) {
-  const slug = Array.isArray(req.query.slug) ? req.query.slug : [req.query.slug];
-  const route = routes[slug[0]];
-  if (!route) return res.status(404).json({ error: 'Route admin inconnue' });
+  // Vercel renseigne normalement req.query.slug. On ne s'y fie pas
+  // aveuglément : si le paramètre manque ou arrive sous une autre forme, on
+  // relit le nom de la route dans l'URL. Une seule route cassée mettrait tout
+  // le back-office hors service.
+  let nom = null;
+  const brut = req.query ? req.query.slug : undefined;
+  if (Array.isArray(brut)) nom = brut[0];
+  else if (typeof brut === 'string' && brut) nom = brut.split('/')[0];
+
+  if (!nom) {
+    const chemin = String(req.url || '').split('?')[0];
+    const m = chemin.match(/\/api\/admin\/([^/]+)/);
+    if (m) nom = decodeURIComponent(m[1]).replace(/\.js$/, '');
+  }
+
+  const route = nom ? routes[nom] : null;
+  if (!route) {
+    // Message volontairement bavard : sans accès aux logs Vercel, c'est le
+    // seul indice visible pour comprendre ce que la plateforme a transmis.
+    return res.status(404).json({
+      error: `Route admin inconnue : « ${nom || '(vide)'} » (URL reçue : ${req.url || '?'})`,
+    });
+  }
   return route(req, res);
 }
