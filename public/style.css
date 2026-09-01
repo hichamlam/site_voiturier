@@ -85,9 +85,11 @@ input,select,textarea { font-family:inherit; }
 .hero-perk-check { width:22px; height:22px; background:var(--gold); border-radius:50%;
   display:flex; align-items:center; justify-content:center; flex-shrink:0; }
 .hero-perk-check svg { width:12px; height:12px; color:var(--ink); stroke-width:3.5; }
-.hero-price-tag { display:inline-flex; align-items:baseline; gap:6px; color:white; font-size:0.92rem; font-weight:600; }
-.hero-price-tag .from { color:var(--gold); font-weight:700; letter-spacing:0.06em; text-transform:uppercase; font-size:0.74rem; }
-.hero-price-tag .amount { font-weight:800; font-size:1.6rem; color:var(--gold); letter-spacing:-0.02em; }
+.hero-price-tag { display:inline-flex; align-items:baseline; gap:8px; color:white; font-size:0.92rem; font-weight:600;
+  background:rgba(11,20,38,0.55); backdrop-filter:blur(8px); border:1px solid rgba(255,255,255,0.15);
+  border-radius:100px; padding:10px 20px; }
+.hero-price-tag .from { color:var(--gold-light); font-weight:700; letter-spacing:0.06em; text-transform:uppercase; font-size:0.74rem; }
+.hero-price-tag .amount { font-weight:800; font-size:1.6rem; color:white; letter-spacing:-0.02em; }
 
 /* BOOKING CARD */
 .bk-card { background:white; border-radius:var(--r-xl); padding:22px;
