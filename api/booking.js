@@ -2,7 +2,7 @@
  * POST /api/booking — paiement sur place
  */
 import { Resend } from 'resend';
-import { supabase, calculatePrice, checkDatesAvailable, upsertClient } from './_lib.js';
+import { supabase, calculatePrice, checkDatesAvailable, checkVehicleAllowed, upsertClient } from './_lib.js';
 import { clientEmailHTML, adminEmailHTML } from './_emails.js';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -22,6 +22,9 @@ export default async function handler(req, res) {
 
     const avail = await checkDatesAvailable(departure.date, ret.date);
     if (!avail.available) return res.status(409).json({ error: 'Dates non disponibles' });
+
+    const vehicleCheck = await checkVehicleAllowed(car.brand, car.model);
+    if (!vehicleCheck.allowed) return res.status(403).json({ error: vehicleCheck.reason });
 
     const price = await calculatePrice({
       depDate: departure.date,
