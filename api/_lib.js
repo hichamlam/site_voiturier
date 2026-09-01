@@ -81,7 +81,8 @@ export async function calculatePrice(input) {
   // 1. Durée
   const d1 = new Date(depDate);
   const d2 = new Date(retDate);
-  const days = Math.max(1, Math.ceil((d2 - d1) / 86400000));
+  // Comptage par date calendaire inclusive (ex: 2 au 5 septembre = 4 jours), pas par tranche de 24h.
+  const days = Math.max(1, Math.round((d2 - d1) / 86400000) + 1);
 
   // 2. Tarif de base depuis la grille
   const { data: rule } = await supabase
