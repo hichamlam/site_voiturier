@@ -467,8 +467,8 @@ section { position:relative; }
 /* CGV modal */
 .cgv-content { padding:34px 36px; max-height:80vh; overflow-y:auto;
   font-size:0.9rem; line-height:1.7; color:var(--ink-soft); }
-.cgv-content h1 { font-size:1.5rem; font-weight:800; color:var(--ink); margin-bottom:18px; }
-.cgv-content h2 { font-size:1.05rem; font-weight:800; color:var(--ink); margin:22px 0 8px; }
+.cgv-content h2 { font-size:1.5rem; font-weight:800; color:var(--ink); margin-bottom:18px; }
+.cgv-content h3 { font-size:1.05rem; font-weight:800; color:var(--ink); margin:22px 0 8px; }
 .cgv-content p { margin-bottom:10px; }
 .cgv-content ul { margin:10px 0 14px 22px; }
 .cgv-content li { margin-bottom:6px; }

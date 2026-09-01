@@ -789,7 +789,7 @@ document.addEventListener('click', e => {
 ═══════════════════════════════════════════════ */
 (function stickyCtaInit() {
   const bar = document.getElementById('stickyCta');
-  const hero = document.querySelector('.hero');
+  const hero = document.querySelector('.hero, .page-hero');
   if (!bar || !hero) return;
   const io2 = new IntersectionObserver(entries => {
     entries.forEach(en => {
