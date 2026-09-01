@@ -65,22 +65,6 @@ window.addEventListener('scroll', () => {
   else nav.classList.remove('scrolled');
 }, { passive:true });
 
-/* ÉTOILES */
-(function() {
-  const c = document.getElementById('stars');
-  if (!c) return;
-  for (let i = 0; i < 30; i++) {
-    const s = document.createElement('div');
-    s.className = 'star';
-    const sz = Math.random() * 2 + 1;
-    s.style.width = s.style.height = sz + 'px';
-    s.style.top = (Math.random() * 100) + '%';
-    s.style.left = (Math.random() * 100) + '%';
-    s.style.animationDelay = (Math.random() * 4) + 's';
-    s.style.opacity = Math.random() * 0.6 + 0.3;
-    c.appendChild(s);
-  }
-})();
 
 /* REVEAL ON SCROLL */
 const obs = new IntersectionObserver(es => {
@@ -189,7 +173,7 @@ async function simSelectCategory(code, btn) {
   STATE.sim.categoryCode = code;
 
   // Calculer le tarif
-  document.getElementById('sim-result-amount').innerHTML = '<span class="spinner" style="border-top-color:var(--gold-deep)"></span>';
+  document.getElementById('sim-result-amount').innerHTML = '<span class="spinner" style="border-top-color:var(--blue-deep)"></span>';
   simGoToStep(3);
 
   const res = await fetchPrice({
