@@ -19,13 +19,18 @@ CREATE TABLE IF NOT EXISTS clients (
 CREATE INDEX IF NOT EXISTS idx_clients_email ON clients(email);
 
 CREATE TABLE IF NOT EXISTS pricing_rules (
-  id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  days_min      int NOT NULL,
-  days_max      int NOT NULL,
-  price_eur     numeric(10,2) NOT NULL,
-  label         text DEFAULT '',
-  created_at    timestamptz DEFAULT now()
+  id                 uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  days_min           int NOT NULL,
+  days_max           int NOT NULL,
+  price_eur          numeric(10,2) NOT NULL,
+  label              text DEFAULT '',
+  -- Optionnel : si rempli, le prix au-delà de days_min devient
+  -- price_eur + (jours - days_min) × extra_per_day_eur (tarif dégressif).
+  extra_per_day_eur  numeric(10,2) DEFAULT NULL,
+  created_at         timestamptz DEFAULT now()
 );
+-- Ajoute la colonne si la table existe déjà (installations précédentes).
+ALTER TABLE pricing_rules ADD COLUMN IF NOT EXISTS extra_per_day_eur numeric(10,2) DEFAULT NULL;
 
 INSERT INTO pricing_rules (days_min, days_max, price_eur, label) VALUES
   (1,1,29,'24h'),(2,2,49,'2 jours'),(3,3,65,'3 jours'),(4,5,79,'4-5 jours'),
@@ -51,6 +56,16 @@ INSERT INTO vehicle_categories (code, name, description, surcharge_eur, wash_sur
   ('suv','SUV / 4×4 / Monospace','Grand véhicule familial',10,10,3),
   ('utilitaire','Van / Utilitaire','Van, fourgon, pickup',25,20,4)
 ON CONFLICT DO NOTHING;
+
+-- Véhicules refusés (marque + modèle) : la réservation est bloquée avec
+-- un message dédié si le client indique une de ces combinaisons.
+CREATE TABLE IF NOT EXISTS blocked_vehicles (
+  id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  brand         text NOT NULL,
+  model         text NOT NULL,
+  reason        text DEFAULT '',
+  created_at    timestamptz DEFAULT now()
+);
 
 DO $$ BEGIN
   CREATE TYPE surcharge_kind AS ENUM ('time_window', 'holiday', 'option');
@@ -265,6 +280,7 @@ ALTER TABLE pricing_special ENABLE ROW LEVEL SECURITY;
 ALTER TABLE blocked_dates ENABLE ROW LEVEL SECURITY;
 ALTER TABLE promo_codes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE vehicle_categories ENABLE ROW LEVEL SECURITY;
+ALTER TABLE blocked_vehicles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE surcharges ENABLE ROW LEVEL SECURITY;
 ALTER TABLE holidays ENABLE ROW LEVEL SECURITY;
 ALTER TABLE quotes ENABLE ROW LEVEL SECURITY;
