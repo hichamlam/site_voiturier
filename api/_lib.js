@@ -86,7 +86,7 @@ export async function calculatePrice(input) {
   // 2. Tarif de base depuis la grille
   const { data: rule } = await supabase
     .from('pricing_rules')
-    .select('price_eur')
+    .select('price_eur, days_min, extra_per_day_eur')
     .lte('days_min', days)
     .gte('days_max', days)
     .order('days_min', { ascending: false })
@@ -94,6 +94,11 @@ export async function calculatePrice(input) {
     .maybeSingle();
 
   let basePrice = rule ? Number(rule.price_eur) : 29;
+  // Palier dégressif : au-delà de days_min, on ajoute extra_per_day_eur par jour.
+  if (rule && rule.extra_per_day_eur && days > rule.days_min) {
+    basePrice += (days - rule.days_min) * Number(rule.extra_per_day_eur);
+  }
+  basePrice = Math.round(basePrice * 100) / 100;
   detail.push({ kind: 'base', label: `Voiturier ${days} jour${days > 1 ? 's' : ''}`, amount: basePrice });
 
   // 3. Surcharge catégorie véhicule
@@ -268,6 +273,21 @@ export async function calculatePrice(input) {
     total,
     surchargesDetail: detail,
   };
+}
+
+// ─── Véhicules refusés (marque + modèle) ───
+export async function checkVehicleAllowed(brand, model) {
+  const b = (brand || '').trim();
+  const m = (model || '').trim();
+  if (!b || !m) return { allowed: true };
+  const { data } = await supabase
+    .from('blocked_vehicles')
+    .select('reason')
+    .ilike('brand', b)
+    .ilike('model', m)
+    .maybeSingle();
+  if (!data) return { allowed: true };
+  return { allowed: false, reason: data.reason || `Désolé, nous n'acceptons pas les ${b} ${m}.` };
 }
 
 export async function checkDatesAvailable(depDate, retDate) {

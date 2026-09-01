@@ -15,6 +15,7 @@ import clientsHandler from './_handlers/clients.js';
 import pricingHandler from './_handlers/pricing.js';
 import promosHandler from './_handlers/promos.js';
 import vehicleCategoriesHandler from './_handlers/vehicle-categories.js';
+import blockedVehiclesHandler from './_handlers/blocked-vehicles.js';
 import surchargesHandler from './_handlers/surcharges.js';
 import quotesHandler from './_handlers/quotes.js';
 import quotesSendHandler from './_handlers/quotes-send.js';
@@ -29,6 +30,7 @@ const routes = {
   pricing: pricingHandler,
   promos: promosHandler,
   'vehicle-categories': vehicleCategoriesHandler,
+  'blocked-vehicles': blockedVehiclesHandler,
   surcharges: surchargesHandler,
   quotes: quotesHandler,
   'quotes-send': quotesSendHandler,

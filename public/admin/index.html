@@ -1421,13 +1421,14 @@ async function renderPricing() {
       </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Min jours</th><th>Max jours</th><th>Prix (€)</th><th>Libellé</th><th></th></tr></thead>
+          <thead><tr><th>Min jours</th><th>Max jours</th><th>Prix (€)</th><th>+ €/jour au-delà</th><th>Libellé</th><th></th></tr></thead>
           <tbody>
             ${rules.map(r => `
               <tr>
                 <td><strong>${r.days_min}</strong></td>
                 <td><strong>${r.days_max}</strong></td>
                 <td class="text-bold text-gold">${r.price_eur}€</td>
+                <td>${r.extra_per_day_eur ? '+' + r.extra_per_day_eur + '€/j' : '—'}</td>
                 <td>${escapeHtml(r.label || '—')}</td>
                 <td class="text-right">
                   <button class="btn btn-ghost btn-sm" onclick="openPricingForm('rule','${r.id}')">Modifier</button>
@@ -1516,6 +1517,7 @@ function openPricingForm(type, id) {
         <div class="field"><label>Min jours *</label><input type="number" id="pf-days_min" min="1" value="${item.days_min || 1}" required></div>
         <div class="field"><label>Max jours *</label><input type="number" id="pf-days_max" min="1" value="${item.days_max || 1}" required></div>
         <div class="field"><label>Prix (€) *</label><input type="number" id="pf-price_eur" step="0.01" value="${item.price_eur || ''}" required></div>
+        <div class="field"><label>+ €/jour au-delà (optionnel)</label><input type="number" step="0.01" id="pf-extra_per_day_eur" value="${item.extra_per_day_eur || ''}"><div class="hint">Ex. mets 10 pour "au-delà de Min jours, +10€ par jour supplémentaire". Laisse vide pour un prix fixe.</div></div>
         <div class="field"><label>Libellé</label><input id="pf-label" value="${escapeHtml(item.label || '')}"></div>
       </div>
     `;
@@ -1566,10 +1568,12 @@ async function submitPricing(type, id) {
   try {
     let payload = {};
     if (type === 'rule') {
+      const extraPerDay = document.getElementById('pf-extra_per_day_eur').value;
       payload = {
         days_min: parseInt(document.getElementById('pf-days_min').value, 10),
         days_max: parseInt(document.getElementById('pf-days_max').value, 10),
         price_eur: parseFloat(document.getElementById('pf-price_eur').value),
+        extra_per_day_eur: extraPerDay ? parseFloat(extraPerDay) : null,
         label: document.getElementById('pf-label').value.trim(),
       };
     } else if (type === 'special') {
@@ -1602,6 +1606,192 @@ async function deletePricing(type, id) {
     await api(`/api/admin/pricing?type=${type}&id=${id}`, { method: 'DELETE' });
     toast('Supprimé', 'success');
     renderPricing();
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+/* ════════════════════════════════════════════════════════════
+   VIEW: CATEGORIES (catégories véhicule + véhicules refusés)
+═══════════════════════════════════════════════════════════ */
+async function renderCategories() {
+  const [catsRes, blockedRes] = await Promise.all([
+    api('/api/admin/vehicle-categories'),
+    api('/api/admin/blocked-vehicles'),
+  ]);
+  const categories = catsRes.categories || [];
+  const blocked = blockedRes.items || [];
+  STATE.categories = categories;
+  STATE.blockedVehicles = blocked;
+
+  const c = document.getElementById('viewContainer');
+  c.innerHTML = `
+    <div class="topbar">
+      <div>
+        <h1>Catégories véhicule</h1>
+        <p class="sub">Suppléments par type de véhicule et véhicules refusés</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="flex-between mb-md">
+        <h2 style="font-size:1.05rem; font-weight:800;">🚗 Catégories & suppléments</h2>
+        <button class="btn btn-primary btn-sm" onclick="openCategoryForm()">+ Ajouter une catégorie</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Nom</th><th>Code</th><th>Supplément (€)</th><th>Supp. lavage (€)</th><th>Statut</th><th></th></tr></thead>
+          <tbody>
+            ${categories.map(cat => `
+              <tr>
+                <td class="text-bold">${escapeHtml(cat.name)}</td>
+                <td>${escapeHtml(cat.code)}</td>
+                <td>${cat.surcharge_eur > 0 ? '+' + cat.surcharge_eur + '€' : '—'}</td>
+                <td>${cat.wash_surcharge_eur > 0 ? '+' + cat.wash_surcharge_eur + '€' : '—'}</td>
+                <td>${cat.active !== false ? '<span class="text-success">✓ Actif</span>' : '<span class="text-muted">Inactif</span>'}</td>
+                <td class="text-right">
+                  <button class="btn btn-ghost btn-sm" onclick="openCategoryForm('${cat.id}')">Modifier</button>
+                  <button class="btn btn-danger btn-sm" onclick="deleteCategory('${cat.id}')">×</button>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="flex-between mb-md">
+        <h2 style="font-size:1.05rem; font-weight:800;">🚫 Véhicules refusés</h2>
+        <button class="btn btn-primary btn-sm" onclick="openBlockedForm()">+ Refuser un modèle</button>
+      </div>
+      ${blocked.length === 0 ? '<div class="text-muted">Aucun véhicule refusé</div>' : `
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Marque</th><th>Modèle</th><th>Message affiché au client</th><th></th></tr></thead>
+            <tbody>
+              ${blocked.map(v => `
+                <tr>
+                  <td class="text-bold">${escapeHtml(v.brand)}</td>
+                  <td>${escapeHtml(v.model)}</td>
+                  <td>${escapeHtml(v.reason || '—')}</td>
+                  <td class="text-right">
+                    <button class="btn btn-ghost btn-sm" onclick="openBlockedForm('${v.id}')">Modifier</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteBlocked('${v.id}')">×</button>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `}
+    </div>
+  `;
+}
+
+function openCategoryForm(id) {
+  const item = id ? (STATE.categories.find(x => x.id === id) || {}) : {};
+  const titleStr = id ? 'Modifier une catégorie' : 'Nouvelle catégorie';
+  const html = `
+    <div class="modal-bg show" onclick="if(event.target.classList.contains('modal-bg'))closeModal()">
+      <div class="modal-card">
+        <div class="modal-head">
+          <h2>${titleStr}</h2>
+          <button class="modal-close-btn" onclick="closeModal()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div class="form-grid">
+          <div class="field"><label>Nom *</label><input id="cf-name" value="${escapeHtml(item.name || '')}" placeholder="Ex. SUV / 4×4" required></div>
+          <div class="field"><label>Code *</label><input id="cf-code" value="${escapeHtml(item.code || '')}" placeholder="Ex. suv" ${id ? 'readonly' : ''} required></div>
+          <div class="field full"><label>Description</label><input id="cf-description" value="${escapeHtml(item.description || '')}"></div>
+          <div class="field"><label>Supplément (€)</label><input type="number" step="0.01" id="cf-surcharge_eur" value="${item.surcharge_eur || 0}"></div>
+          <div class="field"><label>Supp. lavage (€)</label><input type="number" step="0.01" id="cf-wash_surcharge_eur" value="${item.wash_surcharge_eur || 0}"></div>
+          <div class="field full"><label><input type="checkbox" id="cf-active" ${item.active !== false ? 'checked' : ''} style="width:auto;margin-right:6px"> Actif</label></div>
+        </div>
+        <div class="flex-between mt-md">
+          <button class="btn btn-ghost" onclick="closeModal()">Annuler</button>
+          <button class="btn btn-primary" onclick="submitCategory(${id ? `'${id}'` : 'undefined'})">Enregistrer</button>
+        </div>
+      </div>
+    </div>
+  `;
+  document.getElementById('modalsContainer').innerHTML = html;
+}
+
+async function submitCategory(id) {
+  try {
+    const payload = {
+      name: document.getElementById('cf-name').value.trim(),
+      code: document.getElementById('cf-code').value.trim().toLowerCase(),
+      description: document.getElementById('cf-description').value.trim(),
+      surcharge_eur: parseFloat(document.getElementById('cf-surcharge_eur').value) || 0,
+      wash_surcharge_eur: parseFloat(document.getElementById('cf-wash_surcharge_eur').value) || 0,
+      active: document.getElementById('cf-active').checked,
+    };
+    const url = '/api/admin/vehicle-categories' + (id ? '?id=' + id : '');
+    await api(url, { method: id ? 'PATCH' : 'POST', body: JSON.stringify(payload) });
+    toast('Enregistré', 'success');
+    closeModal();
+    renderCategories();
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+async function deleteCategory(id) {
+  if (!confirm('Supprimer cette catégorie ?')) return;
+  try {
+    await api('/api/admin/vehicle-categories?id=' + id, { method: 'DELETE' });
+    toast('Supprimé', 'success');
+    renderCategories();
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+function openBlockedForm(id) {
+  const item = id ? (STATE.blockedVehicles.find(x => x.id === id) || {}) : {};
+  const titleStr = id ? 'Modifier un véhicule refusé' : 'Refuser un modèle de véhicule';
+  const html = `
+    <div class="modal-bg show" onclick="if(event.target.classList.contains('modal-bg'))closeModal()">
+      <div class="modal-card">
+        <div class="modal-head">
+          <h2>${titleStr}</h2>
+          <button class="modal-close-btn" onclick="closeModal()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div class="form-grid">
+          <div class="field"><label>Marque *</label><input id="bf-brand" value="${escapeHtml(item.brand || '')}" placeholder="Ex. Renault" required></div>
+          <div class="field"><label>Modèle *</label><input id="bf-model" value="${escapeHtml(item.model || '')}" placeholder="Ex. Clio" required></div>
+          <div class="field full"><label>Message affiché au client</label><input id="bf-reason" value="${escapeHtml(item.reason || '')}" placeholder="Ex. Désolé, nous n'acceptons pas ce véhicule."></div>
+        </div>
+        <div class="flex-between mt-md">
+          <button class="btn btn-ghost" onclick="closeModal()">Annuler</button>
+          <button class="btn btn-primary" onclick="submitBlocked(${id ? `'${id}'` : 'undefined'})">Enregistrer</button>
+        </div>
+      </div>
+    </div>
+  `;
+  document.getElementById('modalsContainer').innerHTML = html;
+}
+
+async function submitBlocked(id) {
+  try {
+    const payload = {
+      brand: document.getElementById('bf-brand').value.trim(),
+      model: document.getElementById('bf-model').value.trim(),
+      reason: document.getElementById('bf-reason').value.trim(),
+    };
+    const url = '/api/admin/blocked-vehicles' + (id ? '?id=' + id : '');
+    await api(url, { method: id ? 'PATCH' : 'POST', body: JSON.stringify(payload) });
+    toast('Enregistré', 'success');
+    closeModal();
+    renderCategories();
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+async function deleteBlocked(id) {
+  if (!confirm('Supprimer ce véhicule refusé ?')) return;
+  try {
+    await api('/api/admin/blocked-vehicles?id=' + id, { method: 'DELETE' });
+    toast('Supprimé', 'success');
+    renderCategories();
   } catch (err) { toast(err.message, 'error'); }
 }
 
