@@ -5,7 +5,13 @@
  * ce déploiement sait réellement faire. Le front s'en sert pour n'afficher que
  * les moyens de paiement qui fonctionnent, au lieu de proposer un bouton
  * « Carte bancaire » qui échouerait faute de clés Stripe.
+ *
+ * `contact` expose en plus les coordonnées de contact/réassurance saisies
+ * par le propriétaire dans le back-office (onglet Paramètres, table
+ * `settings`). Chaque champ n'apparaît QUE s'il a réellement été renseigné :
+ * aucune valeur par défaut n'est inventée ici.
  */
+import { supabase } from './_lib.js';
 
 const PLACEHOLDER = /^(COLLER_ICI|TON_|change_moi|ton-email@)/i;
 
@@ -14,15 +20,50 @@ function isSet(name) {
   return !!v && v.trim() !== '' && !PLACEHOLDER.test(v.trim());
 }
 
+// Sous-ensemble des clés de la table `settings` destinées au public — les
+// identifiants analytics (GA4, Google Ads) restent internes au back-office.
+const PUBLIC_KEYS = [
+  'contact_phone',
+  'contact_whatsapp',
+  'contact_email',
+  'contact_address',
+  'google_business_url',
+  'insurance_company',
+  'insurance_policy_number',
+];
+
+async function loadPublicContact() {
+  try {
+    const { data, error } = await supabase
+      .from('settings')
+      .select('key, value')
+      .in('key', PUBLIC_KEYS);
+    if (error || !data) return {};
+    const contact = {};
+    for (const row of data) {
+      const v = (row.value || '').trim();
+      if (v !== '') contact[row.key] = v;
+    }
+    return contact;
+  } catch {
+    // Table absente (migration pas encore appliquée) ou Supabase injoignable :
+    // on ne casse pas /api/config pour autant, on omet juste le contact.
+    return {};
+  }
+}
+
 export default async function handler(req, res) {
   // La clé seule ne suffit pas : sans webhook, le client paie mais la
   // réservation n'est jamais confirmée ni encaissée côté back-office.
   const cleStripe = isSet('STRIPE_SECRET_KEY');
   const webhookStripe = isSet('STRIPE_WEBHOOK_SECRET');
+  const contact = await loadPublicContact();
 
   res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=60');
-  return res.status(200).json({
+  const reponse = {
     paiementEnLigne: cleStripe && webhookStripe,
     stripe: { cle: cleStripe, webhook: webhookStripe },
-  });
+  };
+  if (Object.keys(contact).length > 0) reponse.contact = contact;
+  return res.status(200).json(reponse);
 }
