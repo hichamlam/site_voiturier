@@ -521,7 +521,7 @@ window.VO_CONTACT = {
   <div class="container">
     <div class="section-head reveal">
       <p class="section-eyebrow">Tarifs</p>
-      <h2 class="section-title">Simple,<br><span class="accent">transparent</span></h2>
+      <h2 class="section-title">Simple, <span class="accent">transparent</span></h2>
       <p class="section-sub">Moins cher par jour, plus vous restez.</p>
     </div>
     <div class="pricing-cards">
@@ -531,9 +531,9 @@ window.VO_CONTACT = {
         </div>
         <div class="price-card-info">
           <p class="lbl">Court séjour</p>
-          <p class="price"><span class="from">dès</span><span>29€</span></p>
           <p class="desc">Pour 24h, aller-retour express</p>
         </div>
+        <p class="price"><span class="from">dès</span><span>29€</span></p>
       </article>
       <article class="price-card reveal">
         <div class="price-card-icon">
@@ -541,9 +541,9 @@ window.VO_CONTACT = {
         </div>
         <div class="price-card-info">
           <p class="lbl">Une semaine</p>
-          <p class="price"><span class="from">dès</span><span>89€</span></p>
           <p class="desc">Tarif dégressif — week-end et plus</p>
         </div>
+        <p class="price"><span class="from">dès</span><span>89€</span></p>
       </article>
     </div>
     <p class="pricing-note reveal">Tarif exact calculé selon vos dates, avant paiement.</p>
@@ -555,13 +555,13 @@ window.VO_CONTACT = {
   <div class="container">
     <div class="section-head reveal">
       <p class="section-eyebrow">Pendant que vous voyagez</p>
-      <h2 class="section-title">Vous vous reposez.<br><span class="accent">Elle aussi</span></h2>
+      <h2 class="section-title">Vous vous reposez. <span class="accent">Elle aussi</span></h2>
       <p class="section-sub">Offrez à votre voiture le soin qu'elle mérite pendant votre voyage.</p>
     </div>
     <img class="options-illu" src="/img/lavage.svg" width="480" height="300" loading="lazy" role="img" aria-label="Illustration d'un voiturier Direct Voiturier en uniforme bleu marine qui lave l'avant d'une voiture bleu marine au nettoyeur haute pression, avec de la mousse en arrière-plan">
-    <div class="options-grid">
-      <article class="option-card reveal">
-        <div class="option-illu">
+    <div class="options-list">
+      <article class="option-row reveal">
+        <div class="option-row-icon">
           <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8">
             <path d="M 8 30 L 10 22 Q 12 18 16 18 L 32 18 Q 36 18 38 22 L 40 30"/>
             <rect x="6" y="30" width="36" height="10" rx="2"/>
@@ -569,27 +569,30 @@ window.VO_CONTACT = {
             <circle cx="34" cy="40" r="3" fill="currentColor"/>
           </svg>
         </div>
-        <h3 class="option-name">Express</h3>
-        <p class="option-tag">Extérieur rapide</p>
-        <p class="option-desc">Carrosserie, jantes et vitres. Elle brille à votre retour.</p>
-        <p class="option-price"><span class="val">29</span><span class="cur">€</span></p>
+        <div class="option-row-info">
+          <p class="option-row-name">Express</p>
+          <p class="option-row-desc">Extérieur rapide — carrosserie, jantes et vitres</p>
+        </div>
+        <p class="option-row-price"><span class="val">29</span><span class="cur">€</span></p>
       </article>
 
-      <article class="option-card featured reveal">
-        <div class="option-illu">
+      <article class="option-row featured reveal">
+        <span class="option-row-badge">★ Le plus choisi</span>
+        <div class="option-row-icon">
           <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8">
             <path d="M 24 4 L 30 18 L 44 20 L 32 30 L 36 44 L 24 36 L 12 44 L 16 30 L 4 20 L 18 18 Z" fill="currentColor" fill-opacity="0.2"/>
             <path d="M 24 4 L 30 18 L 44 20 L 32 30 L 36 44 L 24 36 L 12 44 L 16 30 L 4 20 L 18 18 Z"/>
           </svg>
         </div>
-        <h3 class="option-name">Complet</h3>
-        <p class="option-tag">La formule signature</p>
-        <p class="option-desc">Extérieur + intérieur. Une voiture comme neuve.</p>
-        <p class="option-price"><span class="val">69</span><span class="cur">€</span></p>
+        <div class="option-row-info">
+          <p class="option-row-name">Complet</p>
+          <p class="option-row-desc">La formule signature — extérieur + intérieur</p>
+        </div>
+        <p class="option-row-price"><span class="val">69</span><span class="cur">€</span></p>
       </article>
 
-      <article class="option-card reveal">
-        <div class="option-illu">
+      <article class="option-row reveal">
+        <div class="option-row-icon">
           <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8">
             <rect x="8" y="14" width="32" height="22" rx="3"/>
             <path d="M 8 26 L 40 26"/>
@@ -598,10 +601,11 @@ window.VO_CONTACT = {
             <path d="M 24 8 L 25 6 L 26 8 L 28 9 L 26 10 L 25 12 L 24 10 L 22 9 Z" fill="currentColor"/>
           </svg>
         </div>
-        <h3 class="option-name">Premium</h3>
-        <p class="option-tag">L'expérience totale</p>
-        <p class="option-desc">Complet + plastiques traités + désinfection.</p>
-        <p class="option-price"><span class="val">99</span><span class="cur">€</span></p>
+        <div class="option-row-info">
+          <p class="option-row-name">Premium</p>
+          <p class="option-row-desc">L'expérience totale — complet + plastiques + désinfection</p>
+        </div>
+        <p class="option-row-price"><span class="val">99</span><span class="cur">€</span></p>
       </article>
     </div>
     <div class="options-quote">
