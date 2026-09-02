@@ -119,13 +119,27 @@ input,select,textarea { font-family:inherit; }
 
 .bk-cats { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; }
 .bk-cat { background:var(--bg-soft); border:2px solid transparent; border-radius:var(--r);
-  padding:14px 12px; text-align:center; cursor:pointer; transition:all 0.2s;
+  padding:14px 12px; text-align:center; cursor:pointer; transition:all 0.2s; position:relative;
   display:flex; flex-direction:column; align-items:center; gap:6px; }
 .bk-cat:hover { border-color:var(--blue-light); background:white; }
 .bk-cat.selected { border-color:var(--blue); background:var(--blue-pale); }
 .bk-cat-icon { display:flex; align-items:center; justify-content:center; height:22px; color:var(--ink); }
 .bk-cat-icon svg { width:34px; height:20px; }
 .bk-cat-name { font-size:0.78rem; font-weight:800; color:var(--ink); line-height:1.2; }
+
+.bk-cat-info { position:absolute; top:6px; right:6px; width:18px; height:18px; border-radius:50%;
+  background:white; border:1px solid var(--line); color:var(--slate); font-size:11px; font-weight:800;
+  line-height:1; display:flex; align-items:center; justify-content:center; cursor:help; z-index:2;
+  box-shadow:0 1px 3px rgba(11,20,38,0.10); padding:0; font-family:inherit; }
+.bk-cat-info:hover, .bk-cat-info:focus-visible { border-color:var(--blue-light); color:var(--blue-deep); }
+.bk-cat-info:focus-visible { outline:2px solid var(--blue); outline-offset:2px; }
+.cat-tooltip { position:fixed; z-index:999; max-width:250px; width:max-content; background:white;
+  color:var(--ink); font-size:0.8rem; line-height:1.45; font-weight:500; padding:10px 12px;
+  border-radius:12px; box-shadow:0 14px 34px rgba(11,20,38,0.20); border:1px solid var(--line);
+  opacity:0; visibility:hidden; transform:translateY(4px); transition:opacity 0.15s ease, transform 0.15s ease;
+  pointer-events:none; }
+.cat-tooltip.open { opacity:1; visibility:visible; transform:translateY(0); pointer-events:auto; }
+@media (max-width:480px) { .cat-tooltip { max-width:78vw; } }
 
 .bk-result { background:linear-gradient(135deg, var(--blue-pale), white); border:2px solid var(--blue);
   border-radius:var(--r-lg); padding:20px 18px; text-align:center; margin-bottom:14px; }
@@ -162,6 +176,7 @@ section { position:relative; }
 .section-title { font-size:clamp(2.1rem,4.6vw,3.5rem); line-height:1.05; letter-spacing:-0.025em;
   font-weight:800; color:var(--ink); margin-bottom:14px; }
 .section-title .accent { color:var(--blue-deep); font-style:italic; }
+.reviews-title { font-size:clamp(1.5rem,3.6vw,2.9rem); }
 .section-sub { font-size:1.05rem; color:var(--slate); font-weight:500;
   max-width:580px; margin:0 auto; line-height:1.6; }
 
@@ -223,6 +238,7 @@ section { position:relative; }
 
 /* OPTIONS LAVAGES */
 .options { padding:100px 0; background:white; }
+.options-illu { display:block; width:100%; max-width:560px; height:auto; margin:0 auto 40px; border-radius:var(--r-xl); }
 .options-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:22px; }
 .option-card { background:white; border:2px solid var(--line); border-radius:var(--r-xl);
   padding:32px 26px; text-align:center; position:relative; transition:all 0.4s var(--ease); }
@@ -524,20 +540,6 @@ section { position:relative; }
   body.modal-open { overflow:hidden; }
   .cgv-content { padding:22px 18px; }
 }
-
-/* ═══ CONFIANCE (badges de réassurance) ═══ */
-.trust { background:var(--bg-soft); padding:34px 0; border-bottom:1px solid var(--line); }
-.trust-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:18px; }
-.trust-item { display:flex; align-items:flex-start; gap:12px; }
-.trust-ico { flex:0 0 auto; width:40px; height:40px; border-radius:12px;
-  background:var(--blue-pale); color:var(--blue-deep);
-  display:flex; align-items:center; justify-content:center; }
-.trust-ico svg { width:20px; height:20px; }
-.trust-txt { display:flex; flex-direction:column; gap:2px; }
-.trust-txt strong { font-size:0.88rem; font-weight:700; color:var(--ink); line-height:1.3; }
-.trust-txt span { font-size:0.76rem; color:var(--slate); line-height:1.4; }
-@media (max-width:1024px) { .trust-grid { grid-template-columns:repeat(2,1fr); } }
-@media (max-width:700px) { .trust { padding:26px 0; } .trust-grid { gap:14px; } }
 
 /* ═══ FAQ ═══ */
 .faq { padding:90px 0; background:var(--bg); }

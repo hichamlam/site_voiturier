@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 300" role="img" aria-label="Illustration d'un voiturier Direct Voiturier en uniforme bleu marine qui lave l'avant d'une voiture bleu marine au nettoyeur haute pression, avec de la mousse en arrière-plan">
+  <title>Voiturier lavant une voiture au nettoyeur haute pression</title>
+
+  <!-- fond -->
+  <rect x="0" y="0" width="480" height="300" rx="24" fill="#EFF6FD"/>
+
+  <!-- mousse en arriere-plan -->
+  <g fill="#C9D2DE" opacity="0.55">
+    <circle cx="330" cy="48" r="10"/>
+    <circle cx="356" cy="30" r="7"/>
+    <circle cx="378" cy="52" r="13"/>
+    <circle cx="404" cy="34" r="9"/>
+    <circle cx="424" cy="58" r="6"/>
+    <circle cx="300" cy="66" r="6"/>
+    <circle cx="440" cy="80" r="11"/>
+    <circle cx="360" cy="76" r="8"/>
+  </g>
+
+  <!-- sol -->
+  <rect x="0" y="246" width="480" height="54" fill="#E3EDF9"/>
+  <ellipse cx="240" cy="248" rx="210" ry="7" fill="#D3E1F2"/>
+
+  <!-- voiture (vue de cote, face a gauche) -->
+  <g>
+    <!-- ombre -->
+    <ellipse cx="330" cy="240" rx="120" ry="10" fill="#0B1426" opacity="0.10"/>
+    <!-- carrosserie basse -->
+    <rect x="210" y="172" width="252" height="56" rx="18" fill="#1B5FA8"/>
+    <!-- pare-chocs avant -->
+    <rect x="200" y="196" width="18" height="26" rx="7" fill="#0B1426"/>
+    <!-- phare -->
+    <ellipse cx="214" cy="201" rx="6" ry="5" fill="#EBA83C"/>
+    <!-- habitacle -->
+    <path d="M266 176 C270 144 292 126 320 126 L392 126 C414 126 424 144 428 176 Z" fill="#1B5FA8"/>
+    <!-- vitres -->
+    <path d="M278 174 C282 152 298 138 320 138 L360 138 L360 174 Z" fill="#EFF6FD"/>
+    <path d="M368 138 L390 138 C404 138 412 152 415 174 L368 174 Z" fill="#EFF6FD"/>
+    <!-- liseret -->
+    <rect x="210" y="172" width="252" height="6" fill="#0B1426" opacity="0.18"/>
+    <!-- poignee -->
+    <rect x="330" y="188" width="16" height="4" rx="2" fill="#0B1426" opacity="0.3"/>
+    <!-- roues -->
+    <circle cx="256" cy="230" r="22" fill="#0B1426"/>
+    <circle cx="256" cy="230" r="9" fill="#8CBCE8"/>
+    <circle cx="418" cy="230" r="22" fill="#0B1426"/>
+    <circle cx="418" cy="230" r="9" fill="#8CBCE8"/>
+  </g>
+
+  <!-- mousse / eclaboussures au point d'impact -->
+  <g fill="#E7ECF2">
+    <circle cx="180" cy="208" r="9"/>
+    <circle cx="196" cy="196" r="6"/>
+    <circle cx="188" cy="222" r="7"/>
+    <circle cx="166" cy="216" r="5"/>
+  </g>
+  <g fill="#FFFFFF">
+    <circle cx="184" cy="214" r="4"/>
+    <circle cx="200" cy="206" r="3"/>
+    <circle cx="172" cy="204" r="3"/>
+  </g>
+
+  <!-- nettoyeur haute pression -->
+  <g>
+    <rect x="118" y="206" width="34" height="26" rx="5" fill="#0B1426"/>
+    <circle cx="135" cy="212" r="4" fill="#EBA83C"/>
+    <rect x="126" y="232" width="4" height="10" fill="#0B1426"/>
+    <rect x="142" y="232" width="4" height="10" fill="#0B1426"/>
+  </g>
+  <!-- tuyau -->
+  <path d="M150 214 C168 210 176 220 188 210" fill="none" stroke="#0B1426" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- jet d'eau -->
+  <path d="M188 210 L168 205 L166 213 Z" fill="#8CBCE8" opacity="0.85"/>
+
+  <!-- voiturier -->
+  <g>
+    <!-- ombre -->
+    <ellipse cx="108" cy="242" rx="34" ry="7" fill="#0B1426" opacity="0.12"/>
+    <!-- jambes -->
+    <rect x="92" y="204" width="14" height="40" rx="6" fill="#0B1426"/>
+    <rect x="112" y="204" width="14" height="40" rx="6" fill="#0B1426"/>
+    <!-- chaussures -->
+    <rect x="88" y="240" width="20" height="8" rx="4" fill="#1B5FA8"/>
+    <rect x="110" y="240" width="20" height="8" rx="4" fill="#1B5FA8"/>
+    <!-- torse / veste uniforme -->
+    <path d="M84 168 C84 152 96 142 112 142 C128 142 140 152 140 168 L140 206 L84 206 Z" fill="#1B5FA8"/>
+    <!-- liseret veste -->
+    <rect x="84" y="196" width="56" height="6" fill="#0B1426" opacity="0.18"/>
+    <!-- bras gauche le long du corps -->
+    <rect x="76" y="158" width="12" height="36" rx="6" fill="#1B5FA8"/>
+    <!-- bras droit tenant la lance -->
+    <path d="M134 160 C150 164 160 176 172 208" fill="none" stroke="#1B5FA8" stroke-width="13" stroke-linecap="round"/>
+    <!-- lance -->
+    <rect x="168" y="204" width="22" height="7" rx="3" fill="#0B1426"/>
+    <!-- main -->
+    <circle cx="170" cy="207" r="7" fill="#F0C29A"/>
+    <!-- cou -->
+    <rect x="104" y="132" width="16" height="14" fill="#F0C29A"/>
+    <!-- tete -->
+    <circle cx="112" cy="122" r="18" fill="#F0C29A"/>
+    <!-- casquette -->
+    <path d="M92 116 C92 100 102 90 112 90 C122 90 132 100 132 116 C132 118 130 120 126 120 L98 120 C94 120 92 118 92 116 Z" fill="#0B1426"/>
+    <rect x="88" y="114" width="30" height="7" rx="3.5" fill="#0B1426"/>
+    <!-- visiere -->
+    <path d="M118 114 L138 116 C140 116.4 140 119 138 119.4 L118 121 Z" fill="#0B1426"/>
+    <!-- badge maison sur la casquette -->
+    <circle cx="112" cy="106" r="7" fill="#EBA83C"/>
+    <text x="112" y="109" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#0B1426" text-anchor="middle">DV</text>
+  </g>
+</svg>

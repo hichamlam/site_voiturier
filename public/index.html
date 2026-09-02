@@ -254,18 +254,22 @@ window.VO_CONTACT = {
 
         <div class="bk-cats">
           <div class="bk-cat" onclick="simSelectCategory('citadine', this)">
+            <button type="button" class="bk-cat-info" data-cat="citadine" aria-expanded="false" aria-label="Exemples de véhicules : citadine" onclick="toggleCatInfo(event, this)"><span aria-hidden="true">i</span></button>
             <div class="bk-cat-icon" aria-hidden="true"><svg viewBox="0 0 48 28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 20 L6 15 Q6 12 9 11 L15 8 Q18 6 22 6 L30 6 Q34 6 36 9 L40 15 L42 15 L42 20"/><path d="M6 20 L42 20"/><circle cx="14" cy="20" r="3.2" fill="currentColor"/><circle cx="34" cy="20" r="3.2" fill="currentColor"/></svg></div>
             <div class="bk-cat-name">Citadine</div>
           </div>
           <div class="bk-cat" onclick="simSelectCategory('berline', this)">
+            <button type="button" class="bk-cat-info" data-cat="berline" aria-expanded="false" aria-label="Exemples de véhicules : berline / break" onclick="toggleCatInfo(event, this)"><span aria-hidden="true">i</span></button>
             <div class="bk-cat-icon" aria-hidden="true"><svg viewBox="0 0 48 28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20 L4 16 L8 16 L12 10 Q14 8 17 8 L28 8 Q31 8 33 10 L37 16 L44 16 L44 20"/><path d="M4 20 L44 20 M12 16 L36 16"/><circle cx="13" cy="20" r="3.2" fill="currentColor"/><circle cx="35" cy="20" r="3.2" fill="currentColor"/></svg></div>
             <div class="bk-cat-name">Berline / Break</div>
           </div>
           <div class="bk-cat" onclick="simSelectCategory('suv', this)">
+            <button type="button" class="bk-cat-info" data-cat="suv" aria-expanded="false" aria-label="Exemples de véhicules : SUV / 4×4 / monospace" onclick="toggleCatInfo(event, this)"><span aria-hidden="true">i</span></button>
             <div class="bk-cat-icon" aria-hidden="true"><svg viewBox="0 0 48 28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20 L4 14 Q4 10 8 9 L14 6 Q16 5 19 5 L30 5 Q33 5 35 7 L40 12 L44 14 L44 20"/><path d="M4 20 L44 20 M14 9 L40 9"/><circle cx="12" cy="20" r="3.6" fill="currentColor"/><circle cx="36" cy="20" r="3.6" fill="currentColor"/></svg></div>
             <div class="bk-cat-name">SUV / 4×4<br>Monospace</div>
           </div>
           <div class="bk-cat" onclick="simSelectCategory('utilitaire', this)">
+            <button type="button" class="bk-cat-info" data-cat="utilitaire" aria-expanded="false" aria-label="Exemples de véhicules : van / utilitaire" onclick="toggleCatInfo(event, this)"><span aria-hidden="true">i</span></button>
             <div class="bk-cat-icon" aria-hidden="true"><svg viewBox="0 0 48 28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20 L3 8 Q3 6 5 6 L34 6 Q36 6 37.5 8 L43 15 L45 15 L45 20"/><path d="M3 20 L45 20 M34 6 L34 15 M3 15 L45 15"/><circle cx="11" cy="20" r="3.2" fill="currentColor"/><circle cx="38" cy="20" r="3.2" fill="currentColor"/></svg></div>
             <div class="bk-cat-name">Van / Utilitaire</div>
           </div>
@@ -396,35 +400,11 @@ window.VO_CONTACT = {
 </section>
 
 
-<!-- CONFIANCE — éléments vérifiables dans le produit et les CGV -->
-<section class="trust" id="confiance" aria-label="Garanties de réservation">
-  <div class="container">
-    <div class="trust-grid reveal">
-      <div class="trust-item">
-        <div class="trust-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
-        <div class="trust-txt"><strong>Prix total avant paiement</strong><span>Le récapitulatif détaille chaque ligne avant de payer</span></div>
-      </div>
-      <div class="trust-item">
-        <div class="trust-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
-        <div class="trust-txt" id="trust-payment"><strong>Paiement sécurisé Stripe</strong><span>Carte bancaire en ligne, ou paiement sur place</span></div>
-      </div>
-      <div class="trust-item">
-        <div class="trust-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg></div>
-        <div class="trust-txt"><strong>Confirmation par email</strong><span>Récapitulatif et consignes de rendez-vous à Orly</span></div>
-      </div>
-      <div class="trust-item">
-        <div class="trust-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg></div>
-        <div class="trust-txt"><strong>État des lieux à la prise en charge</strong><span>Contradictoire et signé, sur demande (voir CGV)</span></div>
-      </div>
-      <!-- TODO CONFIANCE (à compléter avec les VRAIES infos avant d'afficher) :
-           - Assurance / RC professionnelle : ajouter un .trust-item avec le nom
-             de l'assureur et le n° de contrat une fois souscrite. NE PAS afficher sans.
-           - Téléphone service client : ajouter ici + footer quand le numéro pro existe.
-           - Lien fiche Google Business Profile quand elle est créée. -->
-    </div>
-  </div>
-</section>
-
+<!-- TODO CONFIANCE (à compléter avec les VRAIES infos avant de rétablir une section de réassurance) :
+     - Assurance / RC professionnelle : ajouter un bloc avec le nom
+       de l'assureur et le n° de contrat une fois souscrite. NE PAS afficher sans.
+     - Téléphone service client : ajouter ici + footer quand le numéro pro existe.
+     - Lien fiche Google Business Profile quand elle est créée. -->
 <!-- PRICING TEASER -->
 <section class="pricing-teaser" id="prix">
   <div class="container">
@@ -469,6 +449,7 @@ window.VO_CONTACT = {
       <h2 class="section-title">Vous vous reposez.<br><span class="accent">Elle aussi</span></h2>
       <p class="section-sub">Offrez à votre voiture le soin qu'elle mérite pendant votre voyage.</p>
     </div>
+    <img class="options-illu" src="/img/lavage.svg" width="480" height="300" loading="lazy" role="img" aria-label="Illustration d'un voiturier Direct Voiturier en uniforme bleu marine qui lave l'avant d'une voiture bleu marine au nettoyeur haute pression, avec de la mousse en arrière-plan">
     <div class="options-grid">
       <article class="option-card reveal">
         <div class="option-illu">
@@ -526,7 +507,7 @@ window.VO_CONTACT = {
   <div class="container">
     <div class="section-head reveal">
       <p class="section-eyebrow">+9 000 voyageurs nous ont fait confiance</p>
-      <h2 class="section-title">Ils nous ont confié leurs clés.<br><span class="accent">Ils reviennent</span></h2>
+      <h2 class="section-title reviews-title">Ils nous ont confié leurs clés &amp; <span class="accent">Ils reviennent</span></h2>
     </div>
   </div>
   <div class="reviews-track-wrap">
@@ -545,19 +526,19 @@ window.VO_CONTACT = {
     <div class="faq-list reveal">
       <details class="faq-item">
         <summary>Le prix affiché est-il vraiment le prix final ?</summary>
-        <div class="faq-body">Oui. Le tarif calculé inclut la prise en charge et la restitution à Orly ainsi que le gardiennage. Les seuls suppléments possibles sont ceux que vous choisissez (lavage, parking couvert, accès prioritaire) et d'éventuels suppléments horaires ou jours fériés — ils sont tous détaillés ligne par ligne dans le récapitulatif <strong>avant</strong> le paiement.</div>
+        <div class="faq-body">Oui. Le tarif calculé inclut la prise en charge, la restitution et le gardiennage à Orly. Les seules options en plus sont celles que vous choisissez vous-même, toujours détaillées dans le récapitulatif <strong>avant</strong> le paiement.</div>
       </details>
       <details class="faq-item">
         <summary>Mon vol est retardé, que se passe-t-il ?</summary>
-        <div class="faq-body">Prévenez-nous par téléphone dès que vous connaissez le retard : nous nous adaptons. Une tolérance de 30 minutes s'applique au retour ; au-delà et sans préavis, des frais de retard s'appliquent (10€ la première heure entamée, puis 15€ par heure — détail complet dans les CGV). Indiquer votre numéro de vol lors de la réservation nous aide à anticiper.</div>
+        <div class="faq-body">Votre vol a du retard ? Prévenez-nous, on s'adapte : on suit votre numéro de vol et on est là quand vous atterrissez.</div>
       </details>
       <details class="faq-item">
         <summary>Puis-je annuler ou modifier ma réservation ?</summary>
-        <div class="faq-body">Toute réservation est ferme et définitive (le droit de rétractation de 14 jours ne s'applique pas à ce type de service, article L221-28 12° du Code de la consommation). Pour une annulation signalée au moins 7 jours avant la prise en charge, nous étudions un arrangement à l'amiable. Pour modifier des dates ou horaires, contactez-nous par email : contact@directvoiturier.com.</div>
+        <div class="faq-body">Un imprévu ? Écrivez-nous à contact@directvoiturier.com, on trouve une solution. Le détail des conditions figure dans nos CGV.</div>
       </details>
       <details class="faq-item">
         <summary>Comment se passe la prise en charge à Orly ?</summary>
-        <div class="faq-body">Après la réservation, vous recevez un email de confirmation avec les consignes de rendez-vous. Le jour du départ, votre voiturier vous retrouve au dépose-minute de votre terminal (Orly 1-2, 3 ou 4) à l'horaire convenu. Un état des lieux contradictoire signé peut être réalisé à votre demande (15€, réglé sur place — voir CGV).</div>
+        <div class="faq-body">Après votre réservation, vous recevez un email avec toutes les consignes. Le jour J, votre voiturier vous accueille directement au dépose-minute de votre terminal.</div>
       </details>
       <details class="faq-item">
         <summary>Comment payer ?</summary>
@@ -565,7 +546,7 @@ window.VO_CONTACT = {
       </details>
       <details class="faq-item">
         <summary>Où est garée ma voiture pendant mon voyage ?</summary>
-        <div class="faq-body">Votre véhicule est gardé sur notre parking à quelques minutes d'Orly. Une option parking couvert est proposée à la réservation si vous souhaitez un emplacement à l'abri des intempéries.</div>
+        <div class="faq-body">Votre véhicule est gardé sur notre parking à quelques minutes d'Orly. Une option parking couvert est proposée si vous préférez un emplacement à l'abri des intempéries.</div>
       </details>
     </div>
   </div>
@@ -695,18 +676,22 @@ window.VO_CONTACT = {
 
         <div class="bk-cats" style="margin-bottom:14px;">
           <div class="bk-form-cat bk-cat selected" data-cat="citadine" onclick="bkSelectCategory('citadine', this)">
+            <button type="button" class="bk-cat-info" data-cat="citadine" aria-expanded="false" aria-label="Exemples de véhicules : citadine" onclick="toggleCatInfo(event, this)"><span aria-hidden="true">i</span></button>
             <div class="bk-cat-icon" aria-hidden="true"><svg viewBox="0 0 48 28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 20 L6 15 Q6 12 9 11 L15 8 Q18 6 22 6 L30 6 Q34 6 36 9 L40 15 L42 15 L42 20"/><path d="M6 20 L42 20"/><circle cx="14" cy="20" r="3.2" fill="currentColor"/><circle cx="34" cy="20" r="3.2" fill="currentColor"/></svg></div>
             <div class="bk-cat-name">Citadine</div>
           </div>
           <div class="bk-form-cat bk-cat" data-cat="berline" onclick="bkSelectCategory('berline', this)">
+            <button type="button" class="bk-cat-info" data-cat="berline" aria-expanded="false" aria-label="Exemples de véhicules : berline / break" onclick="toggleCatInfo(event, this)"><span aria-hidden="true">i</span></button>
             <div class="bk-cat-icon" aria-hidden="true"><svg viewBox="0 0 48 28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20 L4 16 L8 16 L12 10 Q14 8 17 8 L28 8 Q31 8 33 10 L37 16 L44 16 L44 20"/><path d="M4 20 L44 20 M12 16 L36 16"/><circle cx="13" cy="20" r="3.2" fill="currentColor"/><circle cx="35" cy="20" r="3.2" fill="currentColor"/></svg></div>
             <div class="bk-cat-name">Berline / Break</div>
           </div>
           <div class="bk-form-cat bk-cat" data-cat="suv" onclick="bkSelectCategory('suv', this)">
+            <button type="button" class="bk-cat-info" data-cat="suv" aria-expanded="false" aria-label="Exemples de véhicules : SUV / 4×4 / monospace" onclick="toggleCatInfo(event, this)"><span aria-hidden="true">i</span></button>
             <div class="bk-cat-icon" aria-hidden="true"><svg viewBox="0 0 48 28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20 L4 14 Q4 10 8 9 L14 6 Q16 5 19 5 L30 5 Q33 5 35 7 L40 12 L44 14 L44 20"/><path d="M4 20 L44 20 M14 9 L40 9"/><circle cx="12" cy="20" r="3.6" fill="currentColor"/><circle cx="36" cy="20" r="3.6" fill="currentColor"/></svg></div>
             <div class="bk-cat-name">SUV / 4×4 / Mono.</div>
           </div>
           <div class="bk-form-cat bk-cat" data-cat="utilitaire" onclick="bkSelectCategory('utilitaire', this)">
+            <button type="button" class="bk-cat-info" data-cat="utilitaire" aria-expanded="false" aria-label="Exemples de véhicules : van / utilitaire" onclick="toggleCatInfo(event, this)"><span aria-hidden="true">i</span></button>
             <div class="bk-cat-icon" aria-hidden="true"><svg viewBox="0 0 48 28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20 L3 8 Q3 6 5 6 L34 6 Q36 6 37.5 8 L43 15 L45 15 L45 20"/><path d="M3 20 L45 20 M34 6 L34 15 M3 15 L45 15"/><circle cx="11" cy="20" r="3.2" fill="currentColor"/><circle cx="38" cy="20" r="3.2" fill="currentColor"/></svg></div>
             <div class="bk-cat-name">Van / Utilitaire</div>
           </div>
