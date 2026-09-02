@@ -308,55 +308,166 @@ window.VO_CONTACT = {
   </div>
 </header>
 
-<!-- 3 ÉTAPES -->
+<!-- 3 ÉTAPES — FRISE ILLUSTRÉE -->
 <section class="steps" id="service">
   <div class="container">
     <div class="section-head reveal">
       <p class="section-eyebrow">Comment ça marche</p>
       <h2 class="section-title">Trois étapes,<br><span class="accent">zéro stress</span></h2>
-      <p class="section-sub">Du dépose-minute au retour, tout est prévu pour vous faire gagner du temps.</p>
+      <p class="section-sub">Du dépose-minute au retour.</p>
     </div>
 
-    <div class="steps-grid">
-      <article class="step-card reveal">
-        <div class="step-illu" aria-hidden="true">
-          <span class="step-num">1</span>
-          <svg viewBox="0 0 52 32" aria-hidden="true">
-            <g fill="#0B1426">
-              <circle cx="9" cy="8" r="4.2"/>
-              <path d="M9 15.5c-4.6 0-8.4 2.3-8.4 5.2v3.3h16.8v-3.3c0-2.9-3.8-5.2-8.4-5.2z"/>
-              <g transform="translate(23 4) scale(1.15)">
-                <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/>
+    <div class="frise">
+      <article class="frise-item reveal">
+        <div class="frise-illu-wrap">
+          <span class="frise-num">1</span>
+          <svg class="frise-illu" viewBox="0 0 300 200" role="img" aria-label="Un smartphone affiche un calendrier de réservation avec une date sélectionnée validée par une coche, et une horloge à côté indiquant que la réservation ne prend que quelques minutes">
+            <rect width="300" height="200" rx="22" fill="#EFF6FD"/>
+            <ellipse cx="150" cy="184" rx="90" ry="8" fill="#0B1426" opacity="0.08"/>
+            <!-- horloge -->
+            <g transform="translate(228,62)">
+              <circle r="30" fill="#FFFFFF" stroke="#1B5FA8" stroke-width="5"/>
+              <line x1="0" y1="0" x2="0" y2="-15" stroke="#0B1426" stroke-width="4" stroke-linecap="round"/>
+              <line x1="0" y1="0" x2="12" y2="5" stroke="#0B1426" stroke-width="4" stroke-linecap="round"/>
+              <circle r="3.4" fill="#EBA83C"/>
+            </g>
+            <!-- telephone -->
+            <g>
+              <rect x="88" y="30" width="104" height="150" rx="18" fill="#0B1426"/>
+              <rect x="96" y="44" width="88" height="112" rx="4" fill="#FFFFFF"/>
+              <rect x="96" y="44" width="88" height="20" rx="4" fill="#2E7FD3"/>
+              <rect x="128" y="150" width="24" height="5" rx="2.5" fill="#8CBCE8"/>
+              <!-- calendrier -->
+              <g>
+                <rect x="104" y="70" width="18" height="16" rx="3" fill="#EFF6FD"/>
+                <rect x="126" y="70" width="18" height="16" rx="3" fill="#EFF6FD"/>
+                <rect x="148" y="70" width="18" height="16" rx="3" fill="#EFF6FD"/>
+                <rect x="104" y="90" width="18" height="16" rx="3" fill="#EBA83C"/>
+                <rect x="126" y="90" width="18" height="16" rx="3" fill="#EFF6FD"/>
+                <rect x="148" y="90" width="18" height="16" rx="3" fill="#EFF6FD"/>
+                <rect x="104" y="110" width="18" height="16" rx="3" fill="#EFF6FD"/>
+                <rect x="126" y="110" width="18" height="16" rx="3" fill="#EFF6FD"/>
+                <rect x="148" y="110" width="18" height="16" rx="3" fill="#EFF6FD"/>
+                <path d="M108 98 L112 102 L119 93" fill="none" stroke="#0B1426" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
               </g>
+            </g>
+            <!-- badge check -->
+            <g transform="translate(70,158)">
+              <circle r="18" fill="#1B5FA8"/>
+              <path d="M-8 0 L-2 6 L9 -8" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
             </g>
           </svg>
         </div>
-        <p class="step-tag">L'aller</p>
-        <h3 class="step-title">On vous attend</h3>
-        <p class="step-desc">Votre voiturier vous accueille au dépose-minute, fait l'état des lieux. Vous repartez en 3 minutes.</p>
+        <p class="step-tag">Étape 1</p>
+        <h3 class="step-title">Réservez</h3>
+        <p class="step-desc">En ligne, en moins de 2 minutes.</p>
       </article>
 
-      <article class="step-card reveal">
-        <div class="step-illu" aria-hidden="true">
-          <span class="step-num">2</span>
-          <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-            <path d="M 32 6 L 52 12 L 52 30 Q 52 46 32 56 Q 12 46 12 30 L 12 12 Z"/>
-            <text x="32" y="38" font-family="Plus Jakarta Sans, sans-serif" font-size="22" font-weight="800" fill="currentColor" text-anchor="middle" stroke="none">P</text>
+      <div class="frise-arrow reveal" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+
+      <article class="frise-item reveal">
+        <div class="frise-illu-wrap">
+          <span class="frise-num">2</span>
+          <svg class="frise-illu" viewBox="0 0 300 200" role="img" aria-label="Un voiturier Direct Voiturier en uniforme bleu, casquette à badge DV, tend la main pour récupérer les clés du client au dépose-minute du terminal, à côté de la voiture garée">
+            <rect width="300" height="200" rx="22" fill="#EFF6FD"/>
+            <rect x="14" y="18" width="272" height="12" rx="6" fill="#8CBCE8"/>
+            <rect x="30" y="30" width="6" height="30" fill="#8CBCE8"/>
+            <rect x="120" y="30" width="6" height="30" fill="#8CBCE8"/>
+            <rect x="250" y="30" width="6" height="30" fill="#8CBCE8"/>
+            <rect x="0" y="168" width="300" height="32" fill="#E3EDF9"/>
+            <ellipse cx="150" cy="169" rx="150" ry="5" fill="#D3E1F2"/>
+            <g>
+              <ellipse cx="205" cy="164" rx="70" ry="6" fill="#0B1426" opacity="0.10"/>
+              <rect x="150" y="128" width="140" height="34" rx="10" fill="#0B1426"/>
+              <path d="M180 130 C183 108 198 96 218 96 L248 96 C264 96 272 108 276 130 Z" fill="#0B1426"/>
+              <path d="M188 128 C191 112 202 104 218 104 L232 104 L232 128 Z" fill="#EFF6FD"/>
+              <path d="M238 104 L248 104 C258 104 264 112 267 128 L238 128 Z" fill="#EFF6FD"/>
+              <circle cx="176" cy="162" r="14" fill="#0B1426"/><circle cx="176" cy="162" r="5.5" fill="#8CBCE8"/>
+              <circle cx="264" cy="162" r="14" fill="#0B1426"/><circle cx="264" cy="162" r="5.5" fill="#8CBCE8"/>
+              <ellipse cx="154" cy="146" rx="4" ry="3.4" fill="#EBA83C"/>
+            </g>
+            <g>
+              <ellipse cx="90" cy="166" rx="26" ry="5" fill="#0B1426" opacity="0.12"/>
+              <rect x="78" y="132" width="10" height="30" rx="5" fill="#0B1426"/>
+              <rect x="94" y="132" width="10" height="30" rx="5" fill="#0B1426"/>
+              <rect x="75" y="160" width="16" height="6" rx="3" fill="#1B5FA8"/>
+              <rect x="93" y="160" width="16" height="6" rx="3" fill="#1B5FA8"/>
+              <path d="M70 108 C70 96 79 88 91 88 C103 88 112 96 112 108 L112 134 L70 134 Z" fill="#1B5FA8"/>
+              <rect x="70" y="126" width="42" height="5" fill="#0B1426" opacity="0.18"/>
+              <rect x="64" y="98" width="10" height="26" rx="5" fill="#1B5FA8"/>
+              <path d="M108 100 C122 100 130 106 138 116" fill="none" stroke="#1B5FA8" stroke-width="10" stroke-linecap="round"/>
+              <circle cx="140" cy="118" r="5.5" fill="#F0C29A"/>
+              <rect x="92" y="80" width="14" height="12" fill="#F0C29A"/>
+              <circle cx="91" cy="72" r="14" fill="#F0C29A"/>
+              <path d="M75 66 C75 54 82 46 91 46 C100 46 107 54 107 66 C107 68 105 70 102 70 L80 70 C77 70 75 68 75 66 Z" fill="#0B1426"/>
+              <rect x="73" y="64" width="24" height="6" rx="3" fill="#0B1426"/>
+              <circle cx="91" cy="58" r="6" fill="#EBA83C"/>
+              <text x="91" y="60.5" font-family="Arial,Helvetica,sans-serif" font-size="6" font-weight="700" fill="#0B1426" text-anchor="middle">DV</text>
+            </g>
+            <g fill="#EBA83C">
+              <circle cx="150" cy="118" r="6"/><circle cx="150" cy="118" r="2.4" fill="#EFF6FD"/>
+              <rect x="155" y="115" width="12" height="3" rx="1.5"/>
+              <rect x="163" y="118" width="3" height="5" rx="1"/>
+              <rect x="167" y="118" width="3" height="6" rx="1"/>
+            </g>
           </svg>
         </div>
-        <p class="step-tag">Pendant</p>
-        <h3 class="step-title">Elle est entre<br>de bonnes mains</h3>
-        <p class="step-desc">Parking vidéosurveillé 24h/24, à quelques minutes d'Orly. Lavage possible pendant votre absence.</p>
+        <p class="step-tag">Étape 2</p>
+        <h3 class="step-title">Confiez</h3>
+        <p class="step-desc">Votre voiturier dédié vous attend au dépose-minute.</p>
       </article>
 
-      <article class="step-card reveal">
-        <div class="step-illu" aria-hidden="true">
-          <span class="step-num">3</span>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><g transform="rotate(135 12 12)" fill="#0B1426"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2.5 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></g></svg>
+      <div class="frise-arrow reveal" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+
+      <article class="frise-item reveal">
+        <div class="frise-illu-wrap">
+          <span class="frise-num">3</span>
+          <svg class="frise-illu" viewBox="0 0 300 200" role="img" aria-label="Le voiturier restitue les clés au client devant le terminal à son retour, avec un avion qui atterrit en arrière-plan">
+            <rect width="300" height="200" rx="22" fill="#EFF6FD"/>
+            <g transform="translate(230,50) rotate(15) scale(0.7)" fill="#0B1426" opacity="0.85">
+              <path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" transform="scale(4)"/>
+            </g>
+            <rect x="0" y="168" width="300" height="32" fill="#E3EDF9"/>
+            <ellipse cx="150" cy="169" rx="150" ry="5" fill="#D3E1F2"/>
+            <g>
+              <ellipse cx="150" cy="164" rx="80" ry="6" fill="#0B1426" opacity="0.10"/>
+              <rect x="90" y="128" width="140" height="34" rx="10" fill="#0B1426"/>
+              <path d="M120 130 C123 108 138 96 158 96 L188 96 C204 96 212 108 216 130 Z" fill="#0B1426"/>
+              <path d="M128 128 C131 112 142 104 158 104 L172 104 L172 128 Z" fill="#EFF6FD"/>
+              <path d="M178 104 L188 104 C198 104 204 112 207 128 L178 128 Z" fill="#EFF6FD"/>
+              <circle cx="116" cy="162" r="14" fill="#0B1426"/><circle cx="116" cy="162" r="5.5" fill="#8CBCE8"/>
+              <circle cx="204" cy="162" r="14" fill="#0B1426"/><circle cx="204" cy="162" r="5.5" fill="#8CBCE8"/>
+              <ellipse cx="94" cy="146" rx="4" ry="3.4" fill="#EBA83C"/>
+            </g>
+            <g>
+              <ellipse cx="55" cy="166" rx="26" ry="5" fill="#0B1426" opacity="0.12"/>
+              <rect x="43" y="132" width="10" height="30" rx="5" fill="#0B1426"/>
+              <rect x="59" y="132" width="10" height="30" rx="5" fill="#0B1426"/>
+              <rect x="40" y="160" width="16" height="6" rx="3" fill="#1B5FA8"/>
+              <rect x="58" y="160" width="16" height="6" rx="3" fill="#1B5FA8"/>
+              <path d="M35 108 C35 96 44 88 56 88 C68 88 77 96 77 108 L77 134 L35 134 Z" fill="#1B5FA8"/>
+              <rect x="35" y="126" width="42" height="5" fill="#0B1426" opacity="0.18"/>
+              <rect x="73" y="98" width="10" height="26" rx="5" fill="#1B5FA8"/>
+              <path d="M73 100 C87 100 95 106 103 116" fill="none" stroke="#1B5FA8" stroke-width="10" stroke-linecap="round"/>
+              <circle cx="105" cy="118" r="5.5" fill="#F0C29A"/>
+              <rect x="57" y="80" width="14" height="12" fill="#F0C29A"/>
+              <circle cx="56" cy="72" r="14" fill="#F0C29A"/>
+              <path d="M40 66 C40 54 47 46 56 46 C65 46 72 54 72 66 C72 68 70 70 67 70 L45 70 C42 70 40 68 40 66 Z" fill="#0B1426"/>
+              <rect x="38" y="64" width="24" height="6" rx="3" fill="#0B1426"/>
+              <circle cx="56" cy="58" r="6" fill="#EBA83C"/>
+              <text x="56" y="60.5" font-family="Arial,Helvetica,sans-serif" font-size="6" font-weight="700" fill="#0B1426" text-anchor="middle">DV</text>
+            </g>
+            <g fill="#EBA83C">
+              <circle cx="115" cy="118" r="6"/><circle cx="115" cy="118" r="2.4" fill="#EFF6FD"/>
+              <rect x="120" y="115" width="12" height="3" rx="1.5"/>
+              <rect x="128" y="118" width="3" height="5" rx="1"/>
+              <rect x="132" y="118" width="3" height="6" rx="1"/>
+            </g>
+          </svg>
         </div>
-        <p class="step-tag">Le retour</p>
-        <h3 class="step-title">Elle vous attend</h3>
-        <p class="step-desc">Un appel à l'atterrissage. Le temps des bagages, votre voiture est devant le terminal.</p>
+        <p class="step-tag">Étape 3</p>
+        <h3 class="step-title">Récupérez</h3>
+        <p class="step-desc">Votre véhicule, au même endroit, à votre retour.</p>
       </article>
     </div>
   </div>
@@ -411,7 +522,7 @@ window.VO_CONTACT = {
     <div class="section-head reveal">
       <p class="section-eyebrow">Tarifs</p>
       <h2 class="section-title">Simple,<br><span class="accent">transparent</span></h2>
-      <p class="section-sub">Plus vous restez longtemps, moins vous payez par jour.</p>
+      <p class="section-sub">Moins cher par jour, plus vous restez.</p>
     </div>
     <div class="pricing-cards">
       <article class="price-card reveal">
@@ -435,9 +546,7 @@ window.VO_CONTACT = {
         </div>
       </article>
     </div>
-    <p class="pricing-note reveal">
-      <strong>Plus longtemps = moins cher par jour.</strong> Tarif final calculé selon vos dates.
-    </p>
+    <p class="pricing-note reveal">Tarif exact calculé selon vos dates, avant paiement.</p>
   </div>
 </section>
 
