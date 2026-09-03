@@ -236,6 +236,15 @@ section { position:relative; }
 .gs-trust { color:white; font-weight:700; font-size:1.05rem; letter-spacing:-0.01em; }
 .gs-trust .num { color:var(--accent-gold); font-size:1.5rem; font-weight:800; }
 
+/* AVANTAGES (mini-section) */
+.advantages { padding:38px 0; background:white; }
+.adv-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
+.adv-item { text-align:center; padding:4px 8px; }
+.adv-illu { width:56px; height:56px; margin:0 auto 10px; }
+.adv-illu svg { width:100%; height:100%; display:block; }
+.adv-title { font-size:1.05rem; font-weight:800; color:var(--blue-deep); letter-spacing:-0.02em; margin:0 0 4px; }
+.adv-desc { font-size:0.9rem; color:var(--muted); line-height:1.4; margin:0; }
+
 /* PRICING */
 .pricing-teaser { padding:80px 0; background:linear-gradient(135deg, var(--blue-pale) 0%, white 100%); }
 .pricing-cards { display:grid; grid-template-columns:1fr 1fr; gap:22px; max-width:880px; margin:44px auto 0; }
@@ -576,6 +585,11 @@ section { position:relative; }
   .bk-line-fields input { padding:10px 11px; font-size:0.85rem; }
   .container { padding:0 18px; }
   .steps, .options, .reviews { padding:70px 0; }
+  .advantages { padding:28px 0; }
+  .adv-grid { gap:10px; }
+  .adv-illu { width:44px; height:44px; margin-bottom:8px; }
+  .adv-title { font-size:0.92rem; min-height:2.3em; }
+  .adv-desc { font-size:0.78rem; }
   .pricing-teaser { padding:60px 0; }
   .price-card { padding:22px; gap:16px; }
   .price-card-icon { width:50px; height:50px; }
