@@ -624,6 +624,10 @@ tbody tr:last-child { border-bottom: none; }
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
         Messages
       </button>
+      <button data-view="settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Paramètres
+      </button>
     </nav>
     <div class="sidebar-foot">
       <button onclick="logout()">
@@ -750,6 +754,7 @@ async function switchView(view) {
     else if (view === 'surcharges') await renderSurcharges();
     else if (view === 'quotes') await renderQuotes();
     else if (view === 'templates') await renderTemplates();
+    else if (view === 'settings') await renderSettings();
   } catch (err) {
     container.innerHTML = `<div class="empty"><p>Erreur : ${err.message}</p></div>`;
   }
@@ -2304,6 +2309,113 @@ async function sendShareEmail(ref) {
     toast(`Email envoyé à ${to}`, 'success');
   } catch (err) {
     toast(err.message, 'error');
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   VIEW: PARAMÈTRES (contact & réassurance)
+═══════════════════════════════════════════════════════════ */
+async function renderSettings() {
+  const { settings } = await api('/api/admin/settings');
+  STATE.settings = settings;
+
+  const v = k => escapeHtml(settings[k] || '');
+  const c = document.getElementById('viewContainer');
+  c.innerHTML = `
+    <div class="topbar">
+      <div>
+        <h1>Paramètres</h1>
+        <p class="sub">Coordonnées de contact et éléments de réassurance affichés sur le site public</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="font-size:1.05rem; font-weight:800; margin-bottom:4px;">📞 Contact</h2>
+      <p class="text-muted" style="margin-bottom:16px; font-size:0.85rem;">Un champ laissé vide n'apparaît pas sur le site — rien n'est affiché tant que tu ne l'as pas renseigné.</p>
+      <div class="form-grid">
+        <div class="field">
+          <label>Téléphone service client</label>
+          <input id="set-contact_phone" value="${v('contact_phone')}" placeholder="Ex. 06 00 00 00 00">
+          <div class="hint">Affiché sur le site public (format français : 06 12 34 56 78 ou +33 6 12 34 56 78)</div>
+        </div>
+        <div class="field">
+          <label>Numéro WhatsApp</label>
+          <input id="set-contact_whatsapp" value="${v('contact_whatsapp')}" placeholder="Ex. 06 00 00 00 00">
+          <div class="hint">Format français, utilisé pour le lien « discuter sur WhatsApp »</div>
+        </div>
+        <div class="field">
+          <label>Email de contact</label>
+          <input id="set-contact_email" type="email" value="${v('contact_email')}" placeholder="Ex. contact@exemple-fictif.fr">
+        </div>
+        <div class="field full">
+          <label>Adresse postale / siège</label>
+          <input id="set-contact_address" value="${v('contact_address')}" placeholder="Ex. 1 rue de l'Exemple, 91200 Athis-Mons">
+        </div>
+        <div class="field full">
+          <label>Lien de la fiche Google Business Profile</label>
+          <input id="set-google_business_url" value="${v('google_business_url')}" placeholder="Ex. https://g.page/exemple-fictif">
+          <div class="hint">Lien https:// complet vers la fiche établissement Google</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="font-size:1.05rem; font-weight:800; margin-bottom:4px;">🛡️ Assurance</h2>
+      <p class="text-muted" style="margin-bottom:16px; font-size:0.85rem;">Éléments de réassurance affichés au client (responsabilité civile professionnelle).</p>
+      <div class="form-grid">
+        <div class="field">
+          <label>Nom de l'assureur</label>
+          <input id="set-insurance_company" value="${v('insurance_company')}" placeholder="Ex. Assureur Fictif SA">
+        </div>
+        <div class="field">
+          <label>Numéro de contrat RC pro</label>
+          <input id="set-insurance_policy_number" value="${v('insurance_policy_number')}" placeholder="Ex. RCP-000000">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="font-size:1.05rem; font-weight:800; margin-bottom:4px;">📈 Analytics</h2>
+      <p class="text-muted" style="margin-bottom:16px; font-size:0.85rem;">Identifiants de suivi, à usage interne uniquement (jamais exposés sur le site public).</p>
+      <div class="form-grid">
+        <div class="field">
+          <label>Identifiant GA4</label>
+          <input id="set-ga4_id" value="${v('ga4_id')}" placeholder="Ex. G-0000000000">
+        </div>
+        <div class="field">
+          <label>Identifiant Google Ads</label>
+          <input id="set-google_ads_id" value="${v('google_ads_id')}" placeholder="Ex. AW-0000000000">
+        </div>
+      </div>
+    </div>
+
+    <div class="flex-between">
+      <span></span>
+      <button class="btn btn-primary" id="settingsSaveBtn" onclick="saveSettings()">Enregistrer</button>
+    </div>
+  `;
+}
+
+async function saveSettings() {
+  const keys = [
+    'contact_phone', 'contact_whatsapp', 'contact_email', 'contact_address',
+    'google_business_url', 'insurance_company', 'insurance_policy_number',
+    'ga4_id', 'google_ads_id',
+  ];
+  const payload = {};
+  for (const k of keys) {
+    const el = document.getElementById(`set-${k}`);
+    if (el) payload[k] = el.value.trim();
+  }
+  const btn = document.getElementById('settingsSaveBtn');
+  btn.disabled = true;
+  try {
+    await api('/api/admin/settings', { method: 'PUT', body: JSON.stringify(payload) });
+    toast('Paramètres enregistrés', 'success');
+  } catch (err) {
+    toast(err.message, 'error');
+  } finally {
+    btn.disabled = false;
   }
 }
 

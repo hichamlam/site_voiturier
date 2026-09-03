@@ -65,22 +65,6 @@ window.addEventListener('scroll', () => {
   else nav.classList.remove('scrolled');
 }, { passive:true });
 
-/* ÉTOILES */
-(function() {
-  const c = document.getElementById('stars');
-  if (!c) return;
-  for (let i = 0; i < 30; i++) {
-    const s = document.createElement('div');
-    s.className = 'star';
-    const sz = Math.random() * 2 + 1;
-    s.style.width = s.style.height = sz + 'px';
-    s.style.top = (Math.random() * 100) + '%';
-    s.style.left = (Math.random() * 100) + '%';
-    s.style.animationDelay = (Math.random() * 4) + 's';
-    s.style.opacity = Math.random() * 0.6 + 0.3;
-    c.appendChild(s);
-  }
-})();
 
 /* REVEAL ON SCROLL */
 const obs = new IntersectionObserver(es => {
@@ -189,7 +173,7 @@ async function simSelectCategory(code, btn) {
   STATE.sim.categoryCode = code;
 
   // Calculer le tarif
-  document.getElementById('sim-result-amount').innerHTML = '<span class="spinner" style="border-top-color:var(--gold-deep)"></span>';
+  document.getElementById('sim-result-amount').innerHTML = '<span class="spinner" style="border-top-color:var(--blue-deep)"></span>';
   simGoToStep(3);
 
   const res = await fetchPrice({
@@ -230,6 +214,80 @@ function simBookNow() {
 function categoryLabel(code) {
   return ({citadine:'Citadine', berline:'Berline / Break', suv:'SUV / 4×4 / Monospace', utilitaire:'Van / Utilitaire'})[code] || code;
 }
+
+/* ════════════════════════════════════════════════
+   INFOBULLES « exemples de véhicules » (cartes catégorie)
+═══════════════════════════════════════════════ */
+const CAT_EXAMPLES = {
+  citadine: 'Petite voiture urbaine. Ex. : Renault Clio, Peugeot 208, Citroën C3, Fiat 500, Toyota Yaris, VW Polo.',
+  berline: 'Voiture standard ou familiale. Ex. : Peugeot 308 et 508, Renault Mégane, VW Golf et Passat, Audi A4, BMW Série 3, Tesla Model 3.',
+  suv: 'Grand véhicule familial. Ex. : Peugeot 3008 et 5008, Renault Captur et Scenic, Dacia Duster, Nissan Qashqai, VW Tiguan, Tesla Model Y, BMW X3.',
+  utilitaire: 'Van, fourgon ou pickup. Ex. : Renault Trafic et Master, Citroën Jumpy et Jumper, Peugeot Expert et Boxer, Ford Transit, Mercedes Vito et Sprinter, VW Transporter.'
+};
+
+let catTooltipEl = null;
+let catTooltipBtn = null;
+
+function ensureCatTooltip() {
+  if (catTooltipEl) return catTooltipEl;
+  catTooltipEl = document.createElement('div');
+  catTooltipEl.className = 'cat-tooltip';
+  catTooltipEl.setAttribute('role', 'tooltip');
+  catTooltipEl.id = 'catTooltip';
+  document.body.appendChild(catTooltipEl);
+  return catTooltipEl;
+}
+
+function positionCatTooltip(btn, tip) {
+  const r = btn.getBoundingClientRect();
+  const tw = tip.offsetWidth, th = tip.offsetHeight;
+  let left = r.left + r.width / 2 - tw / 2;
+  left = Math.max(8, Math.min(left, window.innerWidth - tw - 8));
+  let top = r.bottom + 8;
+  if (top + th > window.innerHeight - 8) top = r.top - th - 8;
+  if (top < 8) top = 8;
+  tip.style.left = left + 'px';
+  tip.style.top = top + 'px';
+}
+
+function openCatInfo(btn) {
+  const tip = ensureCatTooltip();
+  tip.textContent = CAT_EXAMPLES[btn.dataset.cat] || '';
+  tip.classList.add('open');
+  btn.setAttribute('aria-expanded', 'true');
+  catTooltipBtn = btn;
+  positionCatTooltip(btn, tip);
+}
+
+function closeCatInfo() {
+  if (!catTooltipEl || !catTooltipBtn) return;
+  catTooltipEl.classList.remove('open');
+  catTooltipBtn.setAttribute('aria-expanded', 'false');
+  catTooltipBtn = null;
+}
+
+function toggleCatInfo(evt, btn) {
+  evt.stopPropagation();
+  evt.preventDefault();
+  if (catTooltipBtn === btn) closeCatInfo();
+  else openCatInfo(btn);
+}
+
+document.addEventListener('click', (e) => {
+  if (catTooltipBtn && !e.target.closest('.bk-cat-info')) closeCatInfo();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && catTooltipBtn) closeCatInfo();
+});
+window.addEventListener('scroll', () => { if (catTooltipBtn) positionCatTooltip(catTooltipBtn, catTooltipEl); }, true);
+window.addEventListener('resize', () => { if (catTooltipBtn) positionCatTooltip(catTooltipBtn, catTooltipEl); });
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.bk-cat-info').forEach((btn) => {
+    btn.addEventListener('mouseenter', () => openCatInfo(btn));
+    btn.addEventListener('mouseleave', () => { if (catTooltipBtn === btn) closeCatInfo(); });
+  });
+});
 
 /* ════════════════════════════════════════════════
    TUNNEL DE RÉSERVATION (3 étapes)
@@ -581,11 +639,6 @@ async function applyPaymentConfig() {
   }
   STATE.booking.payment = 'onsite';
 
-  const trust = document.getElementById('trust-payment');
-  if (trust) {
-    trust.innerHTML = '<strong>Paiement sur place</strong>' +
-      '<span>Espèces ou carte bancaire le jour du départ</span>';
-  }
   const faq = document.getElementById('faq-payment');
   if (faq) {
     faq.textContent = 'Sur place, le jour du départ, en espèces ou par carte bancaire. ' +
@@ -805,7 +858,7 @@ document.addEventListener('click', e => {
 ═══════════════════════════════════════════════ */
 (function stickyCtaInit() {
   const bar = document.getElementById('stickyCta');
-  const hero = document.querySelector('.hero');
+  const hero = document.querySelector('.hero, .page-hero');
   if (!bar || !hero) return;
   const io2 = new IntersectionObserver(entries => {
     entries.forEach(en => {

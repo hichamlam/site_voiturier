@@ -273,6 +273,16 @@ DROP TRIGGER IF EXISTS bookings_stats ON bookings;
 CREATE TRIGGER bookings_stats AFTER INSERT OR UPDATE OF status, payment_status ON bookings
   FOR EACH ROW EXECUTE FUNCTION trg_update_client_stats();
 
+-- Paramètres du site (clé/valeur), gérés depuis le back-office
+-- (onglet « Paramètres ») : coordonnées de contact, assurance, analytics…
+-- Reste vide tant que le propriétaire n'a rien renseigné — aucune valeur
+-- n'est insérée ici par défaut.
+CREATE TABLE IF NOT EXISTS settings (
+  key         text PRIMARY KEY,
+  value       text DEFAULT '',
+  updated_at  timestamptz DEFAULT now()
+);
+
 ALTER TABLE clients ENABLE ROW LEVEL SECURITY;
 ALTER TABLE bookings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE pricing_rules ENABLE ROW LEVEL SECURITY;
@@ -285,3 +295,4 @@ ALTER TABLE surcharges ENABLE ROW LEVEL SECURITY;
 ALTER TABLE holidays ENABLE ROW LEVEL SECURITY;
 ALTER TABLE quotes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE message_templates ENABLE ROW LEVEL SECURITY;
+ALTER TABLE settings ENABLE ROW LEVEL SECURITY;

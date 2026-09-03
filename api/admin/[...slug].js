@@ -21,6 +21,7 @@ import quotesHandler from './_handlers/quotes.js';
 import quotesSendHandler from './_handlers/quotes-send.js';
 import templatesHandler from './_handlers/templates.js';
 import shareBookingHandler from './_handlers/share-booking.js';
+import settingsHandler from './_handlers/settings.js';
 
 const routes = {
   login: loginHandler,
@@ -36,6 +37,7 @@ const routes = {
   'quotes-send': quotesSendHandler,
   templates: templatesHandler,
   'share-booking': shareBookingHandler,
+  settings: settingsHandler,
 };
 
 export default async function handler(req, res) {
