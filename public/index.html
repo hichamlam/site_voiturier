@@ -89,6 +89,15 @@ window.VO_CONTACT = {
 </head>
 <body>
 
+<!-- BANDEAU CODE PROMO — rempli par /api/config, invisible tant qu'aucun code n'est diffusé -->
+<div class="promo-banner" id="promoBanner" hidden role="dialog" aria-label="Code promo">
+  <p id="promoBannerText"></p>
+  <div class="promo-banner-actions">
+    <button class="promo-banner-use" onclick="promoBannerUse()">J'en profite</button>
+    <button class="promo-banner-close" onclick="promoBannerDismiss()" aria-label="Fermer">×</button>
+  </div>
+</div>
+
 <!-- NAV -->
 <nav class="nav" id="nav" aria-label="Navigation principale">
   <a href="#" class="nav-logo" aria-label="Direct Voiturier">

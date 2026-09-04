@@ -1,6 +1,9 @@
 /**
  * POST /api/pricing
- * Body : { depDate, depTime, retDate, retTime, carCategoryCode, washType, hasCoveredParking, hasPriorityAccess, promoCode }
+ * Body : { depDate, depTime, retDate, retTime, carCategoryCode, washType, hasCoveredParking, hasPriorityAccess, promoCode, customerEmail }
+ * customerEmail est optionnel ici : au stade du devis, on ne connaît pas
+ * forcément encore le client, donc un code « première réservation » est
+ * accepté par défaut (le contrôle réel a lieu à la réservation, cf. _lib.js).
  * Returns : objet de calcul détaillé
  */
 import { calculatePrice, checkDatesAvailable } from './_lib.js';
@@ -30,6 +33,7 @@ export default async function handler(req, res) {
       hasCoveredParking: !!body.hasCoveredParking,
       hasPriorityAccess: !!body.hasPriorityAccess,
       promoCode: body.promoCode,
+      customerEmail: body.customerEmail,
     });
 
     return res.status(200).json({ ...price, dateBlocked: false });
