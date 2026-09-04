@@ -87,17 +87,43 @@ export async function calculatePrice(input) {
   // 2. Tarif de base depuis la grille
   const { data: rule } = await supabase
     .from('pricing_rules')
-    .select('price_eur, days_min, extra_per_day_eur')
+    .select('price_eur, days_min, days_max, extra_per_day_eur')
     .lte('days_min', days)
     .gte('days_max', days)
     .order('days_min', { ascending: false })
     .limit(1)
     .maybeSingle();
 
-  let basePrice = rule ? Number(rule.price_eur) : 29;
-  // Palier dégressif : au-delà de days_min, on ajoute extra_per_day_eur par jour.
-  if (rule && rule.extra_per_day_eur && days > rule.days_min) {
-    basePrice += (days - rule.days_min) * Number(rule.extra_per_day_eur);
+  let basePrice;
+  if (rule) {
+    basePrice = Number(rule.price_eur);
+    // Palier dégressif : au-delà de days_min, on ajoute extra_per_day_eur par jour.
+    if (rule.extra_per_day_eur && days > rule.days_min) {
+      basePrice += (days - rule.days_min) * Number(rule.extra_per_day_eur);
+    }
+  } else {
+    // Aucun palier ne couvre `days` (séjour plus long que la grille, ou trou
+    // dans la grille) : on se replie sur le dernier palier situé EN DESSOUS
+    // de `days`, et on extrapole avec son extra_per_day_eur au-delà de SON
+    // days_max, pour ne pas retomber sur un tarif plancher inférieur aux
+    // paliers existants.
+    const { data: lastRule } = await supabase
+      .from('pricing_rules')
+      .select('price_eur, days_max, extra_per_day_eur')
+      .lt('days_max', days)
+      .order('days_max', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (lastRule) {
+      basePrice = Number(lastRule.price_eur);
+      if (lastRule.extra_per_day_eur && days > lastRule.days_max) {
+        basePrice += (days - lastRule.days_max) * Number(lastRule.extra_per_day_eur);
+      }
+    } else {
+      // Grille totalement vide : dernier recours.
+      basePrice = 29;
+    }
   }
   basePrice = Math.round(basePrice * 100) / 100;
   detail.push({ kind: 'base', label: `Voiturier ${days} jour${days > 1 ? 's' : ''}`, amount: basePrice });
