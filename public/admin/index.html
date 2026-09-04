@@ -1427,17 +1427,16 @@ async function renderPricing() {
 
     <div class="card">
       <div class="flex-between mb-md">
-        <h2 style="font-size:1.05rem; font-weight:800;">📊 Grille tarifaire (par paliers de jours)</h2>
-        <button class="btn btn-primary btn-sm" onclick="openPricingForm('rule')">+ Ajouter un palier</button>
+        <h2 style="font-size:1.05rem; font-weight:800;">📊 Grille tarifaire (prix par nombre de jours)</h2>
+        <button class="btn btn-primary btn-sm" onclick="openPricingForm('rule')">+ Ajouter une durée</button>
       </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Min jours</th><th>Max jours</th><th>Prix (€)</th><th>+ €/jour au-delà</th><th>Libellé</th><th></th></tr></thead>
+          <thead><tr><th>Durée</th><th>Prix (€)</th><th>+ €/jour au-delà</th><th>Libellé</th><th></th></tr></thead>
           <tbody>
             ${rules.map(r => `
               <tr>
-                <td><strong>${r.days_min}</strong></td>
-                <td><strong>${r.days_max}</strong></td>
+                <td><strong>${r.days_min === r.days_max ? r.days_min + ' jour' + (r.days_min > 1 ? 's' : '') : r.days_min + ' à ' + r.days_max + ' jours'}</strong></td>
                 <td class="text-bold text-gold">${r.price_eur}€</td>
                 <td>${r.extra_per_day_eur ? '+' + r.extra_per_day_eur + '€/j' : '—'}</td>
                 <td>${escapeHtml(r.label || '—')}</td>
@@ -1522,13 +1521,12 @@ function openPricingForm(type, id) {
   let formHTML = '';
   let titleStr = '';
   if (type === 'rule') {
-    titleStr = id ? 'Modifier un palier' : 'Nouveau palier tarifaire';
+    titleStr = id ? 'Modifier une durée' : 'Nouvelle durée tarifée';
     formHTML = `
       <div class="form-grid">
-        <div class="field"><label>Min jours *</label><input type="number" id="pf-days_min" min="1" value="${item.days_min || 1}" required></div>
-        <div class="field"><label>Max jours *</label><input type="number" id="pf-days_max" min="1" value="${item.days_max || 1}" required></div>
+        <div class="field"><label>Nombre de jours *</label><input type="number" id="pf-days" min="1" value="${item.days_min || 1}" required><div class="hint">Une ligne par durée : 1 jour = 29 €, 2 jours = 49 €, etc.</div></div>
         <div class="field"><label>Prix (€) *</label><input type="number" id="pf-price_eur" step="0.01" value="${item.price_eur || ''}" required></div>
-        <div class="field"><label>+ €/jour au-delà (optionnel)</label><input type="number" step="0.01" id="pf-extra_per_day_eur" value="${item.extra_per_day_eur || ''}"><div class="hint">Ex. mets 10 pour "au-delà de Min jours, +10€ par jour supplémentaire". Laisse vide pour un prix fixe.</div></div>
+        <div class="field full"><label>+ €/jour au-delà (optionnel)</label><input type="number" step="0.01" id="pf-extra_per_day_eur" value="${item.extra_per_day_eur || ''}"><div class="hint">À renseigner sur la dernière durée de la grille : chaque jour supplémentaire au-delà est facturé ce montant. Laisse vide pour un prix fixe.</div></div>
         <div class="field"><label>Libellé</label><input id="pf-label" value="${escapeHtml(item.label || '')}"></div>
       </div>
     `;
@@ -1581,8 +1579,9 @@ async function submitPricing(type, id) {
     if (type === 'rule') {
       const extraPerDay = document.getElementById('pf-extra_per_day_eur').value;
       payload = {
-        days_min: parseInt(document.getElementById('pf-days_min').value, 10),
-        days_max: parseInt(document.getElementById('pf-days_max').value, 10),
+        // Une ligne = une durée précise : days_min et days_max sont identiques.
+        days_min: parseInt(document.getElementById('pf-days').value, 10),
+        days_max: parseInt(document.getElementById('pf-days').value, 10),
         price_eur: parseFloat(document.getElementById('pf-price_eur').value),
         extra_per_day_eur: extraPerDay ? parseFloat(extraPerDay) : null,
         label: document.getElementById('pf-label').value.trim(),
