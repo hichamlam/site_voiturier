@@ -44,16 +44,65 @@ function fmtDateShort(iso) {
 /* ════════════════════════════════════════════════
    API CALLS
 ═══════════════════════════════════════════════ */
-async function fetchPrice(payload) {
+// Cache mémoire des tarifs déjà calculés (clé = payload JSON) : revenir sur
+// un choix déjà tarifé est instantané, sans requête serveur.
+const priceCache = new Map();
+// Appels fetchPrice en attente d'une réponse, requête réseau en cours, et
+// minuteur d'anti-rebond.
+let priceWaiters = [];
+let priceDebounceTimer = null;
+let priceAbortController = null;
+
+async function priceRunBatch() {
+  priceDebounceTimer = null;
+  if (priceWaiters.length === 0) return;
+
+  // Seul le dernier appel compte : c'est lui qui reflète l'état actuel de l'UI.
+  const { payload, key } = priceWaiters[priceWaiters.length - 1];
+
+  // Annule la requête précédente encore en vol pour qu'une réponse lente
+  // n'écrase pas une réponse plus récente (course entre requêtes).
+  if (priceAbortController) priceAbortController.abort();
+  const controller = new AbortController();
+  priceAbortController = controller;
+
+  // Résout tous les appels en attente, y compris ceux dont la requête a été
+  // annulée : sans ça, un `await fetchPrice(...)` supplanté resterait bloqué
+  // pour toujours et l'écran garderait son spinner.
+  const flush = (value) => {
+    const waiters = priceWaiters;
+    priceWaiters = [];
+    waiters.forEach(w => w.resolve(value));
+  };
+
   try {
     const res = await fetch('/api/pricing', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify(payload),
+      signal: controller.signal,
     });
-    if (!res.ok) return null;
-    return await res.json();
-  } catch { return null; }
+    if (!res.ok) { flush(null); return; }
+    const data = await res.json();
+    priceCache.set(key, data);
+    flush(data);
+  } catch (e) {
+    // Requête annulée : les appels en attente le restent, c'est le lot
+    // suivant (déjà lancé) qui les résoudra avec un résultat plus récent.
+    if (e.name === 'AbortError') return;
+    flush(null);
+  }
+}
+
+function fetchPrice(payload) {
+  const key = JSON.stringify(payload);
+  if (priceCache.has(key)) return Promise.resolve(priceCache.get(key));
+
+  return new Promise(resolve => {
+    priceWaiters.push({ payload, key, resolve });
+    if (priceDebounceTimer) clearTimeout(priceDebounceTimer);
+    priceDebounceTimer = setTimeout(priceRunBatch, 250);
+  });
 }
 
 /* ════════════════════════════════════════════════
