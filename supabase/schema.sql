@@ -133,8 +133,17 @@ CREATE TABLE IF NOT EXISTS promo_codes (
   discount_val numeric(10,2) NOT NULL,
   max_uses int DEFAULT NULL, uses_count int DEFAULT 0,
   valid_from date DEFAULT NULL, valid_until date DEFAULT NULL,
-  active boolean DEFAULT true, created_at timestamptz DEFAULT now()
+  active boolean DEFAULT true, created_at timestamptz DEFAULT now(),
+  show_banner boolean DEFAULT false,
+  first_booking_only boolean DEFAULT false
 );
+
+-- Bases déjà créées avant l'ajout de ces deux colonnes : show_banner permet
+-- au propriétaire de choisir un code à diffuser en bannière sur la page
+-- d'accueil (voir /api/config), first_booking_only réserve un code aux
+-- clients n'ayant encore aucune réservation (voir calculatePrice).
+ALTER TABLE promo_codes ADD COLUMN IF NOT EXISTS show_banner boolean DEFAULT false;
+ALTER TABLE promo_codes ADD COLUMN IF NOT EXISTS first_booking_only boolean DEFAULT false;
 
 DO $$ BEGIN
   CREATE TYPE booking_status AS ENUM ('pending','confirmed','taken','in_storage','returned','cancelled');

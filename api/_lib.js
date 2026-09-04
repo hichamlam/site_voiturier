@@ -74,6 +74,7 @@ export async function calculatePrice(input) {
     hasCoveredParking = false,
     hasPriorityAccess = false,
     promoCode = null,
+    customerEmail = null,
   } = input;
 
   const detail = []; // détail pour affichage facture
@@ -256,6 +257,7 @@ export async function calculatePrice(input) {
   // 10. Code promo
   let promoDiscount = 0;
   let promoApplied = null;
+  let promoRejectedReason = null;
 
   if (promoCode) {
     const code = promoCode.trim().toUpperCase();
@@ -272,7 +274,29 @@ export async function calculatePrice(input) {
       const validUntil = !promo.valid_until || promo.valid_until >= today;
       const usesOk = !promo.max_uses || promo.uses_count < promo.max_uses;
 
-      if (validFrom && validUntil && usesOk) {
+      // Code réservé à une première réservation : au stade du devis/simulateur
+      // (calculatePrice appelé sans customerEmail), on ne connaît pas encore le
+      // client, donc on ne peut pas le disqualifier — on l'accepte par défaut.
+      // Le contrôle réel a lieu à la réservation, où api/booking.js et
+      // api/checkout.js transmettent bien customerEmail.
+      let firstBookingOk = true;
+      if (promo.first_booking_only && customerEmail) {
+        // On ne compte que les réservations qui ont réellement eu lieu :
+        // `pending` désigne un paiement Stripe jamais abouti (la ligne est
+        // créée avant la redirection), et `cancelled` une réservation annulée.
+        // Sans cette exclusion, un paiement abandonné brûlerait définitivement
+        // le droit du client à son code de bienvenue, sans recours possible.
+        const { data: existingBooking } = await supabase
+          .from('bookings')
+          .select('id')
+          .eq('customer_email', customerEmail.trim().toLowerCase())
+          .not('status', 'in', '(pending,cancelled)')
+          .limit(1)
+          .maybeSingle();
+        firstBookingOk = !existingBooking;
+      }
+
+      if (validFrom && validUntil && usesOk && firstBookingOk) {
         if (promo.discount_type === 'percent') {
           promoDiscount = Math.round((subtotal * Number(promo.discount_val) / 100) * 100) / 100;
         } else {
@@ -281,7 +305,13 @@ export async function calculatePrice(input) {
         promoDiscount = Math.min(promoDiscount, subtotal);
         promoApplied = code;
         detail.push({ kind: 'promo', label: `Code promo ${code}`, amount: -promoDiscount });
+      } else if (!firstBookingOk) {
+        promoRejectedReason = 'first_booking_only';
+      } else {
+        promoRejectedReason = 'invalid';
       }
+    } else {
+      promoRejectedReason = 'invalid';
     }
   }
 
@@ -297,6 +327,7 @@ export async function calculatePrice(input) {
     optionsTotal,
     promoCode: promoApplied,
     promoDiscount,
+    promoRejectedReason,
     total,
     surchargesDetail: detail,
   };

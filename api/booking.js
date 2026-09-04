@@ -36,7 +36,18 @@ export default async function handler(req, res) {
       hasCoveredParking: !!options.coveredParking,
       hasPriorityAccess: !!options.priorityAccess,
       promoCode,
+      customerEmail: customer.email,
     });
+
+    // Sans ce garde-fou, le client verrait un prix remisé au récapitulatif
+    // (calculé côté front avant que l'e-mail ne soit connu) puis serait
+    // facturé au plein tarif ici sans aucun avertissement.
+    if (promoCode && price.promoRejectedReason === 'first_booking_only') {
+      return res.status(409).json({ error: `Le code promo ${promoCode} est réservé à une première réservation.` });
+    }
+    if (promoCode && price.promoRejectedReason === 'invalid') {
+      return res.status(409).json({ error: `Le code promo ${promoCode} n'est plus valable.` });
+    }
 
     const clientId = await upsertClient(customer);
 
