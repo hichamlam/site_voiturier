@@ -2426,6 +2426,472 @@ async function saveSettings() {
 }
 
 /* ════════════════════════════════════════════════════════════
+   VIEW: SURCHARGES (suppléments horaires + options)
+═══════════════════════════════════════════════════════════ */
+function appliesToLabel(v) {
+  return ({ departure: 'Départ', return: 'Retour', both: 'Départ & retour' })[v] || v || '—';
+}
+function hhmm(t) { return t ? String(t).slice(0, 5) : '—'; }
+
+async function renderSurcharges() {
+  const { surcharges } = await api('/api/admin/surcharges');
+  STATE.surcharges = surcharges;
+  const timeWindows = surcharges.filter(s => s.kind === 'time_window');
+  const options = surcharges.filter(s => s.kind === 'option');
+
+  const c = document.getElementById('viewContainer');
+  c.innerHTML = `
+    <div class="topbar">
+      <div>
+        <h1>Suppléments & frais</h1>
+        <p class="sub">Suppléments horaires et options facturées en plus du tarif de base</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="flex-between mb-md">
+        <h2 style="font-size:1.05rem; font-weight:800;">⏰ Suppléments horaires</h2>
+        <button class="btn btn-primary btn-sm" onclick="openSurchargeForm('time_window')">+ Ajouter un supplément horaire</button>
+      </div>
+      ${timeWindows.length === 0 ? '<div class="text-muted">Aucun supplément horaire</div>' : `
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Nom</th><th>Plage horaire</th><th>S'applique à</th><th>Montant</th><th>Statut</th><th></th></tr></thead>
+            <tbody>
+              ${timeWindows.map(s => `
+                <tr>
+                  <td class="text-bold">${escapeHtml(s.name)}${s.description ? `<div class="text-tiny text-muted">${escapeHtml(s.description)}</div>` : ''}</td>
+                  <td class="font-mono">${hhmm(s.time_start)} – ${hhmm(s.time_end)}</td>
+                  <td>${appliesToLabel(s.applies_to)}</td>
+                  <td class="text-bold">+${s.amount_eur}€</td>
+                  <td>${s.active !== false ? '<span class="text-success">✓ Actif</span>' : '<span class="text-muted">Inactif</span>'}</td>
+                  <td class="text-right">
+                    <button class="btn btn-ghost btn-sm" onclick="openSurchargeForm('time_window','${s.id}')">Modifier</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteSurcharge('${s.id}')">×</button>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `}
+    </div>
+
+    <div class="card">
+      <div class="flex-between mb-md">
+        <h2 style="font-size:1.05rem; font-weight:800;">⚙️ Options</h2>
+        <button class="btn btn-primary btn-sm" onclick="openSurchargeForm('option')">+ Ajouter une option</button>
+      </div>
+      ${options.length === 0 ? '<div class="text-muted">Aucune option</div>' : `
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Nom</th><th>Code</th><th>Montant</th><th>Statut</th><th></th></tr></thead>
+            <tbody>
+              ${options.map(s => `
+                <tr>
+                  <td class="text-bold">${escapeHtml(s.name)}${s.description ? `<div class="text-tiny text-muted">${escapeHtml(s.description)}</div>` : ''}</td>
+                  <td class="font-mono">${escapeHtml(s.option_code || '—')}</td>
+                  <td class="text-bold">+${s.amount_eur}€</td>
+                  <td>${s.active !== false ? '<span class="text-success">✓ Actif</span>' : '<span class="text-muted">Inactif</span>'}</td>
+                  <td class="text-right">
+                    <button class="btn btn-ghost btn-sm" onclick="openSurchargeForm('option','${s.id}')">Modifier</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteSurcharge('${s.id}')">×</button>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `}
+    </div>
+  `;
+}
+
+function openSurchargeForm(kind, id) {
+  const item = id ? (STATE.surcharges.find(x => x.id === id) || {}) : {};
+  const titleStr = (id ? 'Modifier ' : 'Ajouter ') + (kind === 'option' ? 'une option' : 'un supplément horaire');
+  const html = `
+    <div class="modal-bg show" onclick="if(event.target.classList.contains('modal-bg'))closeModal()">
+      <div class="modal-card">
+        <div class="modal-head">
+          <h2>${titleStr}</h2>
+          <button class="modal-close-btn" onclick="closeModal()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div class="form-grid">
+          <div class="field full"><label>Nom *</label><input id="sf-name" value="${escapeHtml(item.name || '')}" required></div>
+          <div class="field full"><label>Description</label><input id="sf-description" value="${escapeHtml(item.description || '')}"></div>
+          ${kind === 'time_window' ? `
+            <div class="field"><label>Heure début *</label><input type="time" id="sf-time_start" value="${hhmm(item.time_start)}" required></div>
+            <div class="field"><label>Heure fin *</label><input type="time" id="sf-time_end" value="${hhmm(item.time_end)}" required></div>
+            <div class="field full"><label>S'applique à</label>
+              <select id="sf-applies_to">
+                <option value="both" ${item.applies_to === 'both' || !item.applies_to ? 'selected' : ''}>Départ & retour</option>
+                <option value="departure" ${item.applies_to === 'departure' ? 'selected' : ''}>Départ uniquement</option>
+                <option value="return" ${item.applies_to === 'return' ? 'selected' : ''}>Retour uniquement</option>
+              </select>
+            </div>
+          ` : `
+            <div class="field full"><label>Code option *</label><input id="sf-option_code" value="${escapeHtml(item.option_code || '')}" placeholder="Ex. covered_parking" required></div>
+          `}
+          <div class="field"><label>Montant (€) *</label><input type="number" step="0.01" id="sf-amount_eur" value="${item.amount_eur ?? ''}" required></div>
+          <div class="field"><label>Ordre d'affichage</label><input type="number" id="sf-display_order" value="${item.display_order ?? 0}"></div>
+          <div class="field full"><label><input type="checkbox" id="sf-active" ${item.active !== false ? 'checked' : ''} style="width:auto;margin-right:6px"> Actif</label></div>
+        </div>
+        <div class="flex-between mt-md">
+          <button class="btn btn-ghost" onclick="closeModal()">Annuler</button>
+          <button class="btn btn-primary" onclick="submitSurcharge('${kind}'${id ? `,'${id}'` : ''})">Enregistrer</button>
+        </div>
+      </div>
+    </div>
+  `;
+  document.getElementById('modalsContainer').innerHTML = html;
+}
+
+async function submitSurcharge(kind, id) {
+  try {
+    const payload = {
+      kind,
+      name: document.getElementById('sf-name').value.trim(),
+      description: document.getElementById('sf-description').value.trim(),
+      amount_eur: parseFloat(document.getElementById('sf-amount_eur').value) || 0,
+      display_order: parseInt(document.getElementById('sf-display_order').value, 10) || 0,
+      active: document.getElementById('sf-active').checked,
+    };
+    if (kind === 'time_window') {
+      payload.time_start = document.getElementById('sf-time_start').value;
+      payload.time_end = document.getElementById('sf-time_end').value;
+      payload.applies_to = document.getElementById('sf-applies_to').value;
+    } else {
+      payload.option_code = document.getElementById('sf-option_code').value.trim();
+    }
+    const url = '/api/admin/surcharges' + (id ? '?id=' + id : '');
+    await api(url, { method: id ? 'PATCH' : 'POST', body: JSON.stringify(payload) });
+    toast('Enregistré', 'success');
+    closeModal();
+    renderSurcharges();
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+async function deleteSurcharge(id) {
+  if (!confirm('Supprimer ce supplément ?')) return;
+  try {
+    await api('/api/admin/surcharges?id=' + id, { method: 'DELETE' });
+    toast('Supprimé', 'success');
+    renderSurcharges();
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+/* ════════════════════════════════════════════════════════════
+   VIEW: QUOTES (devis)
+═══════════════════════════════════════════════════════════ */
+function quoteStatusInfo(s) {
+  return ({
+    draft: { label: 'Brouillon', cls: 'badge-pending' },
+    sent: { label: 'Envoyé', cls: 'badge-confirmed' },
+    accepted: { label: 'Accepté', cls: 'badge-in_storage' },
+  })[s] || { label: s || '—', cls: 'badge-returned' };
+}
+function quoteStatusBadge(s) {
+  const info = quoteStatusInfo(s);
+  return `<span class="badge ${info.cls}"><span class="dot"></span>${info.label}</span>`;
+}
+
+async function renderQuotes() {
+  const { quotes } = await api('/api/admin/quotes');
+  STATE.quotes = quotes;
+  const c = document.getElementById('viewContainer');
+  c.innerHTML = `
+    <div class="topbar">
+      <div>
+        <h1>Devis</h1>
+        <p class="sub">${quotes.length} devis</p>
+      </div>
+      <button class="btn btn-gold" onclick="openQuoteForm()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        Nouveau devis
+      </button>
+    </div>
+
+    <div class="card card-pad-0">
+      ${quotes.length === 0 ? '<div class="empty"><p>Aucun devis</p></div>' : `
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Référence</th><th>Client</th><th>Voyage</th><th>Catégorie</th><th>Total</th><th>Statut</th><th>Validité</th><th></th></tr></thead>
+            <tbody>
+              ${quotes.map(q => `
+                <tr>
+                  <td class="font-mono text-bold">${escapeHtml(q.reference)}</td>
+                  <td>
+                    <div class="text-bold">${escapeHtml(q.customer_firstname)} ${escapeHtml(q.customer_lastname)}</div>
+                    <div class="text-tiny text-muted">${escapeHtml(q.customer_email || '—')}</div>
+                  </td>
+                  <td class="text-tiny">${fmtDate(q.departure_date)} → ${fmtDate(q.return_date)}</td>
+                  <td>${categoryLabel(q.car_category_code)}</td>
+                  <td class="text-bold">${q.total_price}€</td>
+                  <td>${quoteStatusBadge(q.status)}</td>
+                  <td class="text-tiny">${q.valid_until ? fmtDate(q.valid_until) : '—'}</td>
+                  <td class="text-right">
+                    <button class="btn btn-ghost btn-sm" onclick="sendQuote('${q.id}')" ${q.customer_email ? '' : 'disabled title="Email client requis"'}>Envoyer</button>
+                    ${q.status === 'accepted'
+                      ? ''
+                      : `<button class="btn btn-ghost btn-sm" onclick="convertQuote('${q.id}')">Convertir</button>`}
+                    <button class="btn btn-danger btn-sm" onclick="deleteQuote('${q.id}')">×</button>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `}
+    </div>
+  `;
+}
+
+function openQuoteForm() {
+  const html = `
+    <div class="modal-bg show" onclick="if(event.target.classList.contains('modal-bg'))closeModal()">
+      <div class="modal-card lg">
+        <div class="modal-head">
+          <h2>Nouveau devis</h2>
+          <button class="modal-close-btn" onclick="closeModal()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        <h3 class="text-tiny text-bold" style="text-transform:uppercase; letter-spacing:0.1em; color:var(--slate); margin-bottom:8px;">Client</h3>
+        <div class="form-grid">
+          <div class="field"><label>Prénom</label><input id="qf-firstname"></div>
+          <div class="field"><label>Nom</label><input id="qf-lastname"></div>
+          <div class="field"><label>Email</label><input id="qf-email" type="email"></div>
+          <div class="field"><label>Téléphone</label><input id="qf-phone" type="tel"></div>
+        </div>
+
+        <h3 class="text-tiny text-bold mt-md" style="text-transform:uppercase; letter-spacing:0.1em; color:var(--slate); margin-bottom:8px;">Voyage</h3>
+        <div class="form-grid">
+          <div class="field"><label>Date départ *</label><input id="qf-dep-date" type="date" required></div>
+          <div class="field"><label>Heure départ *</label><input id="qf-dep-time" type="time" value="08:00" required></div>
+          <div class="field"><label>Date retour *</label><input id="qf-ret-date" type="date" required></div>
+          <div class="field"><label>Heure retour *</label><input id="qf-ret-time" type="time" value="20:00" required></div>
+        </div>
+
+        <h3 class="text-tiny text-bold mt-md" style="text-transform:uppercase; letter-spacing:0.1em; color:var(--slate); margin-bottom:8px;">Véhicule & service</h3>
+        <div class="form-grid">
+          <div class="field"><label>Catégorie</label>
+            <select id="qf-category">
+              <option value="citadine">Citadine</option>
+              <option value="berline">Berline / Break</option>
+              <option value="suv">SUV / 4×4 / Monospace</option>
+              <option value="utilitaire">Van / Utilitaire</option>
+            </select>
+          </div>
+          <div class="field"><label>Lavage</label>
+            <select id="qf-wash">
+              <option value="none">Aucun</option>
+              <option value="exterieur">Extérieur</option>
+              <option value="interieur">Intérieur</option>
+              <option value="complet">Complet</option>
+              <option value="premium">Premium</option>
+            </select>
+          </div>
+          <div class="field"><label>Code promo</label><input id="qf-promo" style="text-transform:uppercase"></div>
+          <div class="field">
+            <label><input type="checkbox" id="qf-parking" style="width:auto;margin-right:6px">Parking couvert</label>
+          </div>
+          <div class="field">
+            <label><input type="checkbox" id="qf-priority" style="width:auto;margin-right:6px">Accès prioritaire</label>
+          </div>
+          <div class="field full"><label>Notes</label><textarea id="qf-notes"></textarea></div>
+        </div>
+
+        <div class="flex-between mt-lg">
+          <div class="text-muted text-tiny">Le tarif sera calculé automatiquement</div>
+          <div class="flex gap-sm">
+            <button class="btn btn-ghost" onclick="closeModal()">Annuler</button>
+            <button class="btn btn-primary" onclick="submitNewQuote()">Créer le devis</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  document.getElementById('modalsContainer').innerHTML = html;
+
+  const today = new Date(); const tom = new Date(today); tom.setDate(tom.getDate() + 1);
+  const wk = new Date(today); wk.setDate(wk.getDate() + 8);
+  document.getElementById('qf-dep-date').value = tom.toISOString().slice(0, 10);
+  document.getElementById('qf-ret-date').value = wk.toISOString().slice(0, 10);
+}
+
+async function submitNewQuote() {
+  try {
+    const payload = {
+      customer_firstname: document.getElementById('qf-firstname').value.trim(),
+      customer_lastname: document.getElementById('qf-lastname').value.trim(),
+      customer_email: document.getElementById('qf-email').value.trim(),
+      customer_phone: document.getElementById('qf-phone').value.trim(),
+      departure_date: document.getElementById('qf-dep-date').value,
+      departure_time: document.getElementById('qf-dep-time').value,
+      return_date: document.getElementById('qf-ret-date').value,
+      return_time: document.getElementById('qf-ret-time').value,
+      car_category_code: document.getElementById('qf-category').value,
+      wash_type: document.getElementById('qf-wash').value,
+      has_covered_parking: document.getElementById('qf-parking').checked,
+      has_priority_access: document.getElementById('qf-priority').checked,
+      promo_code: document.getElementById('qf-promo').value.trim() || null,
+      notes: document.getElementById('qf-notes').value.trim(),
+    };
+    if (!payload.departure_date || !payload.return_date) {
+      return toast('Dates requises', 'error');
+    }
+    const { quote } = await api('/api/admin/quotes', { method: 'POST', body: JSON.stringify(payload) });
+    toast(`Devis ${quote.reference} créé`, 'success');
+    closeModal();
+    renderQuotes();
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+async function sendQuote(id) {
+  try {
+    await api('/api/admin/quotes-send', { method: 'POST', body: JSON.stringify({ id }) });
+    toast('Devis envoyé', 'success');
+    renderQuotes();
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+async function convertQuote(id) {
+  if (!confirm('Convertir ce devis en réservation ?')) return;
+  try {
+    const { booking } = await api('/api/admin/quotes?action=convert&id=' + id, { method: 'POST' });
+    toast(`Réservation ${booking.reference} créée`, 'success');
+    renderQuotes();
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+async function deleteQuote(id) {
+  if (!confirm('Supprimer ce devis ?')) return;
+  try {
+    await api('/api/admin/quotes?id=' + id, { method: 'DELETE' });
+    toast('Supprimé', 'success');
+    renderQuotes();
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+/* ════════════════════════════════════════════════════════════
+   VIEW: TEMPLATES (modèles de message SMS / email)
+═══════════════════════════════════════════════════════════ */
+function channelLabel(ch) { return ch === 'sms' ? 'SMS' : 'Email'; }
+
+async function renderTemplates() {
+  const { templates } = await api('/api/admin/templates');
+  STATE.templates = templates;
+  const c = document.getElementById('viewContainer');
+  c.innerHTML = `
+    <div class="topbar">
+      <div>
+        <h1>Messages</h1>
+        <p class="sub">${templates.length} modèle(s) de message</p>
+      </div>
+      <button class="btn btn-gold" onclick="openTemplateForm()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        Nouveau modèle
+      </button>
+    </div>
+
+    <div class="card card-pad-0">
+      ${templates.length === 0 ? '<div class="empty"><p>Aucun modèle</p></div>' : `
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Nom</th><th>Code</th><th>Canal</th><th>Statut</th><th></th></tr></thead>
+            <tbody>
+              ${templates.map(t => `
+                <tr>
+                  <td class="text-bold">${escapeHtml(t.name)}</td>
+                  <td class="font-mono text-tiny">${escapeHtml(t.code)}</td>
+                  <td>${channelLabel(t.channel)}</td>
+                  <td>${t.active !== false ? '<span class="text-success">✓ Actif</span>' : '<span class="text-muted">Inactif</span>'}</td>
+                  <td class="text-right">
+                    <button class="btn btn-ghost btn-sm" onclick="openTemplateForm('${t.id}')">Modifier</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteTemplate('${t.id}')">×</button>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `}
+    </div>
+  `;
+}
+
+function openTemplateForm(id) {
+  const item = id ? (STATE.templates.find(x => x.id === id) || {}) : {};
+  const titleStr = id ? 'Modifier le modèle' : 'Nouveau modèle de message';
+  const html = `
+    <div class="modal-bg show" onclick="if(event.target.classList.contains('modal-bg'))closeModal()">
+      <div class="modal-card lg">
+        <div class="modal-head">
+          <h2>${titleStr}</h2>
+          <button class="modal-close-btn" onclick="closeModal()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div class="form-grid">
+          <div class="field"><label>Nom *</label><input id="tf-name" value="${escapeHtml(item.name || '')}" required></div>
+          <div class="field"><label>Code *</label><input id="tf-code" value="${escapeHtml(item.code || '')}" ${id ? 'readonly' : ''} required></div>
+          <div class="field"><label>Canal *</label>
+            <select id="tf-channel" onchange="document.getElementById('tf-subject-field').style.display = this.value === 'email' ? '' : 'none'">
+              <option value="sms" ${item.channel === 'sms' ? 'selected' : ''}>SMS</option>
+              <option value="email" ${item.channel === 'email' ? 'selected' : ''}>Email</option>
+            </select>
+          </div>
+          <div class="field" id="tf-subject-field" style="display:${item.channel === 'email' ? '' : 'none'}">
+            <label>Objet (email)</label><input id="tf-subject" value="${escapeHtml(item.subject || '')}">
+          </div>
+          <div class="field full"><label>Message * <span class="text-tiny text-muted">(variables : {{firstname}}, {{reference}}, {{dep_date}}, {{dep_time}}, {{terminal}}, {{phone_business}}, {{car_brand}}, {{car_model}}, {{car_plate}}…)</span></label>
+            <textarea id="tf-body" rows="8" required>${escapeHtml(item.body || '')}</textarea>
+          </div>
+          <div class="field full"><label><input type="checkbox" id="tf-active" ${item.active !== false ? 'checked' : ''} style="width:auto;margin-right:6px"> Actif</label></div>
+        </div>
+        <div class="flex-between mt-md">
+          <button class="btn btn-ghost" onclick="closeModal()">Annuler</button>
+          <button class="btn btn-primary" onclick="submitTemplate(${id ? `'${id}'` : 'undefined'})">Enregistrer</button>
+        </div>
+      </div>
+    </div>
+  `;
+  document.getElementById('modalsContainer').innerHTML = html;
+}
+
+async function submitTemplate(id) {
+  try {
+    const channel = document.getElementById('tf-channel').value;
+    const payload = {
+      name: document.getElementById('tf-name').value.trim(),
+      code: document.getElementById('tf-code').value.trim(),
+      channel,
+      subject: channel === 'email' ? document.getElementById('tf-subject').value.trim() : '',
+      body: document.getElementById('tf-body').value.trim(),
+      active: document.getElementById('tf-active').checked,
+    };
+    const url = '/api/admin/templates' + (id ? '?id=' + id : '');
+    await api(url, { method: id ? 'PATCH' : 'POST', body: JSON.stringify(payload) });
+    toast('Enregistré', 'success');
+    closeModal();
+    renderTemplates();
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+async function deleteTemplate(id) {
+  if (!confirm('Supprimer ce modèle ?')) return;
+  try {
+    await api('/api/admin/templates?id=' + id, { method: 'DELETE' });
+    toast('Supprimé', 'success');
+    renderTemplates();
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+/* ════════════════════════════════════════════════════════════
    BOOT
 ═══════════════════════════════════════════════════════════ */
 if (STATE.token) {
