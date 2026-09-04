@@ -667,6 +667,21 @@ section { position:relative; }
 .cookie-refuse { background:rgba(255,255,255,0.12); color:white; }
 @media (max-width:700px) { .cookie-banner { bottom:calc(78px + env(safe-area-inset-bottom)); } }
 
+/* ═══ BANDEAU CODE PROMO (rempli par /api/config, un seul code diffusé à la fois) ═══ */
+.promo-banner { position:fixed; left:14px; right:14px; bottom:14px; z-index:150;
+  max-width:420px; margin:0 auto; padding:16px 18px; border-radius:var(--r-lg);
+  background:var(--blue-deep); color:white; box-shadow:var(--sh-lg);
+  display:flex; align-items:center; gap:12px; }
+.promo-banner[hidden] { display:none; }
+.promo-banner p { flex:1; margin:0; font-size:0.82rem; line-height:1.5; color:white; }
+.promo-banner p strong { font-family:'Courier New', monospace; color:var(--accent-gold-light); letter-spacing:0.03em; }
+.promo-banner-actions { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+.promo-banner-use { padding:10px 16px; border-radius:100px; font-weight:700; font-size:0.8rem;
+  background:var(--accent-gold); color:var(--ink); white-space:nowrap; }
+.promo-banner-close { width:28px; height:28px; flex-shrink:0; border-radius:50%;
+  background:rgba(255,255,255,0.12); color:white; font-size:1.1rem; line-height:1; }
+@media (max-width:700px) { .promo-banner { bottom:calc(150px + env(safe-area-inset-bottom)); } }
+
 /* ═══ CONTACT DIRECT — TÉLÉPHONE NAV + WHATSAPP FLOTTANT ═══ */
 .nav-phone { display:inline-flex; align-items:center; gap:8px; padding:11px 18px;
   border:1px solid var(--line); border-radius:100px; font-weight:700; font-size:0.86rem;

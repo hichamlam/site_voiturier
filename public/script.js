@@ -517,6 +517,7 @@ async function bkUpdatePriceLive() {
     hasCoveredParking: data.options.coveredParking,
     hasPriorityAccess: data.options.priorityAccess,
     promoCode: data.promoCode,
+    customerEmail: data.customer?.email || null,
   });
   if (!res || res.dateBlocked) return;
   STATE.booking.serverPrice = res;
@@ -540,6 +541,7 @@ async function bkRenderRecap() {
     hasCoveredParking: data.options.coveredParking,
     hasPriorityAccess: data.options.priorityAccess,
     promoCode: data.promoCode,
+    customerEmail: data.customer?.email || null,
   });
 
   if (!res) {
@@ -600,7 +602,9 @@ async function bkApplyPromo() {
   } else {
     STATE.booking.data.promoCode = null;
     msg.style.color = 'var(--error)';
-    msg.textContent = '✕ Code invalide ou expiré';
+    msg.textContent = (sp && sp.promoRejectedReason === 'first_booking_only')
+      ? '✕ Ce code est réservé à une première réservation.'
+      : '✕ Code invalide ou expiré';
   }
 }
 
@@ -671,6 +675,7 @@ async function applyPaymentConfig() {
     if (!res.ok) return;
     cfg = await res.json();
   } catch { return; }
+  initPromoBanner(cfg);
   if (cfg.paiementEnLigne !== false) return;
 
   const stripeOpt = document.getElementById('payment-option-stripe');
@@ -692,6 +697,69 @@ async function applyPaymentConfig() {
   if (faq) {
     faq.textContent = 'Sur place, le jour du départ, en espèces ou par carte bancaire. ' +
       'Rien à régler au moment de la réservation.';
+  }
+}
+
+/* ════════════════════════════════════════════════
+   BANDEAU CODE PROMO
+   — diffusé par /api/config (clé « promo »), absente si rien à diffuser
+   — masqué définitivement pour ce code une fois fermé (mémorisé par code)
+═══════════════════════════════════════════════ */
+function initPromoBanner(cfg) {
+  const promo = cfg && cfg.promo;
+  const banner = document.getElementById('promoBanner');
+  if (!promo || !promo.code || !banner) return;
+
+  let dismissed = false;
+  try { dismissed = localStorage.getItem('dv_promo_dismissed_' + promo.code) === '1'; } catch {}
+  if (dismissed) return;
+
+  const cible = promo.first_booking_only ? 'votre première réservation' : 'votre réservation';
+  // Number() : une valeur numérique Postgres peut revenir en « 10.00 », qu'on
+  // n'affiche pas tel quel dans une accroche commerciale.
+  const valeur = Number(promo.discount_val);
+  const remise = promo.discount_type === 'fixed' ? `${valeur}€` : `${valeur}%`;
+
+  const text = document.getElementById('promoBannerText');
+  if (text) {
+    text.textContent = '';
+    text.append('Code ');
+    const strong = document.createElement('strong');
+    strong.textContent = promo.code;
+    text.append(strong, ` : -${remise} sur ${cible}`);
+  }
+
+  STATE.promo = promo;
+  banner.hidden = false;
+}
+
+function promoBannerUse() {
+  const promo = STATE.promo;
+  if (!promo) return;
+
+  // On pré-remplit le champ ET l'état : le code est ainsi pris en compte dès
+  // le premier calcul de tarif, sans que le client ait à cliquer « Appliquer ».
+  const champ = document.getElementById('bk-promo');
+  if (champ) champ.value = promo.code;
+  STATE.booking.data.promoCode = promo.code;
+
+  // On masque le bandeau sans mémoriser de refus : le client n'a rien refusé,
+  // et il doit le retrouver s'il revient sans avoir réservé.
+  const banner = document.getElementById('promoBanner');
+  if (banner) banner.hidden = true;
+
+  // Volontairement pas de bkApplyPromo() ici : sans dates saisies, le calcul
+  // échouerait et afficherait « code invalide » à tort. Le code est vérifié
+  // par le serveur au premier tarif calculé, puis au récapitulatif.
+  openBookingModal();
+}
+
+function promoBannerDismiss() {
+  const banner = document.getElementById('promoBanner');
+  if (banner) banner.hidden = true;
+  const promo = STATE.promo;
+  if (promo) {
+    try { localStorage.setItem('dv_promo_dismissed_' + promo.code, '1'); } catch {}
   }
 }
 

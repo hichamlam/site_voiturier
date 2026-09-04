@@ -1836,7 +1836,11 @@ async function renderPromos() {
                   <td><strong>${c.discount_type === 'percent' ? '-'+c.discount_val+'%' : '-'+c.discount_val+'€'}</strong></td>
                   <td class="text-tiny">${c.valid_from ? fmtDate(c.valid_from) : '∞'} → ${c.valid_until ? fmtDate(c.valid_until) : '∞'}</td>
                   <td>${c.uses_count}${c.max_uses ? ' / '+c.max_uses : ''}</td>
-                  <td>${c.active ? '<span class="text-success">✓ Actif</span>' : '<span class="text-muted">Inactif</span>'}</td>
+                  <td>
+                    ${c.active ? '<span class="text-success">✓ Actif</span>' : '<span class="text-muted">Inactif</span>'}
+                    ${c.show_banner ? ' <span class="text-tiny text-muted">📣 Bannière</span>' : ''}
+                    ${c.first_booking_only ? ' <span class="text-tiny text-muted">1ʳᵉ résa</span>' : ''}
+                  </td>
                   <td class="text-right">
                     <button class="btn btn-ghost btn-sm" onclick="openPromoForm('${c.id}')">Modifier</button>
                     <button class="btn btn-danger btn-sm" onclick="deletePromo('${c.id}')">×</button>
@@ -1875,6 +1879,10 @@ function openPromoForm(id) {
           <div class="field"><label>Date fin</label><input type="date" id="prf-valid_until" value="${item.valid_until || ''}"></div>
           <div class="field full"><label>Utilisations max (vide = illimité)</label><input type="number" id="prf-max_uses" value="${item.max_uses || ''}"></div>
           <div class="field full"><label><input type="checkbox" id="prf-active" ${item.active !== false ? 'checked' : ''} style="width:auto;margin-right:6px"> Actif</label></div>
+          <div class="field full"><label><input type="checkbox" id="prf-show_banner" ${item.show_banner ? 'checked' : ''} style="width:auto;margin-right:6px"> Afficher ce code en bannière sur le site</label>
+            <div class="hint">Un seul code peut être diffusé à la fois : c'est le plus récent coché qui s'affiche.</div>
+          </div>
+          <div class="field full"><label><input type="checkbox" id="prf-first_booking_only" ${item.first_booking_only ? 'checked' : ''} style="width:auto;margin-right:6px"> Réservé à une première réservation</label></div>
         </div>
         <div class="flex-between mt-md">
           <button class="btn btn-ghost" onclick="closeModal()">Annuler</button>
@@ -1896,6 +1904,8 @@ async function submitPromo(id) {
       valid_until: document.getElementById('prf-valid_until').value || null,
       max_uses: parseInt(document.getElementById('prf-max_uses').value, 10) || null,
       active: document.getElementById('prf-active').checked,
+      show_banner: document.getElementById('prf-show_banner').checked,
+      first_booking_only: document.getElementById('prf-first_booking_only').checked,
     };
     const url = '/api/admin/promos' + (id ? '?id=' + id : '');
     await api(url, { method: id ? 'PATCH' : 'POST', body: JSON.stringify(payload) });
