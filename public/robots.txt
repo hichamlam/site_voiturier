@@ -4,4 +4,4 @@ Disallow: /admin
 Disallow: /admin/
 Disallow: /api/
 
-Sitemap: https://directvoiturier.com/sitemap.xml
+Sitemap: https://www.directvoiturier.com/sitemap.xml
