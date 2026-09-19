@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
 <title>Back-office — Direct Voiturier</title>
+<link rel="manifest" href="/admin/manifest.json">
+<meta name="theme-color" content="#0B1426">
+<link rel="apple-touch-icon" href="/admin/icons/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DV Admin">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
@@ -521,25 +527,40 @@ tbody tr:last-child { border-bottom: none; }
   color: var(--slate);
 }
 
+.mobile-topbar { display: none; }
+.sidebar-backdrop { display: none; }
 @media (max-width: 900px) {
   .sidebar {
     transform: translateX(-100%);
   }
   .sidebar.open { transform: translateX(0); }
-  .main { margin-left: 0; padding: 18px; }
+  .main { margin-left: 0; padding: 18px; padding-top: 74px; }
   .topbar { margin-bottom: 18px; }
   .form-grid { grid-template-columns: 1fr; }
   .cal-month .cal-day { min-height: 70px; padding: 5px 6px; }
   .cal-event { font-size: 0.62rem; padding: 2px 5px; }
   .modal-card { padding: 22px 18px; }
   .mobile-menu { display: flex !important; }
+  .mobile-topbar {
+    display: flex; align-items: center; gap: 12px;
+    position: fixed; top: 0; left: 0; right: 0; z-index: 40;
+    background: var(--ink); color: white;
+    padding: 14px 16px;
+  }
+  .mobile-topbar .name { font-weight: 800; font-size: 0.95rem; }
+  .sidebar-backdrop.open {
+    display: block;
+    position: fixed; inset: 0; z-index: 45;
+    background: rgba(11,20,38,0.5);
+  }
 }
 .mobile-menu {
   display: none;
   width: 36px; height: 36px;
-  background: var(--ink); color: white;
+  background: rgba(255,255,255,0.12); color: white;
   border-radius: 10px;
   align-items: center; justify-content: center;
+  flex-shrink: 0;
 }
 .mobile-menu svg { width: 18px; height: 18px; }
 </style>
@@ -569,6 +590,15 @@ tbody tr:last-child { border-bottom: none; }
 
 <!-- ─── APP ─── -->
 <div class="app" id="app">
+
+  <!-- Mobile topbar -->
+  <div class="mobile-topbar">
+    <button class="mobile-menu" onclick="toggleSidebar()" aria-label="Ouvrir le menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <div class="name">Direct Voiturier</div>
+  </div>
+  <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar(false)"></div>
 
   <!-- Sidebar -->
   <aside class="sidebar" id="sidebar">
@@ -732,8 +762,25 @@ function showApp() {
    ROUTING
 ═══════════════════════════════════════════════════════════ */
 document.querySelectorAll('.sidebar-nav button').forEach(btn => {
-  btn.addEventListener('click', () => switchView(btn.dataset.view));
+  btn.addEventListener('click', () => {
+    switchView(btn.dataset.view);
+    toggleSidebar(false);
+  });
 });
+
+function toggleSidebar(force) {
+  const sidebar = document.getElementById('sidebar');
+  const backdrop = document.getElementById('sidebarBackdrop');
+  const open = force !== undefined ? force : !sidebar.classList.contains('open');
+  sidebar.classList.toggle('open', open);
+  backdrop.classList.toggle('open', open);
+}
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/admin/sw.js').catch(() => {});
+  });
+}
 
 async function switchView(view) {
   STATE.view = view;
