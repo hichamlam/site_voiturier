@@ -850,7 +850,7 @@ function washLabel(t) {
 function categoryLabel(code) {
   return ({
     citadine: 'Citadine', berline: 'Berline / Break',
-    suv: 'SUV / 4×4 / Monospace', utilitaire: 'Van / Utilitaire',
+    suv: 'SUV / Familial / Monospace', utilitaire: 'Van / Utilitaire',
   })[code] || code || '—';
 }
 
@@ -2294,7 +2294,7 @@ function buildShareText(b, format = 'plain') {
   lines.push('🚙 VÉHICULE');
   lines.push(`${b.car_brand} ${b.car_model}${b.car_color ? ' · ' + b.car_color : ''}`);
   lines.push(`Plaque : ${b.car_plate}`);
-  const catNames = {citadine:'Citadine', berline:'Berline / Break', suv:'SUV / 4×4 / Monospace', utilitaire:'Van / Utilitaire'};
+  const catNames = {citadine:'Citadine', berline:'Berline / Break', suv:'SUV / Familial / Monospace', utilitaire:'Van / Utilitaire'};
   lines.push(`Catégorie : ${catNames[b.car_category_code] || b.car_category_code || 'Citadine'}`);
   lines.push('');
   lines.push('💰 TARIF');
@@ -2738,7 +2738,7 @@ function openQuoteForm() {
             <select id="qf-category">
               <option value="citadine">Citadine</option>
               <option value="berline">Berline / Break</option>
-              <option value="suv">SUV / 4×4 / Monospace</option>
+              <option value="suv">SUV / Familial / Monospace</option>
               <option value="utilitaire">Van / Utilitaire</option>
             </select>
           </div>

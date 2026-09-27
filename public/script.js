@@ -261,7 +261,7 @@ function simBookNow() {
 }
 
 function categoryLabel(code) {
-  return ({citadine:'Citadine', berline:'Berline / Break', suv:'SUV / 4×4 / Monospace', utilitaire:'Van / Utilitaire'})[code] || code;
+  return ({citadine:'Citadine', berline:'Berline / Break', suv:'SUV / Familial / Monospace', utilitaire:'Van / Utilitaire'})[code] || code;
 }
 
 /* ════════════════════════════════════════════════
@@ -752,6 +752,34 @@ function promoBannerUse() {
   // échouerait et afficherait « code invalide » à tort. Le code est vérifié
   // par le serveur au premier tarif calculé, puis au récapitulatif.
   openBookingModal();
+}
+
+function promoBannerCopy() {
+  const promo = STATE.promo;
+  const btn = document.getElementById('promoBannerCopy');
+  if (!promo || !btn) return;
+  const done = () => {
+    btn.textContent = 'Code copié ✓';
+    clearTimeout(btn._t);
+    btn._t = setTimeout(() => { btn.textContent = 'Copier le code'; }, 2500);
+  };
+  // Repli execCommand : navigator.clipboard est absent hors HTTPS et sur
+  // certains navigateurs intégrés (Instagram, Facebook…).
+  const fallback = () => {
+    const ta = document.createElement('textarea');
+    ta.value = promo.code;
+    ta.setAttribute('readonly', '');
+    ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); done(); } catch {}
+    ta.remove();
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(promo.code).then(done, fallback);
+  } else {
+    fallback();
+  }
 }
 
 function promoBannerDismiss() {
