@@ -23,14 +23,18 @@
 <meta name="twitter:description" content="Service voiturier premium à Paris-Orly. 4,6/5 sur Google · 396 avis.">
 <meta name="twitter:image" content="https://www.directvoiturier.com/og-image.jpg">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<meta name="theme-color" content="#2E7FD3">
+<meta name="theme-color" content="#0284C7">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/style.css">
+<link rel="stylesheet" href="/home.css">
 
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"LocalBusiness","name":"Direct Voiturier","url":"https://www.directvoiturier.com","priceRange":"29€-299€","address":{"@type":"PostalAddress","addressLocality":"Athis-Mons","postalCode":"91200","addressCountry":"FR"},"geo":{"@type":"GeoCoordinates","latitude":"48.7233","longitude":"2.3795"},"aggregateRating":{"@type":"AggregateRating","ratingValue":"4.6","reviewCount":"396","bestRating":"5"},"areaServed":{"@type":"Airport","name":"Aéroport Paris-Orly","iataCode":"ORY"},"openingHoursSpecification":{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],"opens":"04:00","closes":"23:59"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Le prix affiché est-il vraiment le prix final ?","acceptedAnswer":{"@type":"Answer","text":"Oui. Le tarif calculé inclut la prise en charge, la restitution et le gardiennage à Orly. Les seules options en plus sont celles que vous choisissez vous-même, toujours détaillées dans le récapitulatif avant le paiement."}},{"@type":"Question","name":"Mon vol est retardé, que se passe-t-il ?","acceptedAnswer":{"@type":"Answer","text":"Votre vol a du retard ? Prévenez-nous, on s'adapte : on suit votre numéro de vol et on est là quand vous atterrissez."}},{"@type":"Question","name":"Puis-je annuler ou modifier ma réservation ?","acceptedAnswer":{"@type":"Answer","text":"Un imprévu ? Écrivez-nous à contact@directvoiturier.com, on trouve une solution. Le détail des conditions figure dans nos CGV."}},{"@type":"Question","name":"Comment se passe la prise en charge à Orly ?","acceptedAnswer":{"@type":"Answer","text":"Après votre réservation, vous recevez un email avec toutes les consignes. Le jour J, votre voiturier vous accueille directement au dépose-minute de votre terminal."}},{"@type":"Question","name":"Quels sont vos horaires ?","acceptedAnswer":{"@type":"Answer","text":"Nos voituriers interviennent 7 jours sur 7, de 4h00 à minuit. Si votre vol part avant 4h00 ou atterrit après minuit, écrivez-nous avant de réserver à contact@directvoiturier.com."}},{"@type":"Question","name":"Comment payer ?","acceptedAnswer":{"@type":"Answer","text":"En ligne par carte bancaire via Stripe (paiement sécurisé, confirmation immédiate) ou sur place en carte ou espèces. Le montant est identique dans les deux cas."}},{"@type":"Question","name":"Où est garée ma voiture pendant mon voyage ?","acceptedAnswer":{"@type":"Answer","text":"Votre véhicule est gardé sur notre parking à quelques minutes d'Orly. Une option parking couvert est proposée si vous préférez un emplacement à l'abri des intempéries."}}]}
 </script>
 
 <!-- ═══════════════════════════════════════════════════════════════
@@ -93,7 +97,7 @@ window.VO_CONTACT = {
 };
 </script>
 </head>
-<body>
+<body class="home">
 
 <!-- BANDEAU CODE PROMO — rempli par /api/config, invisible tant qu'aucun code n'est diffusé -->
 <div class="promo-banner" id="promoBanner" hidden role="dialog" aria-label="Code promo">
@@ -104,601 +108,359 @@ window.VO_CONTACT = {
   </div>
 </div>
 
-<!-- NAV -->
-<nav class="nav" id="nav" aria-label="Navigation principale">
-  <a href="#" class="nav-logo" aria-label="Direct Voiturier">
-    <div class="nav-logo-mark">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
-      </svg>
+<!-- HEADER -->
+<header class="h-nav" id="nav">
+  <div class="h-wrap h-nav-in">
+    <a href="/" class="h-logo" aria-label="Direct Voiturier — accueil">
+      <span class="h-logo-mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg></span>
+      <span>
+        <span class="h-logo-name">DIRECT <b>VOITURIER</b></span>
+        <span class="h-logo-sub">Paris-Orly (1, 2, 3, 4)</span>
+      </span>
+    </a>
+    <nav class="h-nav-links" aria-label="Navigation principale">
+      <a href="/comment-ca-marche">Comment ça marche</a>
+      <a href="/tarifs">Tarifs</a>
+      <a href="/voiturier-orly-terminaux">Terminaux</a>
+      <a href="#avis">Avis</a>
+      <a href="/faq">FAQ</a>
+    </nav>
+    <div class="h-nav-right">
+      <a class="h-nav-phone" id="navPhone" href="#" hidden aria-label="Nous appeler"><svg class="h-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg><span></span></a>
+      <button class="h-nav-cta" type="button" onclick="openBookingModal()"><span class="long">Réserver à Orly</span><span class="short">Réserver</span><svg class="h-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
     </div>
-    <div class="nav-logo-text">
-      <span class="name">Direct Voiturier</span>
-      <span class="tag">Parking Premium · Orly</span>
-    </div>
-  </a>
-  <div class="nav-links">
-    <a href="/comment-ca-marche">Comment ça marche</a>
-    <a href="/tarifs">Tarifs</a>
-    <a href="/parking-orly">Parking Orly</a>
-    <a href="#avis">Avis</a>
-    <a href="/faq">FAQ</a>
-  </div>
-  <a class="nav-phone" id="navPhone" href="#" hidden aria-label="Nous appeler">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.9.34 1.78.66 2.62a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.46-1.23a2 2 0 0 1 2.11-.45c.84.32 1.72.54 2.62.66A2 2 0 0 1 22 16.92z"/></svg>
-    <span></span>
-  </a>
-  <button class="nav-cta" onclick="openBookingModal()">
-    <span>Réserver</span>
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-  </button>
-</nav>
-
-<!-- HERO -->
-<header class="hero" id="reserver">
-  <div class="hero-sky"></div>
-  <div class="plane-halo"></div>
-
-  <svg class="hero-plane" viewBox="0 0 600 320" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <defs>
-      <linearGradient id="planeSilhouette" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stop-color="#1a1428" stop-opacity="0.95"/>
-        <stop offset="50%" stop-color="#0B0A1A" stop-opacity="0.98"/>
-        <stop offset="100%" stop-color="#000000" stop-opacity="1"/>
-      </linearGradient>
-      <linearGradient id="goldReflect" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stop-color="#F6C983" stop-opacity="0.85"/>
-        <stop offset="100%" stop-color="#EBA83C" stop-opacity="0"/>
-      </linearGradient>
-    </defs>
-    <g transform="translate(330,150) rotate(-18) scale(1.55)">
-      <path d="M 5 9 L -65 95 L 65 4 Z" fill="url(#planeSilhouette)"/>
-      <path d="M -125 7 L -162 42 L -100 9 Z" fill="url(#planeSilhouette)"/>
-      <path d="M -115 -9 L -78 -75 L -42 -7 Z" fill="url(#planeSilhouette)"/>
-      <ellipse cx="-15" cy="32" rx="22" ry="8" transform="rotate(12 -15 32)" fill="url(#planeSilhouette)"/>
-      <path d="M -150 0 Q -140 -15 -65 -17 L 95 -11 L 150 0 L 95 11 L -65 17 Q -140 15 -150 0 Z" fill="url(#planeSilhouette)"/>
-      <path d="M 150 0 L 95 -11 L -30 -16 L -30 -12 L 95 -7 Z" fill="url(#goldReflect)"/>
-      <g fill="#000000" opacity="0.85">
-        <ellipse cx="-45" cy="-10" rx="3" ry="2.5"/><ellipse cx="-25" cy="-11" rx="3" ry="2.5"/>
-        <ellipse cx="-5" cy="-12" rx="3" ry="2.5"/><ellipse cx="15" cy="-12" rx="3" ry="2.5"/>
-        <ellipse cx="35" cy="-11" rx="3" ry="2.5"/><ellipse cx="55" cy="-10" rx="3" ry="2.5"/>
-        <ellipse cx="75" cy="-9" rx="3" ry="2.5"/>
-      </g>
-    </g>
-  </svg>
-
-  <div class="cloud-sea">
-    <svg viewBox="0 0 1440 400" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <defs>
-        <linearGradient id="cloudGradTop" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.5"/>
-          <stop offset="50%" stop-color="#DCEBF8" stop-opacity="0.8"/>
-          <stop offset="100%" stop-color="#B9D7F1" stop-opacity="0.95"/>
-        </linearGradient>
-        <linearGradient id="cloudGradFront" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stop-color="#EAF4FC" stop-opacity="0.95"/>
-          <stop offset="100%" stop-color="#8CBCE8" stop-opacity="1"/>
-        </linearGradient>
-      </defs>
-      <path d="M0,180 C100,140 220,170 380,150 C540,130 680,180 840,150 C1000,120 1180,170 1440,140 L1440,400 L0,400 Z" fill="url(#cloudGradTop)"/>
-      <path d="M0,310 C100,260 240,320 400,290 C560,260 720,330 900,300 C1080,270 1260,330 1440,300 L1440,400 L0,400 Z" fill="url(#cloudGradFront)"/>
-      <ellipse cx="200" cy="285" rx="80" ry="20" fill="#CBE2F6" opacity="0.9"/>
-      <ellipse cx="640" cy="280" rx="88" ry="22" fill="#CBE2F6" opacity="0.9"/>
-      <ellipse cx="1100" cy="282" rx="92" ry="22" fill="#CBE2F6" opacity="0.9"/>
-    </svg>
-  </div>
-
-  <div class="hero-content">
-    <div class="hero-text">
-      <h1 class="hero-title">Voiturier à l'aéroport Paris-Orly<br><span class="accent">Voyagez l'esprit léger</span></h1>
-      <p class="hero-sub">Vous déposez vos clés au terminal. On gare votre voiture. Elle vous attend au retour.</p>
-      <div class="hero-perks">
-        <div class="hero-perk">
-          <div class="hero-perk-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg></div>
-          <span>Sans navette</span>
-        </div>
-        <div class="hero-perk">
-          <div class="hero-perk-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></div>
-          <span>Annulation possible</span>
-        </div>
-      </div>
-      <div class="hero-price-tag">
-        <span class="from">À partir de</span>
-        <span class="amount">29€</span>
-      </div>
-    </div>
-
-    <!-- BOOKING CARD : Simulateur 3 étapes -->
-    <aside class="bk-card" aria-label="Simulateur de tarif">
-
-      <!-- ÉTAPE 1 : Dates -->
-      <div class="bk-step active" data-step="1">
-        <div class="bk-tag"><span class="dot"></span>Disponible aujourd'hui</div>
-        <h2 class="bk-title">Calculez votre tarif</h2>
-
-        <div class="bk-line">
-          <div class="bk-line-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><g transform="rotate(45 12 12)" fill="#0B1426"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2.5 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></g></svg>
-          </div>
-          <div class="bk-line-fields">
-            <div>
-              <label class="bk-line-label" for="sim-dep-date">Date début</label>
-              <input type="date" id="sim-dep-date">
-            </div>
-            <div>
-              <label class="bk-line-label" for="sim-dep-time">Heure</label>
-              <input type="time" id="sim-dep-time" value="08:00">
-            </div>
-          </div>
-        </div>
-
-        <div class="bk-line">
-          <div class="bk-line-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><g transform="rotate(135 12 12)" fill="#0B1426"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2.5 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></g></svg>
-          </div>
-          <div class="bk-line-fields">
-            <div>
-              <label class="bk-line-label" for="sim-ret-date">Date fin</label>
-              <input type="date" id="sim-ret-date">
-            </div>
-            <div>
-              <label class="bk-line-label" for="sim-ret-time">Heure</label>
-              <input type="time" id="sim-ret-time" value="20:00">
-            </div>
-          </div>
-        </div>
-
-        <button class="bk-submit" onclick="simNext()">
-          <span>Obtenir mon tarif</span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        </button>
-
-        <div class="bk-foot">
-          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Paiement sécurisé</span>
-          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/></svg>Confirmation immédiate</span>
-        </div>
-      </div>
-
-      <!-- ÉTAPE 2 : Catégorie véhicule -->
-      <div class="bk-step" data-step="2">
-        <button class="bk-back-btn" onclick="simBack()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
-          Retour
-        </button>
-        <h2 class="bk-title">Quel type de véhicule ?</h2>
-
-        <div class="bk-cats">
-          <div class="bk-cat" onclick="simSelectCategory('citadine', this)">
-            <button type="button" class="bk-cat-info" data-cat="citadine" aria-expanded="false" aria-label="Exemples de véhicules : citadine" onclick="toggleCatInfo(event, this)"><span aria-hidden="true">i</span></button>
-            <div class="bk-cat-icon" aria-hidden="true"><svg viewBox="0 0 48 28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 20 L6 15 Q6 12 9 11 L15 8 Q18 6 22 6 L30 6 Q34 6 36 9 L40 15 L42 15 L42 20"/><path d="M6 20 L42 20"/><circle cx="14" cy="20" r="3.2" fill="currentColor"/><circle cx="34" cy="20" r="3.2" fill="currentColor"/></svg></div>
-            <div class="bk-cat-name">Citadine</div>
-          </div>
-          <div class="bk-cat" onclick="simSelectCategory('berline', this)">
-            <button type="button" class="bk-cat-info" data-cat="berline" aria-expanded="false" aria-label="Exemples de véhicules : berline / break" onclick="toggleCatInfo(event, this)"><span aria-hidden="true">i</span></button>
-            <div class="bk-cat-icon" aria-hidden="true"><svg viewBox="0 0 48 28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20 L4 16 L8 16 L12 10 Q14 8 17 8 L28 8 Q31 8 33 10 L37 16 L44 16 L44 20"/><path d="M4 20 L44 20 M12 16 L36 16"/><circle cx="13" cy="20" r="3.2" fill="currentColor"/><circle cx="35" cy="20" r="3.2" fill="currentColor"/></svg></div>
-            <div class="bk-cat-name">Berline / Break</div>
-          </div>
-          <div class="bk-cat" onclick="simSelectCategory('suv', this)">
-            <button type="button" class="bk-cat-info" data-cat="suv" aria-expanded="false" aria-label="Exemples de véhicules : SUV / 4×4 / monospace" onclick="toggleCatInfo(event, this)"><span aria-hidden="true">i</span></button>
-            <div class="bk-cat-icon" aria-hidden="true"><svg viewBox="0 0 48 28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20 L4 14 Q4 10 8 9 L14 6 Q16 5 19 5 L30 5 Q33 5 35 7 L40 12 L44 14 L44 20"/><path d="M4 20 L44 20 M14 9 L40 9"/><circle cx="12" cy="20" r="3.6" fill="currentColor"/><circle cx="36" cy="20" r="3.6" fill="currentColor"/></svg></div>
-            <div class="bk-cat-name">SUV / 4×4<br>Monospace</div>
-          </div>
-          <div class="bk-cat" onclick="simSelectCategory('utilitaire', this)">
-            <button type="button" class="bk-cat-info" data-cat="utilitaire" aria-expanded="false" aria-label="Exemples de véhicules : van / utilitaire" onclick="toggleCatInfo(event, this)"><span aria-hidden="true">i</span></button>
-            <div class="bk-cat-icon" aria-hidden="true"><svg viewBox="0 0 48 28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20 L3 8 Q3 6 5 6 L34 6 Q36 6 37.5 8 L43 15 L45 15 L45 20"/><path d="M3 20 L45 20 M34 6 L34 15 M3 15 L45 15"/><circle cx="11" cy="20" r="3.2" fill="currentColor"/><circle cx="38" cy="20" r="3.2" fill="currentColor"/></svg></div>
-            <div class="bk-cat-name">Van / Utilitaire</div>
-          </div>
-        </div>
-
-        <p style="font-size:0.78rem; color:var(--slate); text-align:center; margin-top:auto;">
-          Sélectionnez votre catégorie pour voir le tarif final
-        </p>
-      </div>
-
-      <!-- ÉTAPE 3 : Tarif affiché -->
-      <div class="bk-step" data-step="3">
-        <button class="bk-back-btn" onclick="simBack()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
-          Modifier
-        </button>
-
-        <div class="bk-result">
-          <div class="bk-result-tag">Votre tarif tout compris</div>
-          <div class="bk-result-amount" id="sim-result-amount">—</div>
-          <div class="bk-result-meta" id="sim-result-meta">—</div>
-        </div>
-
-        <button class="bk-submit" onclick="simBookNow()">
-          <span>Réserver maintenant</span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        </button>
-
-        <div class="bk-foot">
-          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l5 5L20 7"/></svg>Annulation possible</span>
-          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/></svg>Confirmation immédiate</span>
-        </div>
-      </div>
-
-    </aside>
   </div>
 </header>
 
-<!-- 3 ÉTAPES — FRISE ILLUSTRÉE -->
-<section class="steps" id="service">
-  <div class="container">
-    <div class="section-head reveal">
-      <p class="section-eyebrow">Comment ça marche</p>
-      <h2 class="section-title">Trois étapes,<br><span class="accent">zéro stress</span></h2>
-      <p class="section-sub">Du dépose-minute au retour.</p>
-    </div>
-
-    <div class="frise">
-      <article class="frise-item reveal">
-        <div class="frise-illu-wrap">
-          <span class="frise-num">1</span>
-          <svg class="frise-illu" viewBox="0 0 300 200" role="img" aria-label="Un smartphone affiche un calendrier de réservation avec une date sélectionnée validée par une coche, et une horloge à côté indiquant que la réservation ne prend que quelques minutes">
-            <rect width="300" height="200" rx="22" fill="#EFF6FD"/>
-            <ellipse cx="150" cy="184" rx="90" ry="8" fill="#0B1426" opacity="0.08"/>
-            <!-- horloge -->
-            <g transform="translate(228,62)">
-              <circle r="30" fill="#FFFFFF" stroke="#1B5FA8" stroke-width="5"/>
-              <line x1="0" y1="0" x2="0" y2="-15" stroke="#0B1426" stroke-width="4" stroke-linecap="round"/>
-              <line x1="0" y1="0" x2="12" y2="5" stroke="#0B1426" stroke-width="4" stroke-linecap="round"/>
-              <circle r="3.4" fill="#EBA83C"/>
-            </g>
-            <!-- telephone -->
-            <g>
-              <rect x="88" y="30" width="104" height="150" rx="18" fill="#0B1426"/>
-              <rect x="96" y="44" width="88" height="112" rx="4" fill="#FFFFFF"/>
-              <rect x="96" y="44" width="88" height="20" rx="4" fill="#2E7FD3"/>
-              <rect x="128" y="150" width="24" height="5" rx="2.5" fill="#8CBCE8"/>
-              <!-- calendrier -->
-              <g>
-                <rect x="104" y="70" width="18" height="16" rx="3" fill="#EFF6FD"/>
-                <rect x="126" y="70" width="18" height="16" rx="3" fill="#EFF6FD"/>
-                <rect x="148" y="70" width="18" height="16" rx="3" fill="#EFF6FD"/>
-                <rect x="104" y="90" width="18" height="16" rx="3" fill="#EBA83C"/>
-                <rect x="126" y="90" width="18" height="16" rx="3" fill="#EFF6FD"/>
-                <rect x="148" y="90" width="18" height="16" rx="3" fill="#EFF6FD"/>
-                <rect x="104" y="110" width="18" height="16" rx="3" fill="#EFF6FD"/>
-                <rect x="126" y="110" width="18" height="16" rx="3" fill="#EFF6FD"/>
-                <rect x="148" y="110" width="18" height="16" rx="3" fill="#EFF6FD"/>
-                <path d="M108 98 L112 102 L119 93" fill="none" stroke="#0B1426" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
-              </g>
-            </g>
-            <!-- badge check -->
-            <g transform="translate(70,158)">
-              <circle r="18" fill="#1B5FA8"/>
-              <path d="M-8 0 L-2 6 L9 -8" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-            </g>
-          </svg>
-        </div>
-        <p class="step-tag">Étape 1</p>
-        <h3 class="step-title">Réservez</h3>
-        <p class="step-desc">En ligne, en moins de 2 minutes.</p>
-      </article>
-
-      <div class="frise-arrow reveal" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
-
-      <article class="frise-item reveal">
-        <div class="frise-illu-wrap">
-          <span class="frise-num">2</span>
-          <svg class="frise-illu" viewBox="0 0 300 200" role="img" aria-label="Un voiturier Direct Voiturier en uniforme bleu, casquette à badge DV, tend la main pour récupérer les clés du client au dépose-minute du terminal, à côté de la voiture garée, avec un écusson parking sécurisé (lettre P et cadenas)">
-            <rect width="300" height="200" rx="22" fill="#EFF6FD"/>
-            <rect x="14" y="18" width="272" height="12" rx="6" fill="#8CBCE8"/>
-            <rect x="30" y="30" width="6" height="30" fill="#8CBCE8"/>
-            <rect x="120" y="30" width="6" height="30" fill="#8CBCE8"/>
-            <rect x="250" y="30" width="6" height="30" fill="#8CBCE8"/>
-            <rect x="0" y="168" width="300" height="32" fill="#E3EDF9"/>
-            <ellipse cx="150" cy="169" rx="150" ry="5" fill="#D3E1F2"/>
-            <g>
-              <ellipse cx="205" cy="164" rx="70" ry="6" fill="#0B1426" opacity="0.10"/>
-              <rect x="150" y="128" width="140" height="34" rx="10" fill="#0B1426"/>
-              <path d="M180 130 C183 108 198 96 218 96 L248 96 C264 96 272 108 276 130 Z" fill="#0B1426"/>
-              <path d="M188 128 C191 112 202 104 218 104 L232 104 L232 128 Z" fill="#EFF6FD"/>
-              <path d="M238 104 L248 104 C258 104 264 112 267 128 L238 128 Z" fill="#EFF6FD"/>
-              <circle cx="176" cy="162" r="14" fill="#0B1426"/><circle cx="176" cy="162" r="5.5" fill="#8CBCE8"/>
-              <circle cx="264" cy="162" r="14" fill="#0B1426"/><circle cx="264" cy="162" r="5.5" fill="#8CBCE8"/>
-              <ellipse cx="154" cy="146" rx="4" ry="3.4" fill="#EBA83C"/>
-            </g>
-            <g>
-              <ellipse cx="90" cy="166" rx="26" ry="5" fill="#0B1426" opacity="0.12"/>
-              <rect x="78" y="132" width="10" height="30" rx="5" fill="#0B1426"/>
-              <rect x="94" y="132" width="10" height="30" rx="5" fill="#0B1426"/>
-              <rect x="75" y="160" width="16" height="6" rx="3" fill="#1B5FA8"/>
-              <rect x="93" y="160" width="16" height="6" rx="3" fill="#1B5FA8"/>
-              <path d="M70 108 C70 96 79 88 91 88 C103 88 112 96 112 108 L112 134 L70 134 Z" fill="#1B5FA8"/>
-              <rect x="70" y="126" width="42" height="5" fill="#0B1426" opacity="0.18"/>
-              <rect x="64" y="98" width="10" height="26" rx="5" fill="#1B5FA8"/>
-              <path d="M108 100 C122 100 130 106 138 116" fill="none" stroke="#1B5FA8" stroke-width="10" stroke-linecap="round"/>
-              <circle cx="140" cy="118" r="5.5" fill="#F0C29A"/>
-              <rect x="92" y="80" width="14" height="12" fill="#F0C29A"/>
-              <circle cx="91" cy="72" r="14" fill="#F0C29A"/>
-              <path d="M75 66 C75 54 82 46 91 46 C100 46 107 54 107 66 C107 68 105 70 102 70 L80 70 C77 70 75 68 75 66 Z" fill="#0B1426"/>
-              <rect x="73" y="64" width="24" height="6" rx="3" fill="#0B1426"/>
-              <circle cx="91" cy="58" r="6" fill="#EBA83C"/>
-              <text x="91" y="60.5" font-family="Arial,Helvetica,sans-serif" font-size="6" font-weight="700" fill="#0B1426" text-anchor="middle">DV</text>
-            </g>
-            <g fill="#EBA83C">
-              <circle cx="150" cy="118" r="6"/><circle cx="150" cy="118" r="2.4" fill="#EFF6FD"/>
-              <rect x="155" y="115" width="12" height="3" rx="1.5"/>
-              <rect x="163" y="118" width="3" height="5" rx="1"/>
-              <rect x="167" y="118" width="3" height="6" rx="1"/>
-            </g>
-            <!-- badge parking securise -->
-            <g>
-              <path d="M44 42 L68 51 V73 C68 86 57 94 44 99 C31 94 20 86 20 73 V51 Z" fill="#FFFFFF" stroke="#1B5FA8" stroke-width="3.5" stroke-linejoin="round"/>
-              <text x="44.5" y="80" font-family="Arial,Helvetica,sans-serif" font-size="32" font-weight="700" fill="#1B5FA8" text-anchor="middle">P</text>
-              <g transform="translate(64,88)">
-                <circle r="12" fill="#EBA83C" stroke="#FFFFFF" stroke-width="2.5"/>
-                <path d="M-4 -1 v-3 a4 4 0 0 1 8 0 v3" fill="none" stroke="#0B1426" stroke-width="2.4" stroke-linecap="round"/>
-                <rect x="-5.5" y="-1.5" width="11" height="8.5" rx="2" fill="#0B1426"/>
-              </g>
-            </g>
-          </svg>
-        </div>
-        <p class="step-tag">Étape 2</p>
-        <h3 class="step-title">Confiez</h3>
-        <p class="step-desc">Votre voiturier dédié vous attend au dépose-minute.</p>
-      </article>
-
-      <div class="frise-arrow reveal" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
-
-      <article class="frise-item reveal">
-        <div class="frise-illu-wrap">
-          <span class="frise-num">3</span>
-          <svg class="frise-illu" viewBox="0 0 300 200" role="img" aria-label="Le voiturier restitue les clés au client devant le terminal à son retour, avec un avion qui atterrit en arrière-plan">
-            <rect width="300" height="200" rx="22" fill="#EFF6FD"/>
-            <g transform="translate(230,50) rotate(15) scale(0.7)" fill="#0B1426" opacity="0.85">
-              <path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" transform="scale(4)"/>
-            </g>
-            <rect x="0" y="168" width="300" height="32" fill="#E3EDF9"/>
-            <ellipse cx="150" cy="169" rx="150" ry="5" fill="#D3E1F2"/>
-            <g>
-              <ellipse cx="150" cy="164" rx="80" ry="6" fill="#0B1426" opacity="0.10"/>
-              <rect x="90" y="128" width="140" height="34" rx="10" fill="#0B1426"/>
-              <path d="M120 130 C123 108 138 96 158 96 L188 96 C204 96 212 108 216 130 Z" fill="#0B1426"/>
-              <path d="M128 128 C131 112 142 104 158 104 L172 104 L172 128 Z" fill="#EFF6FD"/>
-              <path d="M178 104 L188 104 C198 104 204 112 207 128 L178 128 Z" fill="#EFF6FD"/>
-              <circle cx="116" cy="162" r="14" fill="#0B1426"/><circle cx="116" cy="162" r="5.5" fill="#8CBCE8"/>
-              <circle cx="204" cy="162" r="14" fill="#0B1426"/><circle cx="204" cy="162" r="5.5" fill="#8CBCE8"/>
-              <ellipse cx="94" cy="146" rx="4" ry="3.4" fill="#EBA83C"/>
-            </g>
-            <g>
-              <ellipse cx="55" cy="166" rx="26" ry="5" fill="#0B1426" opacity="0.12"/>
-              <rect x="43" y="132" width="10" height="30" rx="5" fill="#0B1426"/>
-              <rect x="59" y="132" width="10" height="30" rx="5" fill="#0B1426"/>
-              <rect x="40" y="160" width="16" height="6" rx="3" fill="#1B5FA8"/>
-              <rect x="58" y="160" width="16" height="6" rx="3" fill="#1B5FA8"/>
-              <path d="M35 108 C35 96 44 88 56 88 C68 88 77 96 77 108 L77 134 L35 134 Z" fill="#1B5FA8"/>
-              <rect x="35" y="126" width="42" height="5" fill="#0B1426" opacity="0.18"/>
-              <rect x="73" y="98" width="10" height="26" rx="5" fill="#1B5FA8"/>
-              <path d="M73 100 C87 100 95 106 103 116" fill="none" stroke="#1B5FA8" stroke-width="10" stroke-linecap="round"/>
-              <circle cx="105" cy="118" r="5.5" fill="#F0C29A"/>
-              <rect x="57" y="80" width="14" height="12" fill="#F0C29A"/>
-              <circle cx="56" cy="72" r="14" fill="#F0C29A"/>
-              <path d="M40 66 C40 54 47 46 56 46 C65 46 72 54 72 66 C72 68 70 70 67 70 L45 70 C42 70 40 68 40 66 Z" fill="#0B1426"/>
-              <rect x="38" y="64" width="24" height="6" rx="3" fill="#0B1426"/>
-              <circle cx="56" cy="58" r="6" fill="#EBA83C"/>
-              <text x="56" y="60.5" font-family="Arial,Helvetica,sans-serif" font-size="6" font-weight="700" fill="#0B1426" text-anchor="middle">DV</text>
-            </g>
-            <g fill="#EBA83C">
-              <circle cx="115" cy="118" r="6"/><circle cx="115" cy="118" r="2.4" fill="#EFF6FD"/>
-              <rect x="120" y="115" width="12" height="3" rx="1.5"/>
-              <rect x="128" y="118" width="3" height="5" rx="1"/>
-              <rect x="132" y="118" width="3" height="6" rx="1"/>
-            </g>
-          </svg>
-        </div>
-        <p class="step-tag">Étape 3</p>
-        <h3 class="step-title">Récupérez</h3>
-        <p class="step-desc">Votre véhicule, au même endroit, à votre retour.</p>
-      </article>
-    </div>
+<main>
+<!-- HERO + CALCULATEUR -->
+<section class="h-hero" id="reserver" aria-labelledby="h-title">
+  <div class="h-clouds" aria-hidden="true">
+    <svg class="h-cloud-1" viewBox="0 0 100 100"><path d="M20 60 a18 18 0 0 1 32 -10 a14 14 0 0 1 24 4 a16 16 0 0 1 14 18 a10 10 0 0 1 -10 10 L20 82 Z"/></svg>
+    <svg class="h-cloud-2" viewBox="0 0 100 100"><path d="M25 65 a20 20 0 0 1 35 -12 a16 16 0 0 1 26 5 a18 18 0 0 1 12 20 a12 12 0 0 1 -12 12 L25 90 Z"/></svg>
   </div>
-</section>
+  <div class="h-wrap">
+    <div class="h-hero-in">
+      <h1 id="h-title"><span class="h-kicker"><svg class="h-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>Voiturier aéroport Paris-Orly · Terminaux 1, 2, 3 et 4</span><br>Voyagez l'esprit léger.<br><span class="amber">On s'occupe de tout.</span></h1>
+      <p class="h-hero-sub">Votre voiturier prend en charge votre véhicule directement au dépose-minute et vous aide avec vos bagages dès votre retour.</p>
 
-<!-- BANDE GOOGLE -->
-<section class="google-strip">
-  <div class="google-strip-content">
-    <div class="gs-rating">
-      <div class="gs-google-logo" aria-hidden="true">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-        </svg>
-      </div>
-      <div class="gs-rating-info">
-        <div class="gs-rating-num">
-          4,6
-          <div class="stars">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            <svg viewBox="0 0 24 24" aria-label="4,6 sur 5"><defs><linearGradient id="starHalf"><stop offset="60%" stop-color="currentColor"/><stop offset="60%" stop-color="currentColor" stop-opacity="0.28"/></linearGradient></defs><path fill="url(#starHalf)" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      <div class="h-card" id="bookingHeroCard">
+        <div class="h-card-top">
+          <div class="h-card-top-l">
+            <span class="h-card-top-ic"><svg class="h-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.5 2.8C2.1 11.1 2 11.5 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M9 17h6"/></svg></span>
+            <span><b>Service Voiturier</b><small>Orly 1, 2, 3 et 4 · 7j/7</small></span>
+          </div>
+          <span class="h-badge-ok">Dès 29&nbsp;€</span>
+        </div>
+
+        <div>
+          <div class="h-flabel"><svg class="h-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 22h20"/><path d="M6.36 17.4 4 17l-2-4 1.1-.55a2 2 0 0 1 1.8 0l.17.1a2 2 0 0 0 1.8 0L8 12 5 6l.9-.45a2 2 0 0 1 2.09.2l4.02 3a2 2 0 0 0 2.1.2l4.19-2.06a2.41 2.41 0 0 1 1.73-.17L21 7a1.4 1.4 0 0 1 .87 1.99l-.38.76c-.23.46-.6.84-1.07 1.08L7.58 17.2a2 2 0 0 1-1.22.18Z"/></svg><span>Dépose aller au dépose-minute</span></div>
+          <div class="h-frow">
+            <label class="h-field"><svg class="h-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span class="h-sr">Date de départ</span><input type="date" id="sim-dep-date" onchange="homeQuote()"></label>
+            <label class="h-field time"><svg class="h-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><span class="h-sr">Heure de départ</span><input type="time" id="sim-dep-time" value="08:00" onchange="homeQuote()"></label>
           </div>
         </div>
-        <div class="gs-rating-text">396 avis Google</div>
-        <a class="gs-link" id="gsLink" href="#" hidden target="_blank" rel="noopener">
-          Voir les avis sur Google
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg>
-        </a>
+
+        <div>
+          <div class="h-flabel"><svg class="h-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 22h20"/><path d="M3.77 10.77 2 9l2-4.5 1.1.55c.55.28.9.84.9 1.45s.35 1.17.9 1.45L8 8.5l3-6 1.05.53a2 2 0 0 1 1.09 1.52l.72 5.4a2 2 0 0 0 1.09 1.52l4.4 2.2c.42.22.78.55 1.01.96l.6 1.03c.49.88-.06 1.98-1.06 2.1l-1.18.15c-.47.06-.95-.02-1.37-.24L4.29 11.15a2 2 0 0 1-.52-.38Z"/></svg><span>Restitution retour</span></div>
+          <div class="h-frow">
+            <label class="h-field"><svg class="h-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span class="h-sr">Date de retour</span><input type="date" id="sim-ret-date" onchange="homeQuote()"></label>
+            <label class="h-field time"><svg class="h-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><span class="h-sr">Heure de retour</span><input type="time" id="sim-ret-time" value="20:00" onchange="homeQuote()"></label>
+          </div>
+        </div>
+
+        <div>
+          <div class="h-flabel"><svg class="h-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.5 2.8C2.1 11.1 2 11.5 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M9 17h6"/></svg><span>Votre véhicule</span></div>
+          <div class="h-cats" role="group" aria-label="Catégorie de véhicule"><button type="button" class="h-cat" data-cat="citadine" aria-pressed="true" onclick="homeSelectCat('citadine')">Citadine</button><button type="button" class="h-cat" data-cat="berline" aria-pressed="false" onclick="homeSelectCat('berline')">Berline / Break</button><button type="button" class="h-cat" data-cat="suv" aria-pressed="false" onclick="homeSelectCat('suv')">SUV / 4×4</button><button type="button" class="h-cat" data-cat="utilitaire" aria-pressed="false" onclick="homeSelectCat('utilitaire')">Van / Utilitaire</button></div>
+        </div>
+
+        <div class="h-sum" aria-live="polite">
+          <div class="h-sum-l"><b id="sim-result-meta">Calcul du tarif…</b><small id="h-sum-wash">Paris-Orly · sans lavage</small></div>
+          <div class="h-sum-r"><small>Tarif tout compris</small><span class="h-price" id="sim-result-amount">—</span></div>
+        </div>
+
+        <button type="button" class="h-btn lg block" onclick="homeBook()"><span>Réserver mon créneau à Orly</span><svg class="h-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+
+        <div class="h-card-foot">
+          <span><svg class="h-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Paiement sécurisé</span>
+          <span><svg class="h-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Confirmation immédiate</span>
+          <span><svg class="h-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Prix affiché avant paiement</span>
+        </div>
+      </div>
+
+      <div class="h-trust">
+        <div class="h-trust-i"><span class="h-trust-ic a"><svg class="h-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg></span><span><b>Dès 29&nbsp;€ tout compris</b><span>Prise en charge, gardiennage, restitution</span></span></div>
+        <div class="h-trust-i"><span class="h-trust-ic b"><svg class="h-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span><span><b>Zéro navette</b><span>Dépose et retour devant votre terminal</span></span></div>
+        <div class="h-trust-i"><span class="h-trust-ic c"><svg class="h-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span><span><b>+9 000 voyageurs</b><span>4,6/5 sur 396 avis Google</span></span></div>
       </div>
     </div>
-    <div class="gs-divider"></div>
-    <div class="gs-trust">
-      <span class="num">+9 000</span> voyageurs nous ont déjà fait confiance
+  </div>
+</section>
+
+<!-- 4 ÉTAPES -->
+<section class="h-section" id="service">
+  <div class="h-wrap">
+    <div class="h-head reveal">
+      <span class="h-eyebrow">Prise en charge directe</span>
+      <h2>Comment fonctionne le service</h2>
+      <p>Une prise en charge fluide au dépose-minute, pensée pour votre confort.</p>
+    </div>
+    <div class="h-steps">
+      <article class="h-step reveal">
+        <div class="h-step-top"><span>Étape 1</span><i>1</i></div>
+        <div class="h-step-art"><svg aria-hidden="true" focusable="false" viewBox="0 0 340 160" fill="none">
+<!-- Valise moderne -->
+<rect x="90" y="58" width="40" height="72" rx="6" fill="#1E293B"/>
+<line x1="100" y1="58" x2="100" y2="130" stroke="#334155" stroke-width="2"/>
+<line x1="110" y1="58" x2="110" y2="130" stroke="#334155" stroke-width="2"/>
+<line x1="120" y1="58" x2="120" y2="130" stroke="#334155" stroke-width="2"/>
+<path d="M 98,58 L 98,42 L 122,42 L 122,58" stroke="#64748B" stroke-width="3.5" stroke-linecap="round"/>
+<circle cx="100" cy="132" r="4" fill="#0F172A"/>
+<circle cx="120" cy="132" r="4" fill="#0F172A"/>
+
+<!-- Smartphone affichant confirmation e-mail -->
+<rect x="150" y="18" width="82" height="120" rx="12" fill="#0F172A"/>
+<rect x="154" y="22" width="74" height="112" rx="8" fill="#FFFFFF"/>
+<rect x="160" y="30" width="62" height="8" rx="2" fill="#E2E8F0"/>
+<rect x="160" y="48" width="62" height="38" rx="4" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+<circle cx="170" cy="60" r="4.5" fill="#2563EB"/>
+<rect x="180" y="56" width="32" height="3" rx="1.5" fill="#94A3B8"/>
+<rect x="180" y="64" width="22" height="3" rx="1.5" fill="#CBD5E1"/>
+<rect x="165" y="98" width="52" height="13" rx="6.5" fill="#2563EB"/>
+<rect x="180" y="103.5" width="22" height="2" rx="1" fill="#FFFFFF"/>
+</svg></div>
+        <h3>Réservation en quelques clics</h3>
+        <p>Validation en ligne, suivie d'un e-mail de confirmation avec toutes les instructions pour le jour J.</p>
+      </article>
+      <article class="h-step reveal">
+        <div class="h-step-top"><span>Étape 2</span><i>2</i></div>
+        <div class="h-step-art"><svg aria-hidden="true" focusable="false" viewBox="0 0 340 160" fill="none">
+<rect x="200" y="18" width="118" height="22" rx="11" fill="#0F172A"/>
+<text x="259" y="32.5" text-anchor="middle" fill="#FFFFFF" font-size="8.5" font-weight="800" font-family="sans-serif">PHOTOS DU VÉHICULE</text>
+
+<circle cx="48" cy="56" r="10" fill="#0F172A"/>
+<rect x="40" y="68" width="16" height="36" rx="4" fill="#2563EB"/>
+<line x1="44" y1="104" x2="44" y2="134" stroke="#0F172A" stroke-width="4.5" stroke-linecap="round"/>
+<line x1="52" y1="104" x2="52" y2="134" stroke="#0F172A" stroke-width="4.5" stroke-linecap="round"/>
+<path d="M52 76 L75 82" stroke="#2563EB" stroke-width="4" stroke-linecap="round"/>
+<rect x="75" y="70" width="24" height="30" rx="3.5" fill="#FFFFFF" stroke="#0284C7" stroke-width="2"/>
+<circle cx="87" cy="85" r="4" fill="#0284C7"/>
+<path d="M83 77 H91 M83 93 H91" stroke="#38BDF8" stroke-width="1.5" stroke-linecap="round"/>
+
+<!-- MÊME CHÂSSIS AUTOMOBILE EXACT -->
+<path d="M 100,124 L 115,124 C 117,112 127,104 140,104 C 153,104 163,112 165,124 L 245,124 C 247,112 257,104 270,104 C 283,104 293,112 295,124 L 315,124 C 322,124 326,118 326,108 L 320,96 L 285,96 L 245,68 C 225,58 165,58 140,68 L 115,96 L 98,102 C 94,106 94,118 100,124 Z" fill="#1E293B"/>
+
+<polygon points="144,72 195,72 195,94 122,94" fill="#64748B"/>
+<polygon points="201,72 238,72 276,94 201,94" fill="#64748B"/>
+
+<rect x="314" y="99" width="9" height="3.5" rx="1.5" fill="#FFFFFF"/>
+<line x1="316" y1="100.7" x2="321" y2="100.7" stroke="#38BDF8" stroke-width="1" stroke-linecap="round"/>
+
+<rect x="94" y="104" width="4.5" height="10" rx="1.5" fill="#EF4444"/>
+
+<line x1="25" y1="135" x2="330" y2="135" stroke="#E2E8F0" stroke-width="2" stroke-linecap="round"/>
+
+<circle cx="140" cy="124" r="17" fill="#0F172A" stroke="#CBD5E1" stroke-width="3.5"/>
+<circle cx="140" cy="124" r="7.5" fill="#475569"/>
+<circle cx="270" cy="124" r="17" fill="#0F172A" stroke="#CBD5E1" stroke-width="3.5"/>
+<circle cx="270" cy="124" r="7.5" fill="#475569"/>
+</svg></div>
+        <h3>Prise en charge à votre terminal</h3>
+        <p>Rendez-vous au dépose-minute de votre terminal d'Orly. Remise des clés et photos de contrôle effectuées sur place avec votre voiturier.</p>
+      </article>
+      <article class="h-step reveal">
+        <div class="h-step-top"><span>Étape 3</span><i>3</i></div>
+        <div class="h-step-art"><svg aria-hidden="true" focusable="false" viewBox="0 0 340 160" fill="none">
+<circle cx="48" cy="56" r="10" fill="#0F172A"/>
+<rect x="40" y="68" width="16" height="36" rx="4" fill="#0284C7"/>
+<line x1="44" y1="104" x2="44" y2="134" stroke="#0F172A" stroke-width="4.5" stroke-linecap="round"/>
+<line x1="52" y1="104" x2="52" y2="134" stroke="#0F172A" stroke-width="4.5" stroke-linecap="round"/>
+
+<path d="M52 76 L86 66" stroke="#0F172A" stroke-width="3.5" stroke-linecap="round"/>
+<path d="M86 66 L156 50 L168 76 Z" fill="#BAE6FD" opacity="0.65"/>
+
+<circle cx="152" cy="58" r="5" fill="#FFFFFF"/>
+<circle cx="166" cy="54" r="4.5" fill="#FFFFFF"/>
+<circle cx="178" cy="62" r="5.5" fill="#FFFFFF"/>
+<circle cx="138" cy="68" r="4" fill="#FFFFFF"/>
+
+<!-- MÊME CHÂSSIS AUTOMOBILE EXACT -->
+<path d="M 100,124 L 115,124 C 117,112 127,104 140,104 C 153,104 163,112 165,124 L 245,124 C 247,112 257,104 270,104 C 283,104 293,112 295,124 L 315,124 C 322,124 326,118 326,108 L 320,96 L 285,96 L 245,68 C 225,58 165,58 140,68 L 115,96 L 98,102 C 94,106 94,118 100,124 Z" fill="#1E293B"/>
+
+<polygon points="144,72 195,72 195,94 122,94" fill="#64748B"/>
+<polygon points="201,72 238,72 276,94 201,94" fill="#64748B"/>
+
+<rect x="314" y="99" width="9" height="3.5" rx="1.5" fill="#FFFFFF"/>
+<line x1="316" y1="100.7" x2="321" y2="100.7" stroke="#38BDF8" stroke-width="1" stroke-linecap="round"/>
+
+<rect x="94" y="104" width="4.5" height="10" rx="1.5" fill="#EF4444"/>
+
+<line x1="25" y1="135" x2="330" y2="135" stroke="#E2E8F0" stroke-width="2" stroke-linecap="round"/>
+
+<circle cx="140" cy="124" r="17" fill="#0F172A" stroke="#CBD5E1" stroke-width="3.5"/>
+<circle cx="140" cy="124" r="7.5" fill="#475569"/>
+<circle cx="270" cy="124" r="17" fill="#0F172A" stroke="#CBD5E1" stroke-width="3.5"/>
+<circle cx="270" cy="124" r="7.5" fill="#475569"/>
+</svg></div>
+        <h3>Stationnement et entretien soigné</h3>
+        <p>Votre voiture est gardée sur notre parking à quelques minutes d'Orly, sous vidéosurveillance 24h/24. Si l'option lavage est sélectionnée, elle est nettoyée avec soin avant votre retour.</p>
+      </article>
+      <article class="h-step last reveal">
+        <div class="h-step-top"><span>Étape 4</span><i>4</i></div>
+        <div class="h-step-art"><svg aria-hidden="true" focusable="false" viewBox="0 0 350 160" fill="none">
+<!-- Voiturier à l'arrière gauche rangeant la valise -->
+<circle cx="48" cy="62" r="9.5" fill="#064E3B"/>
+<rect x="40" y="74" width="16" height="32" rx="3.5" fill="#059669"/>
+<line x1="44" y1="106" x2="44" y2="134" stroke="#064E3B" stroke-width="4.5" stroke-linecap="round"/>
+<line x1="52" y1="106" x2="52" y2="134" stroke="#064E3B" stroke-width="4.5" stroke-linecap="round"/>
+<path d="M52 82 L76 96" stroke="#059669" stroke-width="3.5" stroke-linecap="round"/>
+
+<!-- Valise dans le coffre arrière ouvert -->
+<rect x="74" y="86" width="24" height="34" rx="3.5" fill="#1E293B"/>
+<line x1="78" y1="94" x2="94" y2="94" stroke="#64748B" stroke-width="2"/>
+<line x1="78" y1="102" x2="94" y2="102" stroke="#64748B" stroke-width="2"/>
+<line x1="78" y1="110" x2="94" y2="110" stroke="#64748B" stroke-width="2"/>
+
+<!-- GRAND HAYON ARRIÈRE AVEC VÉRIN HYDRAULIQUE RÉALISTE -->
+<path d="M140 70 L96 40" stroke="#064E3B" stroke-width="5.5" stroke-linecap="round"/>
+<line x1="128" y1="80" x2="108" y2="48" stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round"/>
+
+<polygon points="98,124 140,124 140,78 98,88" fill="#022C22"/>
+
+<!-- CORPS AUTOMOBILE IDENTIQUE DIRIGÉ VERS LA DROITE -->
+<path d="M 100,124 L 115,124 C 117,112 127,104 140,104 C 153,104 163,112 165,124 L 245,124 C 247,112 257,104 270,104 C 283,104 293,112 295,124 L 315,124 C 322,124 326,118 326,108 L 320,96 L 285,96 L 245,68 C 225,58 165,58 140,68 L 140,94 L 100,124 Z" fill="#064E3B"/>
+
+<polygon points="201,72 238,72 276,94 201,94" fill="#A7F3D0" opacity="0.75"/>
+<line x1="201" y1="72" x2="201" y2="94" stroke="#064E3B" stroke-width="2.5"/>
+
+<rect x="314" y="99" width="9" height="3.5" rx="1.5" fill="#FFFFFF"/>
+<line x1="316" y1="100.7" x2="321" y2="100.7" stroke="#A7F3D0" stroke-width="1" stroke-linecap="round"/>
+
+<rect x="94" y="104" width="4.5" height="10" rx="1.5" fill="#EF4444"/>
+
+<line x1="25" y1="135" x2="330" y2="135" stroke="#D1FAE5" stroke-width="2" stroke-linecap="round"/>
+
+<circle cx="140" cy="124" r="17" fill="#022C22" stroke="#A7F3D0" stroke-width="3.5"/>
+<circle cx="140" cy="124" r="7.5" fill="#064E3B"/>
+<circle cx="270" cy="124" r="17" fill="#022C22" stroke="#A7F3D0" stroke-width="3.5"/>
+<circle cx="270" cy="124" r="7.5" fill="#064E3B"/>
+
+<!-- Voyageur à l'avant du véhicule -->
+<circle cx="334" cy="62" r="9.5" fill="#1E293B"/>
+<rect x="328" y="74" width="14" height="32" rx="3.5" fill="#0F172A"/>
+<line x1="331" y1="106" x2="331" y2="134" stroke="#0F172A" stroke-width="4.5" stroke-linecap="round"/>
+<line x1="337" y1="106" x2="337" y2="134" stroke="#0F172A" stroke-width="4.5" stroke-linecap="round"/>
+
+<!-- BADGE GARANTI AU PREMIER PLAN ABSOLU -->
+<g id="badgeStep4">
+<rect x="68" y="6" width="170" height="22" rx="11" fill="#065F46"/>
+<text x="153" y="20.5" text-anchor="middle" fill="#FFFFFF" font-size="8.5" font-weight="900" font-family="sans-serif" letter-spacing="0.4">VALISES CHARGÉES AU COFFRE</text>
+<line x1="104" y1="28" x2="104" y2="38" stroke="#059669" stroke-width="2" stroke-dasharray="2 2"/>
+</g>
+</svg></div>
+        <h3>Restitution et aide aux bagages</h3>
+        <p>À votre retour à Orly, votre voiture vous attend devant votre terminal. Votre voiturier charge vos valises directement dans le coffre pour vous permettre de reprendre la route sans attendre.</p>
+      </article>
     </div>
   </div>
 </section>
 
-<!-- AVANTAGES -->
-<section class="advantages" id="avantages">
-  <div class="container">
-    <div class="adv-grid">
-      <article class="adv-item reveal">
-        <div class="adv-illu" aria-hidden="true">
-          <svg viewBox="0 0 64 64" fill="none">
-            <circle cx="32" cy="34" r="22" fill="#EFF6FD"/>
-            <circle cx="32" cy="34" r="22" stroke="#1B5FA8" stroke-width="3"/>
-            <path d="M32 21v13l9 5" stroke="#0B1426" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
-            <circle cx="32" cy="34" r="3" fill="#EBA83C"/>
-            <rect x="26" y="6" width="12" height="5" rx="2.5" fill="#1B5FA8"/>
-            <rect x="29.5" y="9" width="5" height="5" fill="#1B5FA8"/>
-          </svg>
-        </div>
-        <h3 class="adv-title">Gain de temps</h3>
-        <p class="adv-desc">Dépose au terminal, zéro navette.</p>
-      </article>
-
-      <article class="adv-item reveal">
-        <div class="adv-illu" aria-hidden="true">
-          <svg viewBox="0 0 64 64" fill="none">
-            <g transform="rotate(-10 32 20)">
-              <rect x="17" y="9" width="30" height="17" rx="2.5" fill="#EFF6FD" stroke="#8CBCE8" stroke-width="2"/>
-              <circle cx="32" cy="17.5" r="4.5" fill="#EBA83C"/>
-            </g>
-            <rect x="8" y="24" width="48" height="30" rx="6" fill="#1B5FA8"/>
-            <rect x="8" y="30" width="48" height="24" rx="6" fill="#2E7FD3"/>
-            <rect x="34" y="35" width="24" height="12" rx="6" fill="#0B1426"/>
-            <circle cx="46" cy="41" r="3.2" fill="#EBA83C"/>
-          </svg>
-        </div>
-        <h3 class="adv-title">Économique</h3>
-        <p class="adv-desc">Dès 29 €, prix total avant paiement.</p>
-      </article>
-
-      <article class="adv-item reveal">
-        <div class="adv-illu" aria-hidden="true">
-          <svg viewBox="0 0 64 64" fill="none">
-            <path d="M32 6l20 7v18c0 13-8.6 21.6-20 27C20.6 52.6 12 44 12 31V13l20-7z" fill="#2E7FD3"/>
-            <path d="M32 6l20 7v18c0 13-8.6 21.6-20 27V6z" fill="#1B5FA8"/>
-            <rect x="23" y="29" width="18" height="14" rx="3" fill="#EBA83C"/>
-            <path d="M27 29v-4a5 5 0 0110 0v4" stroke="#EFF6FD" stroke-width="3" stroke-linecap="round"/>
-            <circle cx="32" cy="36" r="2.4" fill="#0B1426"/>
-          </svg>
-        </div>
-        <h3 class="adv-title">Sécurité</h3>
-        <p class="adv-desc">Une équipe de voituriers expérimentés.</p>
-      </article>
+<!-- TARIFS -->
+<section class="h-section" id="prix" style="padding-top:0">
+  <div class="h-wrap">
+    <div class="h-head reveal">
+      <span class="h-eyebrow">Tarifs</span>
+      <h2>Simple et transparent</h2>
+      <p>Moins cher par jour, plus vous restez. Le prix total est affiché avant le paiement.</p>
     </div>
+    <div class="h-prices reveal">
+      <div class="h-price-card"><div><b>Court séjour</b><span>Pour 24h, aller-retour express</span></div><div class="amt"><small>Dès</small><strong>29&nbsp;€</strong></div></div>
+      <div class="h-price-card"><div><b>Une semaine</b><span>Tarif dégressif, week-end et plus</span></div><div class="amt"><small>Dès</small><strong>89&nbsp;€</strong></div></div>
+    </div>
+    <p class="h-prices-note">Tarif exact calculé selon vos dates en haut de page. <a href="/tarifs">Voir la grille des tarifs</a></p>
   </div>
 </section>
 
-
-<!-- TODO CONFIANCE (à compléter avec les VRAIES infos avant de rétablir une section de réassurance) :
-     - Assurance / RC professionnelle : ajouter un bloc avec le nom
-       de l'assureur et le n° de contrat une fois souscrite. NE PAS afficher sans.
-     - Téléphone service client : ajouter ici + footer quand le numéro pro existe.
-     - Lien fiche Google Business Profile quand elle est créée. -->
-<!-- PRICING TEASER -->
-<section class="pricing-teaser" id="prix">
-  <div class="container">
-    <div class="section-head reveal">
-      <p class="section-eyebrow">Tarifs</p>
-      <h2 class="section-title">Simple, <span class="accent">transparent</span></h2>
-      <p class="section-sub">Moins cher par jour, plus vous restez.</p>
+<!-- LAVAGE -->
+<section class="h-wash" id="lavages">
+  <div class="h-wrap">
+    <div class="h-head reveal">
+      <span class="h-eyebrow">Option Bien-Être &amp; Privilège</span>
+      <h2>Retrouvez une voiture impeccable à votre atterrissage</h2>
+      <p>Faites glisser la jauge centrale pour comparer l'état avant et après notre préparation complète.</p>
     </div>
-    <div class="pricing-cards">
-      <article class="price-card reveal">
-        <div class="price-card-icon">
-          <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="16" cy="16" r="13"/><path d="M16 8v8l5 3"/></svg>
-        </div>
-        <div class="price-card-info">
-          <p class="lbl">Court séjour</p>
-          <p class="desc">Pour 24h, aller-retour express</p>
-        </div>
-        <p class="price"><span class="from">dès</span><span>29€</span></p>
-      </article>
-      <article class="price-card reveal">
-        <div class="price-card-icon">
-          <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="6" width="24" height="22" rx="3"/><path d="M4 12h24M10 4v4M22 4v4"/></svg>
-        </div>
-        <div class="price-card-info">
-          <p class="lbl">Une semaine</p>
-          <p class="desc">Tarif dégressif — week-end et plus</p>
-        </div>
-        <p class="price"><span class="from">dès</span><span>89€</span></p>
-      </article>
-    </div>
-    <p class="pricing-note reveal">Tarif exact calculé selon vos dates, avant paiement.</p>
-  </div>
-</section>
+    <div class="h-studio reveal">
+      <div class="h-stage" id="washContainer">
+        <div class="h-stage-tags" aria-hidden="true"><div><span class="a">Avant : Boue &amp; Poussière</span><span class="b">Après : Lustrée &amp; Propre</span></div></div>
+        <div class="h-stage-layer h-stage-clean"><svg role="img" aria-label="Voiture propre après lavage" viewBox="0 0 640 220" fill="none">
+<defs>
+<linearGradient id="sapphireLustreGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+<stop offset="0%" stop-color="#38BDF8"/>
+<stop offset="35%" stop-color="#0284C7"/>
+<stop offset="100%" stop-color="#034694"/>
+</linearGradient>
+</defs>
 
-<!-- LAVAGES -->
-<section class="options" id="lavages">
-  <div class="container">
-    <div class="section-head reveal">
-      <p class="section-eyebrow">Pendant que vous voyagez</p>
-      <h2 class="section-title">Vous vous reposez. <span class="accent">Elle aussi</span></h2>
-      <p class="section-sub">Offrez à votre voiture le soin qu'elle mérite pendant votre voyage.</p>
-    </div>
-    <img class="options-illu" src="/img/lavage.svg" width="480" height="300" loading="lazy" role="img" aria-label="Illustration d'un voiturier Direct Voiturier en uniforme bleu marine qui lave l'avant d'une voiture bleu marine au nettoyeur haute pression, avec de la mousse en arrière-plan">
-    <div class="options-list">
-      <article class="option-row reveal">
-        <div class="option-row-icon">
-          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8">
-            <path d="M 8 30 L 10 22 Q 12 18 16 18 L 32 18 Q 36 18 38 22 L 40 30"/>
-            <rect x="6" y="30" width="36" height="10" rx="2"/>
-            <circle cx="14" cy="40" r="3" fill="currentColor"/>
-            <circle cx="34" cy="40" r="3" fill="currentColor"/>
-          </svg>
-        </div>
-        <div class="option-row-info">
-          <p class="option-row-name">Express</p>
-          <p class="option-row-desc">Extérieur rapide — carrosserie, jantes et vitres</p>
-        </div>
-        <p class="option-row-price"><span class="val">29</span><span class="cur">€</span></p>
-      </article>
+<path d="M 60,150 C 80,122 120,115 165,108 L 240,76 C 295,58 400,58 465,86 L 540,118 C 585,126 610,142 615,165 C 615,182 595,192 568,192 C 550,192 532,168 485,168 C 440,168 420,192 230,192 C 210,192 192,168 145,168 C 100,168 80,192 60,192 C 42,192 32,175 60,150 Z" fill="url(#sapphireLustreGrad)" stroke="#38BDF8" stroke-width="2"/>
 
-      <article class="option-row featured reveal">
-        <span class="option-row-badge">★ Le plus choisi</span>
-        <div class="option-row-icon">
-          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8">
-            <path d="M 24 4 L 30 18 L 44 20 L 32 30 L 36 44 L 24 36 L 12 44 L 16 30 L 4 20 L 18 18 Z" fill="currentColor" fill-opacity="0.2"/>
-            <path d="M 24 4 L 30 18 L 44 20 L 32 30 L 36 44 L 24 36 L 12 44 L 16 30 L 4 20 L 18 18 Z"/>
-          </svg>
-        </div>
-        <div class="option-row-info">
-          <p class="option-row-name">Complet</p>
-          <p class="option-row-desc">La formule signature — extérieur + intérieur</p>
-        </div>
-        <p class="option-row-price"><span class="val">69</span><span class="cur">€</span></p>
-      </article>
+<polygon points="245,82 330,82 330,116 195,116" fill="#BAE6FD" opacity="0.65"/>
+<polygon points="345,82 450,90 430,116 345,116" fill="#BAE6FD" opacity="0.65"/>
 
-      <article class="option-row reveal">
-        <div class="option-row-icon">
-          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8">
-            <rect x="8" y="14" width="32" height="22" rx="3"/>
-            <path d="M 8 26 L 40 26"/>
-            <circle cx="16" cy="32" r="4"/>
-            <rect x="28" y="28" width="8" height="8" rx="1.5"/>
-            <path d="M 24 8 L 25 6 L 26 8 L 28 9 L 26 10 L 25 12 L 24 10 L 22 9 Z" fill="currentColor"/>
-          </svg>
-        </div>
-        <div class="option-row-info">
-          <p class="option-row-name">Premium</p>
-          <p class="option-row-desc">L'expérience totale — complet + plastiques + désinfection</p>
-        </div>
-        <p class="option-row-price"><span class="val">99</span><span class="cur">€</span></p>
-      </article>
-    </div>
-    <div class="options-quote">
-      <p class="hand">→ Lavage complet à 69€, la formule signature</p>
-      <p class="options-disclaimer">Pour véhicules très sales, un supplément peut être demandé sur place</p>
+<circle cx="145" cy="168" r="35" fill="#0B0F19" stroke="#FFFFFF" stroke-width="4"/>
+<circle cx="145" cy="168" r="18" fill="#1E293B" stroke="#38BDF8" stroke-width="3"/>
+<circle cx="485" cy="168" r="35" fill="#0B0F19" stroke="#FFFFFF" stroke-width="4"/>
+<circle cx="485" cy="168" r="18" fill="#1E293B" stroke="#38BDF8" stroke-width="3"/>
+</svg></div>
+        <div class="h-stage-layer h-stage-dirty" id="dirtyLayer"><svg role="img" aria-label="Voiture sale avant lavage" viewBox="0 0 640 220" fill="none">
+<path d="M 60,150 C 80,122 120,115 165,108 L 240,76 C 295,58 400,58 465,86 L 540,118 C 585,126 610,142 615,165 C 615,182 595,192 568,192 C 550,192 532,168 485,168 C 440,168 420,192 230,192 C 210,192 192,168 145,168 C 100,168 80,192 60,192 C 42,192 32,175 60,150 Z" fill="#17273F" stroke="#253E61" stroke-width="2"/>
+
+<polygon points="245,82 330,82 330,116 195,116" fill="#475569" opacity="0.6"/>
+<polygon points="345,82 450,90 430,116 345,116" fill="#475569" opacity="0.6"/>
+
+<path d="M 45,192 Q 180,140 340,175 Q 490,145 615,192 Z" fill="#452B14" opacity="0.88"/>
+<circle cx="120" cy="158" r="14" fill="#38220E" opacity="0.85"/>
+<circle cx="150" cy="148" r="9" fill="#4D3016" opacity="0.8"/>
+<circle cx="250" cy="165" r="16" fill="#38220E" opacity="0.85"/>
+<circle cx="380" cy="170" r="14" fill="#4D3016" opacity="0.8"/>
+<circle cx="460" cy="160" r="15" fill="#38220E" opacity="0.9"/>
+<circle cx="560" cy="172" r="12" fill="#4D3016" opacity="0.85"/>
+
+<circle cx="145" cy="168" r="35" fill="#18120C" stroke="#3D2918" stroke-width="4"/>
+<circle cx="145" cy="168" r="18" fill="#24160B" stroke="#4D341F" stroke-width="2"/>
+<circle cx="485" cy="168" r="35" fill="#18120C" stroke="#3D2918" stroke-width="4"/>
+<circle cx="485" cy="168" r="18" fill="#24160B" stroke="#4D341F" stroke-width="2"/>
+</svg></div>
+        <div class="h-handle" id="washHandle"><button type="button" role="slider" aria-label="Comparer avant et après lavage" aria-valuemin="5" aria-valuemax="95" aria-valuenow="50"><svg class="h-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 7-5 5 5 5M15 7l5 5-5 5"/></svg></button></div>
+      </div>
+      <span class="h-wash-label" id="h-wash-label">Choisissez votre formule de lavage :</span>
+      <div class="h-pills" role="group" aria-labelledby="h-wash-label">
+        <button type="button" class="h-pill" data-home-wash="none" data-desc="Je récupère ma voiture telle quelle." aria-pressed="true" onclick="homeSelectWash('none')"><b>Sans lavage</b><em>0&nbsp;€</em></button><button type="button" class="h-pill" data-home-wash="exterieur" data-desc="Carrosserie, jantes et vitres." aria-pressed="false" onclick="homeSelectWash('exterieur')"><b>Extérieur</b><em>+29&nbsp;€</em></button><button type="button" class="h-pill" data-home-wash="interieur" data-desc="Aspirateur, plastiques et tapis." aria-pressed="false" onclick="homeSelectWash('interieur')"><b>Intérieur</b><em>+49&nbsp;€</em></button><button type="button" class="h-pill rec" data-home-wash="complet" data-desc="Extérieur + intérieur : la formule signature." aria-pressed="false" onclick="homeSelectWash('complet')"><span class="h-rec">★ Recommandé</span><b>Lavage Complet</b><em>+69&nbsp;€</em></button><button type="button" class="h-pill wide" data-home-wash="premium" data-desc="L&#x27;expérience totale, désinfection incluse." aria-pressed="false" onclick="homeSelectWash('premium')"><b>Premium</b><em>+99&nbsp;€</em></button>
+      </div>
+      <p class="h-wash-desc" id="h-wash-desc" aria-live="polite"><b>Sans lavage</b> — Je récupère ma voiture telle quelle.</p>
+      <div class="h-wash-cta"><button type="button" class="h-btn block" onclick="homeBook()"><span>Réserver avec cette formule</span><svg class="h-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button></div>
+      <p class="h-wash-note">Pour les véhicules très sales (boue séchée, poils d'animaux abondants), un supplément peut être demandé sur place. <a href="/lavage-voiture-orly" style="color:#94A3B8;text-decoration:underline">Détail des lavages</a></p>
     </div>
   </div>
 </section>
 
 <!-- AVIS -->
-<section class="reviews" id="avis">
-  <div class="container">
-    <div class="section-head reveal">
-      <p class="section-eyebrow">+9 000 voyageurs nous ont fait confiance</p>
-      <h2 class="section-title reviews-title">Ils nous ont confié leurs clés &amp; <span class="accent">Ils reviennent</span></h2>
+<section class="h-reviews" id="avis">
+  <div class="h-wrap">
+    <div class="h-head reveal">
+      <span class="h-stars" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+      <h2>Une équipe humaine et attentive à chaque situation</h2>
+      <p>Familles avec poussette, voyageurs seuls, seniors ou voyageurs d'affaires : notre équipe s'adapte avec bienveillance à vos horaires et à vos imprévus.</p>
+      <div class="h-chips">
+        <span class="h-chip b"><svg class="h-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>Écoute &amp; bienveillance</span>
+        <span class="h-chip g"><svg class="h-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Adaptation aux retards de vol</span>
+        <span class="h-chip a"><svg class="h-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>Vidéosurveillance 24h/24</span>
+      </div>
+    </div>
+    <div class="h-rating reveal">
+      <span class="h-rating-n">4,6<small>/5</small></span>
+      <span class="h-stars" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+      <span class="h-rating-t">396 avis Google · +9 000 voyageurs</span>
+      <a id="gsLink" href="#" hidden target="_blank" rel="noopener">Voir les avis sur Google</a>
     </div>
   </div>
   <div class="reviews-track-wrap">
@@ -706,104 +468,126 @@ window.VO_CONTACT = {
   </div>
 </section>
 
+<!-- TERMINAUX -->
+<section class="h-section" id="terminaux">
+  <div class="h-wrap">
+    <div class="h-head reveal">
+      <span class="h-eyebrow">Tous les terminaux d'Orly</span>
+      <h2>Votre voiturier vous attend à votre terminal</h2>
+      <p>Prise en charge et restitution au dépose-minute d'Orly 1, 2, 3 et 4.</p>
+    </div>
+    <div class="h-terms reveal">
+      <a class="h-term" href="/voiturier-orly-1-2"><span class="h-term-ic"><svg class="h-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg></span><b>Orly 1 et 2</b><span>Dépose-minute d'Orly 1-2</span><span class="go">Voir le terminal →</span></a>
+      <a class="h-term" href="/voiturier-orly-3"><span class="h-term-ic"><svg class="h-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg></span><b>Orly 3</b><span>Dépose-minute d'Orly 3</span><span class="go">Voir le terminal →</span></a>
+      <a class="h-term" href="/voiturier-orly-4"><span class="h-term-ic"><svg class="h-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg></span><b>Orly 4</b><span>Dépose-minute d'Orly 4</span><span class="go">Voir le terminal →</span></a>
+      <a class="h-term hours" href="/horaires-voiturier-orly"><span class="h-term-ic"><svg class="h-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span><b>7j/7, 4h–minuit</b><span>Nos horaires de prise en charge</span><span class="go">Voir les horaires →</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- TODO CONFIANCE (à compléter avec les VRAIES infos avant de rétablir une section de réassurance) :
+     - Assurance / RC professionnelle : ajouter un bloc avec le nom
+       de l'assureur et le n° de contrat une fois souscrite. NE PAS afficher sans.
+     - Téléphone service client : ajouter ici + footer quand le numéro pro existe.
+     - Lien fiche Google Business Profile quand elle est créée. -->
 
 <!-- FAQ — transparence tarifs / retards / annulation (alignée sur les CGV) -->
-<section class="faq" id="faq">
-  <div class="container">
-    <div class="section-head reveal">
-      <p class="section-eyebrow">Questions fréquentes</p>
-      <h2 class="section-title">Tout est clair<br><span class="accent">avant de réserver</span></h2>
+<section class="h-section" id="faq" style="padding-top:0">
+  <div class="h-wrap">
+    <div class="h-head reveal">
+      <span class="h-eyebrow">Questions fréquentes</span>
+      <h2>Tout est clair avant de réserver</h2>
     </div>
-    <div class="faq-list reveal">
-      <details class="faq-item">
+    <div class="h-faq reveal">
+      <details>
         <summary>Le prix affiché est-il vraiment le prix final ?</summary>
         <div class="faq-body">Oui. Le tarif calculé inclut la prise en charge, la restitution et le gardiennage à Orly. Les seules options en plus sont celles que vous choisissez vous-même, toujours détaillées dans le récapitulatif <strong>avant</strong> le paiement.</div>
       </details>
-      <details class="faq-item">
+      <details>
         <summary>Mon vol est retardé, que se passe-t-il ?</summary>
         <div class="faq-body">Votre vol a du retard ? Prévenez-nous, on s'adapte : on suit votre numéro de vol et on est là quand vous atterrissez.</div>
       </details>
-      <details class="faq-item">
+      <details>
         <summary>Puis-je annuler ou modifier ma réservation ?</summary>
         <div class="faq-body">Un imprévu ? Écrivez-nous à contact@directvoiturier.com, on trouve une solution. Le détail des conditions figure dans nos CGV.</div>
       </details>
-      <details class="faq-item">
+      <details>
         <summary>Comment se passe la prise en charge à Orly ?</summary>
         <div class="faq-body">Après votre réservation, vous recevez un email avec toutes les consignes. Le jour J, votre voiturier vous accueille directement au dépose-minute de votre terminal.</div>
       </details>
-      <details class="faq-item">
+      <details>
+        <summary>Quels sont vos horaires ?</summary>
+        <div class="faq-body">Nos voituriers interviennent 7 jours sur 7, de 4h00 à minuit. Si votre vol part avant 4h00 ou atterrit après minuit, écrivez-nous avant de réserver à contact@directvoiturier.com. <a href="/horaires-voiturier-orly">Voir nos horaires</a></div>
+      </details>
+      <details>
         <summary>Comment payer ?</summary>
         <div class="faq-body" id="faq-payment">En ligne par carte bancaire via Stripe (paiement sécurisé, confirmation immédiate) ou sur place en carte ou espèces. Le montant est identique dans les deux cas.</div>
       </details>
-      <details class="faq-item">
+      <details>
         <summary>Où est garée ma voiture pendant mon voyage ?</summary>
         <div class="faq-body">Votre véhicule est gardé sur notre parking à quelques minutes d'Orly. Une option parking couvert est proposée si vous préférez un emplacement à l'abri des intempéries.</div>
       </details>
     </div>
+    <p class="h-faq-more"><a href="/faq">Toutes les questions fréquentes</a></p>
   </div>
 </section>
 
 <!-- CTA FINAL -->
-<section class="final-cta">
-  <div class="final-cta-inner reveal">
-    <h2>Le voyage commence<br><span class="accent">au dépose-minute</span></h2>
-    <p>Pas de place à chercher, pas de navette à attendre. Vous descendez, vous partez.</p>
-    <button class="final-cta-btn" onclick="openBookingModal()">
-      <span>Réserver maintenant</span>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-    </button>
-    <p style="margin:20px 0 0;font-size:0.82rem;font-weight:600;color:rgba(255,255,255,0.82)">Prix affiché avant paiement · Confirmation par email · 4,6/5 sur 396 avis Google</p>
+<section class="h-final">
+  <div class="h-wrap">
+    <div class="h-final-in reveal">
+      <h2>Le voyage commence<br><span>au dépose-minute</span></h2>
+      <p>Pas de place à chercher, pas de navette à attendre. Vous descendez, vous partez.</p>
+      <button type="button" class="h-btn lg" onclick="homeBook()"><span>Réserver mon créneau</span><svg class="h-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+      <p class="h-final-meta">Prix affiché avant paiement · Confirmation par email · 4,6/5 sur 396 avis Google</p>
+    </div>
   </div>
 </section>
+</main>
 
 <!-- FOOTER -->
-<footer class="footer">
-  <div class="container">
-    <div class="footer-grid">
-      <div class="footer-brand">
-        <div class="name">
-          <div class="name-logo">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
-            </svg>
-          </div>
-          <div class="name-text">Direct Voiturier</div>
-        </div>
-        <p>Service voiturier premium présent à l'aéroport Paris-Orly depuis plus de 6 ans. Plus de 9 000 voyageurs accompagnés.</p>
-      </div>
-      <div class="footer-col">
-        <h5>Service</h5>
-        <ul>
-          <li><a href="/comment-ca-marche">Comment ça marche</a></li>
-          <li><a href="/tarifs">Tarifs</a></li>
-          <li><a href="#lavages">Lavages</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h5>Découvrir</h5>
-        <ul>
-          <li><a href="/voiturier-orly">Voiturier Orly</a></li>
-          <li><a href="/parking-orly">Parking Orly</a></li>
-          <li><a href="/faq">FAQ</a></li>
-          <li><a href="/voiturier-orly-terminaux">Voiturier Orly 1, 2, 3 et 4</a></li>
-          <li><a href="/parking-orly-pas-cher">Parking Orly pas cher</a></li>
-          <li><a href="/parking-longue-duree-orly">Parking longue durée Orly</a></li>
-          <li><a href="/lavage-voiture-orly">Lavage voiture Orly</a></li>
-          <li><a href="/guides-voiturier-orly">Tous nos guides Orly</a></li>
-          <li><a href="mailto:contact@directvoiturier.com">Contact</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h5>Légal</h5>
-        <ul>
-          <li><a onclick="openCGV()">Conditions générales</a></li>
-          <li><a onclick="openCGV()">Mentions légales</a></li>
-        </ul>
+<footer class="h-footer">
+  <div class="h-wrap">
+    <div class="h-foot-top">
+      <div class="h-foot-brand"><span class="h-logo-mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg></span><span>DIRECT VOITURIER Paris-Orly</span></div>
+      <div class="h-foot-quick">
+        <a href="/voiturier-orly-terminaux">Terminaux 1, 2, 3 &amp; 4</a>
+        <a href="/comment-ca-marche">Dépose-minute</a>
+        <a href="mailto:contact@directvoiturier.com">Assistance directe</a>
+        <a onclick="openCGV()" role="button" tabindex="0">Conditions générales</a>
       </div>
     </div>
-    <div class="footer-bottom">
-      <span>© 2026 Direct Voiturier · Tous droits réservés</span>
-      <span>Aéroport Paris-Orly · 91200 Athis-Mons</span>
+    <div class="h-foot-cols">
+      <div><h3>Service</h3><ul>
+        <li><a href="/comment-ca-marche">Comment ça marche</a></li>
+        <li><a href="/tarifs">Tarifs</a></li>
+        <li><a href="/lavage-voiture-orly">Lavages</a></li>
+        <li><a href="/reserver-voiturier-orly">Réserver</a></li>
+        <li><a href="/horaires-voiturier-orly">Horaires</a></li>
+      </ul></div>
+      <div><h3>Orly</h3><ul>
+        <li><a href="/voiturier-orly">Voiturier Orly</a></li>
+        <li><a href="/voiturier-orly-1-2">Voiturier Orly 1 et 2</a></li>
+        <li><a href="/voiturier-orly-3">Voiturier Orly 3</a></li>
+        <li><a href="/voiturier-orly-4">Voiturier Orly 4</a></li>
+        <li><a href="/parking-orly">Parking Orly</a></li>
+      </ul></div>
+      <div><h3>Guides</h3><ul>
+        <li><a href="/parking-orly-pas-cher">Parking Orly pas cher</a></li>
+        <li><a href="/parking-longue-duree-orly">Parking longue durée Orly</a></li>
+        <li><a href="/voiturier-orly-vol-retarde">Vol retardé</a></li>
+        <li><a href="/guides-voiturier-orly">Tous nos guides Orly</a></li>
+        <li><a href="/faq">FAQ</a></li>
+      </ul></div>
+      <div><h3>Contact &amp; légal</h3><ul>
+        <li><a href="mailto:contact@directvoiturier.com">contact@directvoiturier.com</a></li>
+        <li><a onclick="openCGV()" role="button" tabindex="0">Conditions générales</a></li>
+        <li><a onclick="openCGV()" role="button" tabindex="0">Mentions légales</a></li>
+      </ul></div>
+    </div>
+    <div class="h-foot-legal">
+      <p>Direct Voiturier est un service indépendant de voiturier et de gardiennage dédié aux voyageurs de l'aéroport Paris-Orly (ORY). Présent à Orly depuis plus de 6 ans, plus de 9 000 voyageurs accompagnés.</p>
+      <p>© 2026 Direct Voiturier · Aéroport Paris-Orly · 91200 Athis-Mons</p>
     </div>
   </div>
 </footer>
@@ -1212,8 +996,8 @@ window.VO_CONTACT = {
 
 <!-- CTA MOBILE COLLANT -->
 <div class="sticky-cta" id="stickyCta" aria-hidden="true">
-  <div class="sticky-cta-price"><span class="from">Dès</span> <strong>29€</strong></div>
-  <button class="sticky-cta-btn" onclick="trackEvent('begin_checkout',{cta:'sticky'});openBookingModal()">
+  <div class="sticky-cta-price"><span class="from" id="stickyFrom">Dès</span> <strong id="stickyPrice">29€</strong></div>
+  <button class="sticky-cta-btn" onclick="homeBook()">
     Réserver mon voiturier
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
   </button>
