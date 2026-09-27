@@ -975,7 +975,7 @@ document.addEventListener('click', e => {
 ═══════════════════════════════════════════════ */
 (function stickyCtaInit() {
   const bar = document.getElementById('stickyCta');
-  const hero = document.querySelector('.hero, .page-hero');
+  const hero = document.querySelector('.hero, .page-hero, .h-hero');
   if (!bar || !hero) return;
   const io2 = new IntersectionObserver(entries => {
     entries.forEach(en => {
@@ -986,3 +986,156 @@ document.addEventListener('click', e => {
   }, { threshold: 0.05 });
   io2.observe(hero);
 })();
+
+/* ════════════════════════════════════════════════
+   HOME — calculateur en direct (tarif serveur /api/pricing),
+   catégories, formules de lavage et comparateur avant/après
+═══════════════════════════════════════════════ */
+const HOME_WASH_LABEL = { none:'sans lavage', exterieur:'lavage extérieur', interieur:'lavage intérieur', complet:'lavage complet', premium:'lavage premium' };
+let homeQuoteSeq = 0;
+let homeTouched = false;
+let homeLastTracked = '';
+
+function homeReadInputs() {
+  const v = id => (document.getElementById(id) || {}).value || '';
+  STATE.sim.depDate = v('sim-dep-date');
+  STATE.sim.depTime = v('sim-dep-time') || '08:00';
+  STATE.sim.retDate = v('sim-ret-date');
+  STATE.sim.retTime = v('sim-ret-time') || '20:00';
+  const s = STATE.sim;
+  return !!(s.depDate && s.retDate && new Date(s.retDate) >= new Date(s.depDate));
+}
+
+function homeSticky(total) {
+  const p = document.getElementById('stickyPrice');
+  const f = document.getElementById('stickyFrom');
+  if (!p || !f) return;
+  if (total) { p.textContent = total + '€'; f.textContent = 'Votre tarif'; }
+  else { p.textContent = '29€'; f.textContent = 'Dès'; }
+}
+
+async function homeQuote(userAction = true) {
+  const amount = document.getElementById('sim-result-amount');
+  const meta = document.getElementById('sim-result-meta');
+  if (!amount || !meta) return;
+  if (userAction && !homeTouched) { homeTouched = true; trackEvent('quote_started'); }
+  STATE.sim.quotedPrice = 0;
+  const washLine = document.getElementById('h-sum-wash');
+  const wash = STATE.booking.data.wash.type;
+  if (washLine) washLine.textContent = 'Paris-Orly · ' + (wash === 'none' ? 'sans lavage' : HOME_WASH_LABEL[wash] + ' inclus');
+
+  if (!homeReadInputs()) {
+    homeQuoteSeq++;
+    amount.className = 'h-price muted';
+    amount.textContent = 'Vérifiez vos dates';
+    meta.textContent = 'Le retour doit suivre le départ';
+    homeSticky(null);
+    return;
+  }
+  const seq = ++homeQuoteSeq;
+  amount.className = 'h-price';
+  amount.innerHTML = '<span class="spinner"></span>';
+  const s = STATE.sim;
+  const payload = { depDate:s.depDate, depTime:s.depTime, retDate:s.retDate, retTime:s.retTime, carCategoryCode:s.categoryCode };
+  if (wash !== 'none') payload.washType = wash;
+  const res = await fetchPrice(payload);
+  if (seq !== homeQuoteSeq) return; // une saisie plus récente a pris le relais
+
+  if (!res) {
+    amount.className = 'h-price muted';
+    amount.textContent = 'Tarif indisponible';
+    meta.textContent = 'Réessayez dans un instant';
+    homeSticky(null);
+    return;
+  }
+  if (res.dateBlocked) {
+    amount.className = 'h-price muted';
+    amount.textContent = 'Complet';
+    meta.textContent = 'Dates non disponibles — choisissez d\'autres dates';
+    homeSticky(null);
+    return;
+  }
+  STATE.sim.quotedPrice = res.total;
+  amount.className = 'h-price';
+  amount.innerHTML = `${res.total}<span class="cur">€</span>`;
+  meta.textContent = `${res.days} jour${res.days > 1 ? 's' : ''} · ${categoryLabel(s.categoryCode)}`;
+  homeSticky(res.total);
+  const key = JSON.stringify(payload);
+  if (homeTouched && key !== homeLastTracked) {
+    homeLastTracked = key;
+    trackEvent('quote_shown', { value: res.total, currency: 'EUR', category: s.categoryCode });
+  }
+}
+
+function homeSelectCat(code) {
+  STATE.sim.categoryCode = code;
+  document.querySelectorAll('.h-cat').forEach(b => b.setAttribute('aria-pressed', b.dataset.cat === code ? 'true' : 'false'));
+  homeQuote();
+}
+
+function homeSelectWash(key) {
+  // Source unique des prix : les options du tunnel (data-price), identiques au serveur
+  const opt = document.querySelector(`.wash-option[data-wash="${key}"]`);
+  if (!opt) return;
+  document.querySelectorAll('.wash-option').forEach(o => o.classList.toggle('selected', o === opt));
+  const radio = opt.querySelector('input[type="radio"]');
+  if (radio) radio.checked = true;
+  STATE.booking.data.wash.type = key;
+  STATE.booking.data.wash.price = parseInt(opt.dataset.price, 10) || 0;
+  let label = '';
+  document.querySelectorAll('.h-pill').forEach(b => {
+    const on = b.dataset.homeWash === key;
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    if (on) label = b.querySelector('b').textContent;
+  });
+  const pill = document.querySelector(`.h-pill[data-home-wash="${key}"]`);
+  const desc = document.getElementById('h-wash-desc');
+  if (desc && pill) {
+    desc.innerHTML = '';
+    const b = document.createElement('b'); b.textContent = label;
+    desc.append(b, ' — ' + pill.dataset.desc);
+  }
+  homeQuote();
+}
+
+function homeBook() {
+  if (!document.getElementById('sim-dep-date')) { openBookingModal(); return; }
+  if (!homeReadInputs()) {
+    const card = document.getElementById('bookingHeroCard');
+    if (card) card.scrollIntoView({ behavior:'smooth', block:'center' });
+    homeQuote();
+    return;
+  }
+  simBookNow();
+}
+
+/* Comparateur avant / après (souris, doigt, clavier) */
+(function homeWashSlider() {
+  const stage = document.getElementById('washContainer');
+  const dirty = document.getElementById('dirtyLayer');
+  const handle = document.getElementById('washHandle');
+  if (!stage || !dirty || !handle) return;
+  const knob = handle.querySelector('button');
+  let pct = 50, dragging = false;
+  const set = p => {
+    pct = Math.max(5, Math.min(95, p));
+    dirty.style.clipPath = `inset(0 ${100 - pct}% 0 0)`;
+    handle.style.left = pct + '%';
+    if (knob) knob.setAttribute('aria-valuenow', Math.round(pct));
+  };
+  const fromX = x => { const r = stage.getBoundingClientRect(); set(((x - r.left) / r.width) * 100); };
+  stage.addEventListener('pointerdown', e => {
+    dragging = true; fromX(e.clientX);
+    if (e.target.closest('#washHandle')) { try { stage.setPointerCapture(e.pointerId); } catch (_) {} }
+  });
+  stage.addEventListener('pointermove', e => { if (dragging) fromX(e.clientX); });
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(t => stage.addEventListener(t, () => { dragging = false; }));
+  if (knob) knob.addEventListener('keydown', e => {
+    if (e.key === 'ArrowLeft') { set(pct - 5); e.preventDefault(); }
+    if (e.key === 'ArrowRight') { set(pct + 5); e.preventDefault(); }
+  });
+})();
+
+document.addEventListener('DOMContentLoaded', () => {
+  if (document.getElementById('bookingHeroCard')) homeQuote(false);
+});
