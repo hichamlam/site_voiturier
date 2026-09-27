@@ -19,7 +19,7 @@ function fmtDate(iso) {
   return new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
 }
 function categoryLabel(code) {
-  return ({citadine:'Citadine', berline:'Berline / Break', suv:'SUV / 4×4 / Monospace', utilitaire:'Van / Utilitaire'})[code] || code;
+  return ({citadine:'Citadine', berline:'Berline / Break', suv:'SUV / Familial / Monospace', utilitaire:'Van / Utilitaire'})[code] || code;
 }
 function washLabel(t) {
   return ({none:'Aucun', exterieur:'Lavage extérieur', interieur:'Lavage intérieur', complet:'Lavage complet', premium:'Lavage premium'})[t] || '—';

@@ -261,7 +261,7 @@ function simBookNow() {
 }
 
 function categoryLabel(code) {
-  return ({citadine:'Citadine', berline:'Berline / Break', suv:'SUV / 4×4 / Monospace', utilitaire:'Van / Utilitaire'})[code] || code;
+  return ({citadine:'Citadine', berline:'Berline / Break', suv:'SUV / Familial / Monospace', utilitaire:'Van / Utilitaire'})[code] || code;
 }
 
 /* ════════════════════════════════════════════════
@@ -726,7 +726,15 @@ function initPromoBanner(cfg) {
     text.append('Code ');
     const strong = document.createElement('strong');
     strong.textContent = promo.code;
-    text.append(strong, ` : -${remise} sur ${cible}`);
+    // Bouton copier collé au code : icône presse-papier + « Copier ».
+    const copy = document.createElement('button');
+    copy.type = 'button';
+    copy.className = 'promo-banner-copy';
+    copy.id = 'promoBannerCopy';
+    copy.setAttribute('aria-label', 'Copier le code ' + promo.code);
+    copy.addEventListener('click', promoBannerCopy);
+    text.append(strong, ' ', copy, ` : -${remise} sur ${cible}`);
+    promoCopyLabel(copy, false);
   }
 
   STATE.promo = promo;
@@ -752,6 +760,40 @@ function promoBannerUse() {
   // échouerait et afficherait « code invalide » à tort. Le code est vérifié
   // par le serveur au premier tarif calculé, puis au récapitulatif.
   openBookingModal();
+}
+
+function promoCopyLabel(btn, copied) {
+  btn.innerHTML = copied
+    ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Copié'
+    : '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>Copier';
+}
+
+function promoBannerCopy() {
+  const promo = STATE.promo;
+  const btn = document.getElementById('promoBannerCopy');
+  if (!promo || !btn) return;
+  const done = () => {
+    promoCopyLabel(btn, true);
+    clearTimeout(btn._t);
+    btn._t = setTimeout(() => promoCopyLabel(btn, false), 2500);
+  };
+  // Repli execCommand : navigator.clipboard est absent hors HTTPS et sur
+  // certains navigateurs intégrés (Instagram, Facebook…).
+  const fallback = () => {
+    const ta = document.createElement('textarea');
+    ta.value = promo.code;
+    ta.setAttribute('readonly', '');
+    ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); done(); } catch {}
+    ta.remove();
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(promo.code).then(done, fallback);
+  } else {
+    fallback();
+  }
 }
 
 function promoBannerDismiss() {

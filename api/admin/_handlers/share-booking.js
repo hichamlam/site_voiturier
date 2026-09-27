@@ -26,7 +26,7 @@ function washLabel(t) {
   return ({none:'Aucun', exterieur:'Lavage extérieur', interieur:'Lavage intérieur', complet:'Lavage complet', premium:'Lavage premium'})[t] || '—';
 }
 function categoryLabel(code) {
-  return ({citadine:'Citadine', berline:'Berline / Break', suv:'SUV / 4×4 / Monospace', utilitaire:'Van / Utilitaire'})[code] || code;
+  return ({citadine:'Citadine', berline:'Berline / Break', suv:'SUV / Familial / Monospace', utilitaire:'Van / Utilitaire'})[code] || code;
 }
 function statusLabel(s) {
   return ({pending:'En attente', confirmed:'Confirmée', taken:'Prise en charge', in_storage:'En stock', returned:'Restituée', cancelled:'Annulée'})[s] || s;
