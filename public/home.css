@@ -366,18 +366,27 @@ body.home .wash-option-badge { background:var(--amber-400); color:#020617; }
 body.home section[id] { scroll-margin-top:76px; }
 @media (min-width:768px) { body.home section[id] { scroll-margin-top:88px; } }
 
-/* ─── BANDEAU CODE PROMO : collé en bas, au-dessus de la barre de réservation ─── */
-body.home .promo-banner { bottom:calc(12px + env(safe-area-inset-bottom)); background:var(--royal); border-radius:20px;
-  flex-wrap:wrap; gap:10px 12px; padding:14px 14px 14px 18px; box-shadow:0 14px 34px rgba(2,6,23,.28); }
-body.home .promo-banner p { flex:1 1 200px; font-size:.86rem; }
-body.home .promo-banner-copy { padding:10px 14px; border-radius:100px; font-weight:700; font-size:.8rem; white-space:nowrap;
-  background:rgba(255,255,255,.14); color:#fff; border:1px solid rgba(255,255,255,.35); cursor:pointer; }
-body.home .promo-banner-copy:hover { background:rgba(255,255,255,.22); }
-@media (max-width:700px) {
-  body.home .promo-banner { left:10px; right:10px; }
-  body.home .promo-banner p { flex-basis:100%; }
-  body.home .promo-banner-actions { flex:1 1 100%; }
-  body.home .promo-banner-copy, body.home .promo-banner-use { flex:1; }
+/* ─── BANDEAU CODE PROMO : en bas sur mobile, bandeau pleine largeur en haut sur ordinateur ─── */
+body.home .promo-banner { background:var(--royal); gap:10px 12px; box-shadow:0 14px 34px rgba(2,6,23,.28); }
+body.home .promo-banner p { font-size:.86rem; }
+body.home .promo-banner-copy { display:inline-flex; align-items:center; gap:5px; vertical-align:middle; margin:0 2px;
+  padding:4px 10px; border-radius:100px; font-weight:700; font-size:.75rem; line-height:1.2; font-family:inherit; letter-spacing:0;
+  background:rgba(255,255,255,.16); color:#fff; border:1px solid rgba(255,255,255,.4); cursor:pointer; }
+body.home .promo-banner-copy:hover { background:rgba(255,255,255,.26); }
+body.home .promo-banner-copy svg { width:14px; height:14px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+@media (max-width:767px) {
+  body.home .promo-banner { left:10px; right:10px; bottom:calc(12px + env(safe-area-inset-bottom)); border-radius:20px; padding:14px 14px 14px 18px; }
   body.home:has(.sticky-cta.show) .promo-banner { bottom:calc(88px + env(safe-area-inset-bottom)); }
   body.home.modal-open .promo-banner { display:none; }
+  body.home .promo-banner { flex-wrap:wrap; }
+  body.home .promo-banner p { flex:1 1 100%; }
+  body.home .promo-banner-actions { flex:1 1 100%; }
+  body.home .promo-banner-use { flex:1; }
+}
+@media (min-width:768px) {
+  body.home .promo-banner { position:sticky; top:0; left:auto; right:auto; bottom:auto; z-index:90; max-width:none; margin:0;
+    height:52px; padding:0 20px; border-radius:0; justify-content:center; box-shadow:none; }
+  body.home .promo-banner p { flex:0 1 auto; font-size:.9rem; }
+  body.home:has(#promoBanner:not([hidden])) .h-nav { top:52px; }
+  body.home:has(#promoBanner:not([hidden])) section[id] { scroll-margin-top:140px; }
 }

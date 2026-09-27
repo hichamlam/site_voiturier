@@ -726,7 +726,15 @@ function initPromoBanner(cfg) {
     text.append('Code ');
     const strong = document.createElement('strong');
     strong.textContent = promo.code;
-    text.append(strong, ` : -${remise} sur ${cible}`);
+    // Bouton copier collé au code : icône presse-papier + « Copier ».
+    const copy = document.createElement('button');
+    copy.type = 'button';
+    copy.className = 'promo-banner-copy';
+    copy.id = 'promoBannerCopy';
+    copy.setAttribute('aria-label', 'Copier le code ' + promo.code);
+    copy.addEventListener('click', promoBannerCopy);
+    text.append(strong, ' ', copy, ` : -${remise} sur ${cible}`);
+    promoCopyLabel(copy, false);
   }
 
   STATE.promo = promo;
@@ -754,14 +762,20 @@ function promoBannerUse() {
   openBookingModal();
 }
 
+function promoCopyLabel(btn, copied) {
+  btn.innerHTML = copied
+    ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Copié'
+    : '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>Copier';
+}
+
 function promoBannerCopy() {
   const promo = STATE.promo;
   const btn = document.getElementById('promoBannerCopy');
   if (!promo || !btn) return;
   const done = () => {
-    btn.textContent = 'Code copié ✓';
+    promoCopyLabel(btn, true);
     clearTimeout(btn._t);
-    btn._t = setTimeout(() => { btn.textContent = 'Copier le code'; }, 2500);
+    btn._t = setTimeout(() => promoCopyLabel(btn, false), 2500);
   };
   // Repli execCommand : navigator.clipboard est absent hors HTTPS et sur
   // certains navigateurs intégrés (Instagram, Facebook…).
