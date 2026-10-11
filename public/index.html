@@ -428,9 +428,9 @@ window.VO_CONTACT = {
       </div>
       <span class="h-wash-label" id="h-wash-label">Choisissez votre formule de lavage :</span>
       <div class="h-pills" role="group" aria-labelledby="h-wash-label">
-        <button type="button" class="h-pill" data-home-wash="none" data-desc="Je récupère ma voiture telle quelle." aria-pressed="true" onclick="homeSelectWash('none')"><b>Sans lavage</b><em>0&nbsp;€</em></button><button type="button" class="h-pill" data-home-wash="exterieur" data-desc="Carrosserie, jantes et vitres." aria-pressed="false" onclick="homeSelectWash('exterieur')"><b>Extérieur</b><em>+29&nbsp;€</em></button><button type="button" class="h-pill" data-home-wash="interieur" data-desc="Aspirateur, plastiques et tapis." aria-pressed="false" onclick="homeSelectWash('interieur')"><b>Intérieur</b><em>+49&nbsp;€</em></button><button type="button" class="h-pill rec" data-home-wash="complet" data-desc="Extérieur et intérieur, la formule la plus demandée." aria-pressed="false" onclick="homeSelectWash('complet')"><span class="h-rec">Le plus choisi</span><b>Complet</b><em>+69&nbsp;€</em></button><button type="button" class="h-pill wide" data-home-wash="premium" data-desc="Lavage complet avec désinfection de l&#x27;habitacle." aria-pressed="false" onclick="homeSelectWash('premium')"><b>Premium</b><em>+99&nbsp;€</em></button>
+        <button type="button" class="h-pill" data-home-wash="none" data-desc="Je récupère ma voiture telle quelle." aria-pressed="false" onclick="homeSelectWash('none')"><b>Sans lavage</b><em>0&nbsp;€</em></button><button type="button" class="h-pill" data-home-wash="exterieur" data-desc="Carrosserie, jantes et vitres." aria-pressed="false" onclick="homeSelectWash('exterieur')"><b>Extérieur</b><em>+29&nbsp;€</em></button><button type="button" class="h-pill" data-home-wash="interieur" data-desc="Aspirateur, plastiques et tapis." aria-pressed="false" onclick="homeSelectWash('interieur')"><b>Intérieur</b><em>+49&nbsp;€</em></button><button type="button" class="h-pill rec" data-home-wash="complet" data-desc="Extérieur et intérieur, la formule la plus demandée." aria-pressed="false" onclick="homeSelectWash('complet')"><span class="h-rec">Le plus choisi</span><b>Complet</b><em>+69&nbsp;€</em></button><button type="button" class="h-pill wide" data-home-wash="premium" data-desc="Lavage complet avec désinfection de l&#x27;habitacle." aria-pressed="false" onclick="homeSelectWash('premium')"><b>Premium</b><em>+99&nbsp;€</em></button>
       </div>
-      <p class="h-wash-desc" id="h-wash-desc" aria-live="polite"><b>Sans lavage</b>. Je récupère ma voiture telle quelle.</p>
+      <p class="h-wash-desc" id="h-wash-desc" aria-live="polite">Le lavage est optionnel. Choisissez une formule si vous le souhaitez.</p>
       <div class="h-wash-cta"><button type="button" class="h-btn block" onclick="homeBook()"><span>Réserver avec cette formule</span><svg class="h-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button></div>
       <p class="h-wash-note">Pour les véhicules très sales (boue séchée, poils d'animaux abondants), un supplément peut être demandé sur place. <a href="/lavage-voiture-orly">Détail des lavages</a></p>
     </div>
@@ -611,7 +611,12 @@ window.VO_CONTACT = {
         <h2 class="modal-title">Vos coordonnées</h2>
         <p class="modal-subtitle">Pour vous envoyer la confirmation et vous appeler à l'atterrissage.</p>
 
-        <div class="form-row">
+        <div class="bk-recap" id="bk-dates-recap" hidden>
+          <div class="bk-recap-l"><span class="bk-recap-k">Vos dates</span><b id="bk-recap-text"></b><span id="bk-recap-price" class="bk-recap-price"></span></div>
+          <button type="button" class="bk-recap-edit" onclick="bkEditDates()">Modifier</button>
+        </div>
+        <div id="bk-dates-fields">
+<div class="form-row">
           <div class="form-group">
             <label for="bk-dep-date">Départ<span class="req">*</span></label>
             <input type="date" id="bk-dep-date" required>
@@ -632,6 +637,8 @@ window.VO_CONTACT = {
             <label for="bk-ret-time">Heure</label>
             <input type="time" id="bk-ret-time" value="20:00">
           </div>
+        </div>
+
         </div>
 
         <div class="form-row">

@@ -364,7 +364,29 @@ function openBookingModal(prefilled = false) {
       bkUpdatePriceLive();
     }, 50);
   }
+  bkShowDates(!prefilled);
 }
+
+function bkFmtDate(iso, t) {
+  if (!iso) return '';
+  const d = new Date(iso + 'T12:00:00');
+  const s = d.toLocaleDateString('fr-FR', { weekday:'short', day:'numeric', month:'short' });
+  return s + (t ? ' à ' + t.replace(':', 'h') : '');
+}
+function bkShowDates(editing) {
+  const f = document.getElementById('bk-dates-fields'), r = document.getElementById('bk-dates-recap');
+  if (!f || !r) return;
+  const D = STATE.booking.data;
+  const ok = !editing && D.departure.date && D.return.date;
+  f.hidden = !!ok; r.hidden = !ok;
+  if (ok) {
+    document.getElementById('bk-recap-text').textContent =
+      bkFmtDate(D.departure.date, D.departure.time) + '  →  ' + bkFmtDate(D.return.date, D.return.time);
+    const q = STATE.sim && STATE.sim.quotedPrice;
+    document.getElementById('bk-recap-price').textContent = q ? 'Total ' + q + ' €' : '';
+  }
+}
+function bkEditDates() { bkShowDates(true); }
 
 function closeBookingModal() {
   document.getElementById('bookingModal').classList.remove('open');

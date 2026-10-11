@@ -540,3 +540,13 @@ body.home .review-stars, .h-stars { color:#F5A524; }
   .h-trust-i span { font-size:.7rem; }
 }
 .h-trust-i { justify-content:flex-start; }
+
+/* Rappel des dates dans le tunnel */
+.bk-recap { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 16px; margin-bottom:18px; border-radius:14px; background:var(--royal-50); border:1px solid var(--royal-100); }
+.bk-recap[hidden], #bk-dates-fields[hidden] { display:none !important; }
+.bk-recap-l { display:flex; flex-direction:column; gap:2px; min-width:0; }
+.bk-recap-k { font-size:.75rem; font-weight:700; color:#4B6380; }
+.bk-recap-l b { font-size:.95rem; color:var(--ink); }
+.bk-recap-price { font-size:.85rem; font-weight:800; color:var(--royal-800); }
+.bk-recap-edit { flex-shrink:0; padding:9px 16px; border-radius:10px; border:1.5px solid var(--blue-light); background:#fff; color:var(--royal-800); font-weight:800; font-size:.88rem; }
+.bk-recap-edit:hover { background:#fff; border-color:var(--royal); }
