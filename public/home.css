@@ -550,3 +550,28 @@ body.home .review-stars, .h-stars { color:#F5A524; }
 .bk-recap-price { font-size:.85rem; font-weight:800; color:var(--royal-800); }
 .bk-recap-edit { flex-shrink:0; padding:9px 16px; border-radius:10px; border:1.5px solid var(--blue-light); background:#fff; color:var(--royal-800); font-weight:800; font-size:.88rem; }
 .bk-recap-edit:hover { background:#fff; border-color:var(--royal); }
+
+/* ===== RETOUCHES 2 : héros allégé, terminaux informatifs ===== */
+.h-hero { padding:52px 0 72px; background:linear-gradient(180deg,#07508F 0%,#0A6CC2 38%,#5CB3EA 74%,#F8FAFC 100%); }
+.h-hero h1 { font-size:clamp(2.5rem, 11.5vw, 4.4rem); line-height:1.02; text-shadow:0 2px 24px rgba(4,40,80,.25); }
+.h-hero h1 .hl { color:#BFE3FF; }
+.h-hero-sub { font-size:1rem; font-weight:500; color:rgba(255,255,255,.85); margin-top:18px; }
+.h-hero .h-card { margin-top:32px; }
+.h-card-top { padding-bottom:14px; }
+.h-card-top > b { font-size:1.15rem; font-weight:900; color:var(--ink); }
+.h-flabel { font-size:.8rem; font-weight:800; color:#4B6380; letter-spacing:0; }
+.h-sum-l small { font-weight:600; }
+@media (min-width:640px){ .h-hero { padding:72px 0 96px; } .h-hero-sub { font-size:1.12rem; } }
+
+.h-term { min-height:0; padding:20px; gap:8px; border-radius:18px; background:#fff; border:1px solid var(--line); box-shadow:none; cursor:default; }
+.h-term:hover { transform:none; box-shadow:none; border-color:var(--line); }
+.h-term b { font-size:1.05rem; }
+.h-term span { font-size:.84rem; line-height:1.5; color:#475569; }
+.h-term.hours { background:var(--royal-50); border-color:#CFE6F8; }
+.h-term.hours b { color:var(--ink); }
+.h-term.hours span { color:#475569; }
+.h-terms-note { max-width:620px; margin:20px auto 0; text-align:center; font-size:.92rem; line-height:1.55; color:#475569; }
+.h-hero h1 { font-size:clamp(2.35rem, 10.4vw, 4.4rem); text-wrap:balance; }
+.h-hero h1 br { display:none; }
+.h-hero h1 .hl { display:block; margin-top:4px; }
+.h-term { padding:18px 16px; }

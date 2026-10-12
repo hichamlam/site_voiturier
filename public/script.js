@@ -1092,7 +1092,7 @@ async function homeQuote(userAction = true) {
   STATE.sim.quotedPrice = 0;
   const washLine = document.getElementById('h-sum-wash');
   const wash = STATE.booking.data.wash.type;
-  if (washLine) washLine.textContent = 'Paris-Orly, ' + (wash === 'none' ? 'sans lavage' : HOME_WASH_LABEL[wash] + ' inclus');
+  if (washLine) washLine.textContent = (wash === 'none' ? 'Sans lavage' : HOME_WASH_LABEL[wash].replace(/^./, c => c.toUpperCase()) + ' inclus');
 
   if (!homeReadInputs()) {
     homeQuoteSeq++;

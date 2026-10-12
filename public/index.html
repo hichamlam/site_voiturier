@@ -141,26 +141,25 @@ window.VO_CONTACT = {
   </div>
   <div class="h-wrap">
     <div class="h-hero-in">
-      <p class="h-hero-place">Voiturier à l'aéroport Paris-Orly, terminaux 1 à 4</p>
       <h1 id="h-title">Voyagez l'esprit léger.<br><span class="hl">On s'occupe de tout.</span></h1>
-      <p class="h-hero-sub">Votre voiturier récupère votre voiture au dépose-minute et vous la rend au même endroit à votre retour, bagages chargés.</p>
+      <p class="h-hero-sub">Votre voiturier à Paris-Orly, terminaux 1 à 4.</p>
 
       <div class="h-card" id="bookingHeroCard">
         <div class="h-card-top">
-          <span><b>Votre prix en 10 secondes</b><small>Prix unique, tout compris, 7j/7</small></span>
+          <b>Votre prix</b>
           <span class="h-badge-ok">Dès 29&nbsp;€</span>
         </div>
 
         <div class="h-dates">
           <div class="h-dgroup">
-            <span class="h-flabel">Aller, dépose au terminal</span>
+            <span class="h-flabel">Départ</span>
             <div class="h-frow">
               <label class="h-field"><span class="h-sr">Date de départ</span><input type="date" id="sim-dep-date" onchange="homeQuote()"></label>
               <label class="h-field time"><span class="h-sr">Heure de départ</span><input type="time" id="sim-dep-time" value="08:00" onchange="homeQuote()"></label>
             </div>
           </div>
           <div class="h-dgroup">
-            <span class="h-flabel">Retour, restitution au terminal</span>
+            <span class="h-flabel">Retour</span>
             <div class="h-frow">
               <label class="h-field"><span class="h-sr">Date de retour</span><input type="date" id="sim-ret-date" onchange="homeQuote()"></label>
               <label class="h-field time"><span class="h-sr">Heure de retour</span><input type="time" id="sim-ret-time" value="20:00" onchange="homeQuote()"></label>
@@ -169,8 +168,8 @@ window.VO_CONTACT = {
         </div>
 
         <div class="h-sum" aria-live="polite">
-          <div class="h-sum-l"><b id="sim-result-meta">Calcul du tarif…</b><small id="h-sum-wash">Paris-Orly, sans lavage</small></div>
-          <div class="h-sum-r"><small>Total à payer</small><span class="h-price" id="sim-result-amount"></span></div>
+          <div class="h-sum-l"><b id="sim-result-meta">Calcul du tarif…</b><small id="h-sum-wash">Sans lavage</small></div>
+          <div class="h-sum-r"><small>Total</small><span class="h-price" id="sim-result-amount"></span></div>
         </div>
 
         <div class="h-card-btns">
@@ -178,17 +177,12 @@ window.VO_CONTACT = {
           <a class="h-btn-tel" data-phone hidden href="#"><span>Appeler le <span data-phone-label></span></span></a>
         </div>
 
-        <div class="h-card-foot">
-          <span>Paiement sécurisé</span>
-          <span>Confirmation immédiate</span>
-          <span>Annulation étudiée au cas par cas</span>
-        </div>
       </div>
 
       <div class="h-trust">
-        <div class="h-trust-i"><b>&minus;70&nbsp;%</b><span>jusqu'à, face aux parkings officiels</span></div>
-        <div class="h-trust-i"><b>1h30</b><span>gagnée en moyenne, sans navette</span></div>
-        <div class="h-trust-i"><b>+9&nbsp;000</b><span>voyageurs nous ont fait confiance</span></div>
+        <div class="h-trust-i"><b>&minus;70&nbsp;%</b><span>vs parkings d'Orly</span></div>
+        <div class="h-trust-i"><b>1h30</b><span>gagnée, sans navette</span></div>
+        <div class="h-trust-i"><b>+9&nbsp;000</b><span>voyageurs servis</span></div>
       </div>
     </div>
   </div>
@@ -370,7 +364,7 @@ window.VO_CONTACT = {
     </div>
     <div class="h-prices reveal">
       <div class="h-price-card"><div><b>1 jour</b><span>Idéal pour un aller-retour rapide</span></div><div class="amt"><small>Dès</small><strong>29&nbsp;€</strong></div></div>
-      <div class="h-price-card"><div><b>1 semaine</b><span>Le prix par jour baisse avec la durée</span></div><div class="amt"><small>Dès</small><strong>89&nbsp;€</strong></div></div>
+      <div class="h-price-card"><div><b>1 semaine</b><span>Le prix par jour baisse avec la durée</span></div><div class="amt"><small>Dès</small><strong>79&nbsp;€</strong></div></div>
     </div>
     <p class="h-prices-note">Votre prix exact s'affiche dès que vous saisissez vos dates en haut de page. <a href="/tarifs">Voir la grille des tarifs</a></p>
   </div>
@@ -464,11 +458,12 @@ window.VO_CONTACT = {
       <p>Prise en charge et restitution au dépose-minute d'Orly 1, 2, 3 et 4.</p>
     </div>
     <div class="h-terms reveal">
-      <a class="h-term" href="/voiturier-orly-1-2"><b>Orly 1 et 2</b><span>Dépose-minute d'Orly 1-2</span><span class="go">Voir le terminal →</span></a>
-      <a class="h-term" href="/voiturier-orly-3"><b>Orly 3</b><span>Dépose-minute d'Orly 3</span><span class="go">Voir le terminal →</span></a>
-      <a class="h-term" href="/voiturier-orly-4"><b>Orly 4</b><span>Dépose-minute d'Orly 4</span><span class="go">Voir le terminal →</span></a>
-      <a class="h-term hours" href="/horaires-voiturier-orly"><b>7j/7, de 4h à minuit</b><span>Nos horaires de prise en charge</span><span class="go">Voir les horaires →</span></a>
+      <div class="h-term"><b>Orly 1 et 2</b><span>Ancien Orly Ouest. Rendez-vous au dépose-minute.</span></div>
+      <div class="h-term"><b>Orly 3</b><span>Entre Orly 1-2 et Orly 4. Rendez-vous au dépose-minute.</span></div>
+      <div class="h-term"><b>Orly 4</b><span>Ancien Orly Sud. Rendez-vous au dépose-minute.</span></div>
+      <div class="h-term hours"><b>Horaires</b><span>7j/7, de 4h à minuit. Point exact envoyé par email.</span></div>
     </div>
+    <p class="h-terms-note reveal">Au retour, prévenez-nous à l'atterrissage : votre voiture vous attend devant votre terminal d'arrivée.</p>
   </div>
 </section>
 
