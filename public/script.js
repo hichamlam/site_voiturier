@@ -126,7 +126,8 @@ const obs = new IntersectionObserver(es => {
 }, { threshold: 0.12 });
 document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 
-/* AVIS — données */
+/* AVIS : coller ici de VRAIS avis Google, mot pour mot (prénom + initiale, date).
+   Ne pas inventer d'avis : c'est interdit (pratique commerciale trompeuse) et ça se voit. */
 const REVIEWS = [
   { name:'Marie C.',   trip:'Bali · 14 jours',     text:'Voyage à Bali, retour épuisée à 6h du matin. La voiture m\'attendait, propre, à l\'endroit prévu. C\'est la deuxième fois. Ce sera la troisième.' },
   { name:'Thomas R.',  trip:'Voyageur fréquent',   text:'Je voyage chaque mois pour le travail. Ils savent mon prénom, ma plaque, mes habitudes. C\'est ça, le vrai service premium.' },
@@ -245,7 +246,7 @@ async function simSelectCategory(code, btn) {
 
   STATE.sim.quotedPrice = res.total;
   document.getElementById('sim-result-amount').innerHTML = `${res.total}<span class="cur">€</span>`;
-  document.getElementById('sim-result-meta').textContent = `${res.days} jour${res.days > 1 ? 's' : ''} · ${categoryLabel(code)}`;
+  document.getElementById('sim-result-meta').textContent = `${res.days} jour${res.days > 1 ? 's' : ''}`;
 }
 
 function simBack() { simGoToStep(STATE.sim.step - 1); }
@@ -363,7 +364,29 @@ function openBookingModal(prefilled = false) {
       bkUpdatePriceLive();
     }, 50);
   }
+  bkShowDates(!prefilled);
 }
+
+function bkFmtDate(iso, t) {
+  if (!iso) return '';
+  const d = new Date(iso + 'T12:00:00');
+  const s = d.toLocaleDateString('fr-FR', { weekday:'short', day:'numeric', month:'short' });
+  return s + (t ? ' à ' + t.replace(':', 'h') : '');
+}
+function bkShowDates(editing) {
+  const f = document.getElementById('bk-dates-fields'), r = document.getElementById('bk-dates-recap');
+  if (!f || !r) return;
+  const D = STATE.booking.data;
+  const ok = !editing && D.departure.date && D.return.date;
+  f.hidden = !!ok; r.hidden = !ok;
+  if (ok) {
+    document.getElementById('bk-recap-text').textContent =
+      bkFmtDate(D.departure.date, D.departure.time) + '  →  ' + bkFmtDate(D.return.date, D.return.time);
+    const q = STATE.sim && STATE.sim.quotedPrice;
+    document.getElementById('bk-recap-price').textContent = q ? 'Total ' + q + ' €' : '';
+  }
+}
+function bkEditDates() { bkShowDates(true); }
 
 function closeBookingModal() {
   document.getElementById('bookingModal').classList.remove('open');
@@ -400,33 +423,29 @@ function markError(id) {
   if (inp) inp.closest('.form-group').classList.add('has-error');
 }
 
-/* Étape 1 : Voyage + véhicule */
+/* Étape 1 : dates + coordonnées */
 async function bkValidateStep1() {
   clearErrors();
   let ok = true;
-  const requiredFields = ['bk-dep-date','bk-ret-date','bk-brand','bk-model','bk-plate'];
-  requiredFields.forEach(id => {
-    const v = document.getElementById(id).value.trim();
-    if (!v) { markError(id); ok = false; }
+  ['bk-dep-date','bk-ret-date','bk-firstname','bk-lastname','bk-phone'].forEach(id => {
+    if (!document.getElementById(id).value.trim()) { markError(id); ok = false; }
   });
   const dep = document.getElementById('bk-dep-date').value;
   const ret = document.getElementById('bk-ret-date').value;
-  if (dep && ret && new Date(ret) < new Date(dep)) {
-    markError('bk-ret-date'); ok = false;
-  }
+  if (dep && ret && new Date(ret) < new Date(dep)) { markError('bk-ret-date'); ok = false; }
+  const email = document.getElementById('bk-email').value.trim();
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { markError('bk-email'); ok = false; }
   if (!ok) return false;
 
-  // Sauvegarde
   STATE.booking.data.departure.date = dep;
   STATE.booking.data.departure.time = document.getElementById('bk-dep-time').value;
-  STATE.booking.data.departure.terminal = document.getElementById('bk-dep-terminal').value;
   STATE.booking.data.return.date = ret;
   STATE.booking.data.return.time = document.getElementById('bk-ret-time').value;
-  STATE.booking.data.return.terminal = document.getElementById('bk-ret-terminal').value;
-  STATE.booking.data.car.brand = document.getElementById('bk-brand').value.trim();
-  STATE.booking.data.car.model = document.getElementById('bk-model').value.trim();
-  STATE.booking.data.car.color = document.getElementById('bk-color').value.trim();
-  STATE.booking.data.car.plate = document.getElementById('bk-plate').value.trim().toUpperCase();
+  STATE.booking.data.customer.firstname = document.getElementById('bk-firstname').value.trim();
+  STATE.booking.data.customer.lastname = document.getElementById('bk-lastname').value.trim();
+  STATE.booking.data.customer.email = email;
+  STATE.booking.data.customer.phone = document.getElementById('bk-phone').value.trim();
+  STATE.booking.data.customer.flight = document.getElementById('bk-flight').value.trim().toUpperCase();
   return true;
 }
 
@@ -436,22 +455,22 @@ async function bkNext1() {
   bkUpdatePriceLive();
 }
 
-/* Étape 2 : Coordonnées + options */
+/* Étape 2 : véhicule + options (prix unique, pas de catégorie) */
 function bkValidateStep2() {
   clearErrors();
   let ok = true;
-  ['bk-firstname','bk-lastname','bk-phone'].forEach(id => {
+  ['bk-brand','bk-model','bk-plate'].forEach(id => {
     if (!document.getElementById(id).value.trim()) { markError(id); ok = false; }
   });
-  const email = document.getElementById('bk-email').value.trim();
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { markError('bk-email'); ok = false; }
   if (!ok) return false;
-
-  STATE.booking.data.customer.firstname = document.getElementById('bk-firstname').value.trim();
-  STATE.booking.data.customer.lastname = document.getElementById('bk-lastname').value.trim();
-  STATE.booking.data.customer.email = email;
-  STATE.booking.data.customer.phone = document.getElementById('bk-phone').value.trim();
-  STATE.booking.data.customer.flight = document.getElementById('bk-flight').value.trim();
+  const term = document.getElementById('bk-dep-terminal').value;
+  STATE.booking.data.departure.terminal = term;
+  STATE.booking.data.return.terminal = term;
+  STATE.booking.data.car.categoryCode = 'citadine';
+  STATE.booking.data.car.brand = document.getElementById('bk-brand').value.trim();
+  STATE.booking.data.car.model = document.getElementById('bk-model').value.trim();
+  STATE.booking.data.car.color = document.getElementById('bk-color').value.trim();
+  STATE.booking.data.car.plate = document.getElementById('bk-plate').value.trim().toUpperCase();
   return true;
 }
 
@@ -991,8 +1010,17 @@ function trackPurchase(ref, value) {
     const l = document.getElementById('gsLink');
     if (l) { l.href = gp; l.hidden = false; }
   }
+  if (phoneRaw) {
+    const tel = phoneRaw.replace(/[^+0-9]/g, '');
+    document.querySelectorAll('[data-phone]').forEach(a => { a.href = 'tel:' + tel; a.hidden = false; });
+    document.querySelectorAll('[data-phone-label]').forEach(s => { s.textContent = phoneRaw; });
+  }
   const wa = (C.WHATSAPP || '').replace(/[^0-9]/g, '');
   if (wa) {
+    document.querySelectorAll('[data-whatsapp]').forEach(a => {
+      a.href = 'https://wa.me/' + wa + '?text=' + encodeURIComponent('Bonjour, j\'ai une question sur le voiturier à Orly.');
+      a.hidden = false;
+    });
     const f = document.getElementById('waFloat');
     if (f) {
       f.href = 'https://wa.me/' + wa + '?text='
@@ -1064,7 +1092,7 @@ async function homeQuote(userAction = true) {
   STATE.sim.quotedPrice = 0;
   const washLine = document.getElementById('h-sum-wash');
   const wash = STATE.booking.data.wash.type;
-  if (washLine) washLine.textContent = 'Paris-Orly · ' + (wash === 'none' ? 'sans lavage' : HOME_WASH_LABEL[wash] + ' inclus');
+  if (washLine) washLine.textContent = (wash === 'none' ? 'Sans lavage' : HOME_WASH_LABEL[wash].replace(/^./, c => c.toUpperCase()) + ' inclus');
 
   if (!homeReadInputs()) {
     homeQuoteSeq++;
@@ -1100,7 +1128,7 @@ async function homeQuote(userAction = true) {
   STATE.sim.quotedPrice = res.total;
   amount.className = 'h-price';
   amount.innerHTML = `${res.total}<span class="cur">€</span>`;
-  meta.textContent = `${res.days} jour${res.days > 1 ? 's' : ''} · ${categoryLabel(s.categoryCode)}`;
+  meta.textContent = `${res.days} jour${res.days > 1 ? 's' : ''}`;
   homeSticky(res.total);
   const key = JSON.stringify(payload);
   if (homeTouched && key !== homeLastTracked) {
@@ -1135,7 +1163,7 @@ function homeSelectWash(key) {
   if (desc && pill) {
     desc.innerHTML = '';
     const b = document.createElement('b'); b.textContent = label;
-    desc.append(b, ' — ' + pill.dataset.desc);
+    desc.append(b, '. ' + pill.dataset.desc);
   }
   homeQuote();
 }
@@ -1179,5 +1207,13 @@ function homeBook() {
 })();
 
 document.addEventListener('DOMContentLoaded', () => {
+  const d = document.getElementById('sim-dep-date'), r = document.getElementById('sim-ret-date');
+  if (d && r && !d.value && !r.value) {
+    const iso = x => x.toISOString().split('T')[0];
+    const a = new Date(); a.setDate(a.getDate() + 1);
+    const b = new Date(a); b.setDate(b.getDate() + 7);
+    d.value = iso(a); r.value = iso(b);
+    d.min = iso(new Date()); r.min = iso(new Date());
+  }
   if (document.getElementById('bookingHeroCard')) homeQuote(false);
 });

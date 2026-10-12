@@ -1,4 +1,4 @@
-const CACHE = 'dv-admin-v1';
+const CACHE = 'dv-admin-v2';
 const SHELL = ['/admin/', '/admin/manifest.json', '/admin/icons/icon-192.png', '/admin/icons/icon-512.png'];
 
 self.addEventListener('install', (event) => {

@@ -15,9 +15,10 @@ Direct Voiturier permet aux voyageurs au départ de l'aéroport Paris-Orly (ORY)
 - [Voiturier Orly 1, 2, 3 et 4](https://www.directvoiturier.com/voiturier-orly-terminaux): prise en charge au dépose-minute des terminaux Orly 1-2, Orly 3 et Orly 4, restitution au terminal d'arrivée.
 - [Voiturier Orly 1 et Orly 2](https://www.directvoiturier.com/voiturier-orly-1-2): prise en charge au dépose-minute d'Orly 1-2.
 - [Voiturier Orly 3](https://www.directvoiturier.com/voiturier-orly-3): prise en charge au dépose-minute d'Orly 3.
+- [Voiturier Transavia Orly](https://www.directvoiturier.com/voiturier-transavia-orly): voiturier pour les vols Transavia (Orly 1 ou Orly 2).
 - [Voiturier Orly 4](https://www.directvoiturier.com/voiturier-orly-4): prise en charge au dépose-minute d'Orly 4.
 - [Horaires du voiturier à Orly](https://www.directvoiturier.com/horaires-voiturier-orly): service 7 jours sur 7, de 4h00 à minuit.
-- [Parking Orly pas cher](https://www.directvoiturier.com/parking-orly-pas-cher): tarifs dès 29€ pour 24h et dès 89€ la semaine, prix dégressif et tout compris, identique en ligne ou sur place.
+- [Parking Orly pas cher](https://www.directvoiturier.com/parking-orly-pas-cher): tarifs dès 29€ pour 24h et dès 79€ la semaine, prix dégressif et tout compris, identique en ligne ou sur place.
 - [Code promo voiturier Orly](https://www.directvoiturier.com/code-promo-voiturier-orly): code BIENVENUE, -10% sur la première réservation (vérifiée par adresse email), réduction affichée avant paiement, en ligne ou sur place.
 - [Suivi de réservation voiturier Orly](https://www.directvoiturier.com/suivi-reservation-voiturier-orly): espace client personnel, statut de la réservation à chaque étape (confirmée, prise en charge, stationnée, restituée), notifications automatiques, factures.
 - [Parking longue durée Orly](https://www.directvoiturier.com/parking-longue-duree-orly): gardiennage sous vidéosurveillance 24h/24, parking couvert et lavage en option.
@@ -29,7 +30,7 @@ Direct Voiturier permet aux voyageurs au départ de l'aéroport Paris-Orly (ORY)
 - [Parking Orly vacances de la Toussaint 2026](https://www.directvoiturier.com/parking-orly-vacances-toussaint): Partir d'Orly du 17 octobre au 2 novembre 2026 sans stress.
 - [Parking Orly vacances de Noël 2026](https://www.directvoiturier.com/parking-orly-vacances-noel): Partir d'Orly pour les fêtes, du 19 décembre 2026 au 4 janvier 2027.
 - [Parking Orly week-end](https://www.directvoiturier.com/parking-orly-week-end): Un voiturier pour un week-end ou un court séjour, dès 29€ pour 24h.
-- [Parking Orly une semaine](https://www.directvoiturier.com/parking-orly-une-semaine): Une semaine de voyage, dès 89€ tout compris.
+- [Parking Orly une semaine](https://www.directvoiturier.com/parking-orly-une-semaine): Une semaine de voyage, dès 79€ tout compris.
 - [Parking couvert Orly](https://www.directvoiturier.com/parking-couvert-orly): Votre voiture à l'abri des intempéries pendant votre voyage.
 - [Réserver un voiturier à Orly](https://www.directvoiturier.com/reserver-voiturier-orly): Tarif en 30 secondes, paiement en ligne ou sur place, confirmation par email.
 - [Vol retardé à Orly : que devient votre voiture ?](https://www.directvoiturier.com/voiturier-orly-vol-retarde): Suivi du numéro de vol et adaptation à votre heure d'atterrissage.
