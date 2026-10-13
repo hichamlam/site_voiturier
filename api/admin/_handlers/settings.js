@@ -31,6 +31,7 @@ const FIELDS = {
   contact_phone: { label: 'Téléphone service client', type: 'phone', maxLen: 30 },
   contact_whatsapp: { label: 'Numéro WhatsApp', type: 'phone', maxLen: 30 },
   contact_email: { label: 'Email de contact', type: 'email', maxLen: 200 },
+  notification_email: { label: 'Email de réception des réservations', type: 'email', maxLen: 200 },
   contact_address: { label: 'Adresse postale / siège', type: 'text', maxLen: 300 },
   google_business_url: { label: 'Lien de la fiche Google Business Profile', type: 'url', maxLen: 500 },
   insurance_company: { label: "Nom de l'assureur", type: 'text', maxLen: 200 },

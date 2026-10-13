@@ -390,3 +390,14 @@ export function calculateLateFee(scheduledTime, actualTime) {
   const extraHours = Math.ceil((lateMinutes - 60) / 60);
   return { lateMinutes, fee: 10 + extraHours * 15 };
 }
+
+// Adresse qui reçoit les notifications de réservation : réglage admin
+// (settings.notification_email) > variable ADMIN_EMAIL > contact@.
+export async function getNotificationEmail() {
+  try {
+    const { data } = await supabase.from('settings').select('value').eq('key', 'notification_email').maybeSingle();
+    const v = (data?.value || '').trim();
+    if (v) return v;
+  } catch {}
+  return process.env.ADMIN_EMAIL || 'contact@directvoiturier.com';
+}

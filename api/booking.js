@@ -2,7 +2,7 @@
  * POST /api/booking — paiement sur place
  */
 import { Resend } from 'resend';
-import { supabase, calculatePrice, checkDatesAvailable, checkVehicleAllowed, upsertClient } from './_lib.js';
+import { supabase, calculatePrice, checkDatesAvailable, checkVehicleAllowed, upsertClient, getNotificationEmail } from './_lib.js';
 import { clientEmailHTML, adminEmailHTML } from './_emails.js';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -106,7 +106,7 @@ export default async function handler(req, res) {
     // Emails
     if (process.env.RESEND_API_KEY) {
       const FROM = process.env.FROM_EMAIL || 'Direct Voiturier <contact@directvoiturier.com>';
-      const ADMIN = process.env.ADMIN_EMAIL || 'contact@directvoiturier.com';
+      const ADMIN = await getNotificationEmail();
       const ctx = {
         reference, total: price.total, customer, car, dep: departure, ret, wash: wash || { type: 'none' },
         options, surchargesDetail: price.surchargesDetail, paymentMode: 'sur place',
