@@ -1060,8 +1060,14 @@ async function homeQuote(userAction = true) {
   if (!homeReadInputs()) {
     homeQuoteSeq++;
     amount.className = 'h-price muted';
-    amount.textContent = 'Vérifiez vos dates';
-    meta.textContent = 'Le retour doit suivre le départ';
+    if (!STATE.sim.depDate || !STATE.sim.retDate) {
+      // Aucune date choisie : on n'affiche aucun prix
+      amount.textContent = '—';
+      meta.textContent = 'Choisissez vos dates';
+    } else {
+      amount.textContent = 'Vérifiez vos dates';
+      meta.textContent = 'Le retour doit suivre le départ';
+    }
     homeSticky(null);
     return;
   }
@@ -1171,11 +1177,9 @@ function homeBook() {
 
 document.addEventListener('DOMContentLoaded', () => {
   const d = document.getElementById('sim-dep-date'), r = document.getElementById('sim-ret-date');
-  if (d && r && !d.value && !r.value) {
+  if (d && r) {
+    // Pas de dates pré-remplies : le prix s'affiche seulement quand le client choisit ses dates
     const iso = x => x.toISOString().split('T')[0];
-    const a = new Date(); a.setDate(a.getDate() + 1);
-    const b = new Date(a); b.setDate(b.getDate() + 7);
-    d.value = iso(a); r.value = iso(b);
     d.min = iso(new Date()); r.min = iso(new Date());
   }
   if (document.getElementById('bookingHeroCard')) homeQuote(false);
