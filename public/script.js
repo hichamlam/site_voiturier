@@ -1188,3 +1188,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   if (document.getElementById('bookingHeroCard')) homeQuote(false);
 });
+
+(function(){ var t=document.getElementById('faqToggle'), x=document.getElementById('faqExtra'); if(!t||!x) return;
+  t.addEventListener('click', function(){ var open=x.hidden; x.hidden=!open; t.setAttribute('aria-expanded', open); t.textContent= open ? 'Masquer les questions' : 'Voir les 7 questions'; });
+})();

@@ -666,3 +666,42 @@ body.home .review-stars, .h-stars { color:#F5A524; }
 .h-pill[aria-pressed="true"]::before { border-color:var(--royal); background:radial-gradient(var(--royal) 46%, transparent 52%); }
 .h-pill[aria-pressed="true"] em { color:var(--royal-800); }
 .h-wash-desc { font-size:.9rem; }
+
+/* ===== Sections du bas allégées : avis, terminaux, FAQ + contact, bandeau final ===== */
+.h-reviews { padding:40px 0; }
+.h-reviews .h-head { margin-bottom:14px; }
+.h-rating { margin-bottom:18px; padding:10px 16px; }
+body.home .review-card { width:280px; padding:16px; gap:8px; border-radius:20px; }
+body.home .review-avatar { width:38px; height:38px; border-radius:12px; }
+@media (min-width:640px) { body.home .review-card { width:330px; } .h-reviews { padding:48px 0; } }
+#terminaux { padding-top:40px; padding-bottom:28px; }
+#terminaux .h-head { margin-bottom:16px; }
+.h-tlist { grid-template-columns:repeat(3,1fr); gap:8px; max-width:640px; }
+.h-trow { display:block; text-align:center; padding:12px 6px; border-radius:14px; }
+.h-trow b { font-size:.95rem; }
+.h-trow span { font-size:.72rem; line-height:1.3; }
+@media (min-width:700px) { .h-trow { padding:14px 10px; } .h-trow b { font-size:1.02rem; } .h-trow span { font-size:.82rem; } }
+.h-thours { display:block; background:none; padding:0; margin:12px auto 0; text-align:center; font-size:.82rem; max-width:640px; }
+#faq { padding-bottom:28px; }
+#faq .h-head { margin-bottom:16px; }
+.h-faq { gap:8px; }
+.h-faq summary { padding:13px 14px; font-size:.92rem; }
+.h-faq .faq-body { padding:0 14px 14px; }
+.h-faq-extra { display:grid; gap:8px; }
+.h-faq-extra[hidden] { display:none; }
+.h-faq-more { margin-top:12px; }
+.h-faq-more button { background:none; border:0; font:inherit; font-size:.9rem; font-weight:800; color:var(--royal); text-decoration:underline; text-underline-offset:3px; cursor:pointer; }
+.h-contact-bar { max-width:760px; margin:16px auto 0; padding:10px 14px; border-radius:16px; background:var(--royal-50); display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+.h-contact-bar > b { font-size:.9rem; font-weight:900; color:var(--ink); }
+.h-contact-bar .h-contact-btns { display:flex; gap:6px; max-width:none; margin:0; grid-template-columns:none; }
+.h-contact-bar .h-contact-btns a { min-height:0; padding:8px 14px; border-radius:10px; font-size:.82rem; font-weight:800; background:#fff; color:var(--royal); }
+.h-contact-bar .h-contact-btns a.h-btn-call { background:var(--royal); color:#fff; }
+.h-contact-bar .h-contact-btns a[hidden] { display:none; }
+.h-final { padding-bottom:40px; }
+.h-final-in { padding:26px 18px; }
+.h-final-in h2 { font-size:clamp(1.4rem,5vw,2rem); }
+.h-final-btns { margin-top:16px; }
+.h-final-in p { display:none; }
+#faq { padding-bottom:40px; }
+.h-rating { gap:4px 12px; }
+.h-rating-t { font-size:.8rem; }

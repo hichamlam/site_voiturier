@@ -228,7 +228,6 @@ window.VO_CONTACT = {
   <div class="h-wrap">
     <div class="h-head reveal">
       <h2>Ils nous ont confié leur voiture</h2>
-      <p>Familles, voyageurs seuls, seniors ou déplacements pro : la même équipe vous accueille à l'aller et au retour.</p>
     </div>
     <div class="h-rating reveal">
       <span class="h-rating-n">4,6<small>/5</small></span>
@@ -246,38 +245,22 @@ window.VO_CONTACT = {
 <section class="h-section" id="terminaux">
   <div class="h-wrap">
     <div class="h-head reveal">
-      <h2>Votre voiturier vous attend à votre terminal</h2>
-      <p>Rendez-vous au dépose-minute, à l'aller comme au retour.</p>
+      <h2>Retrouvez-nous à Orly</h2>
     </div>
     <div class="h-tlist reveal">
-      <div class="h-trow"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></i><div><b>Orly 1 et 2</b><span>Ancien Orly Ouest</span></div></div>
-      <div class="h-trow"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></i><div><b>Orly 3</b><span>Entre Orly 1-2 et Orly 4</span></div></div>
-      <div class="h-trow"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></i><div><b>Orly 4</b><span>Ancien Orly Sud</span></div></div>
+      <div class="h-trow"><b>Orly 1 et 2</b><span>Ancien Orly Ouest</span></div>
+      <div class="h-trow"><b>Orly 3</b><span>Entre Orly 1-2 et 4</span></div>
+      <div class="h-trow"><b>Orly 4</b><span>Ancien Orly Sud</span></div>
     </div>
-    <p class="h-thours reveal"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span><b>7j/7, de 4h à minuit.</b> Point exact envoyé par email. Au retour, prévenez-nous à l'atterrissage.</span></p>
+    <p class="h-thours reveal"><b>7j/7, de 4h à minuit.</b> Point exact envoyé par email. Au retour, prévenez-nous à l'atterrissage.</p>
   </div>
 </section>
 
-<!-- CONTACT DIRECT -->
-<section class="h-section h-contact" id="contact">
-  <div class="h-wrap">
-    <div class="h-contact-in reveal">
-      <h2>Une question avant de réserver ?</h2>
-      <p>Une vraie personne vous répond, 7j/7 de 4h à minuit. Vol très tôt, retour tardif, grand véhicule : appelez, on regarde ensemble.</p>
-      <div class="h-contact-btns">
-        <a class="h-btn-call" data-phone hidden href="#"><span>Appeler le <span data-phone-label></span></span></a>
-        <a class="h-btn-wa" data-whatsapp hidden href="#" target="_blank" rel="noopener">Écrire sur WhatsApp</a>
-      </div>
-      <a class="h-contact-mail" href="mailto:contact@directvoiturier.com">ou par email : contact@directvoiturier.com</a>
-    </div>
-  </div>
-</section>
-
-<!-- FAQ — transparence tarifs / retards / annulation (alignée sur les CGV) -->
+<!-- FAQ + CONTACT -->
 <section class="h-section" id="faq" style="padding-top:0">
   <div class="h-wrap">
     <div class="h-head reveal">
-      <h2>Tout est clair avant de réserver</h2>
+      <h2>Questions fréquentes</h2>
     </div>
     <div class="h-faq reveal">
       <details>
@@ -292,24 +275,34 @@ window.VO_CONTACT = {
         <summary>Puis-je annuler ou modifier ma réservation ?</summary>
         <div class="faq-body">Les réservations sont fermes selon nos conditions générales, mais nous étudions chaque demande au cas par cas et faisons un geste quand c'est possible, surtout si vous nous prévenez au moins 7 jours avant. Écrivez-nous à contact@directvoiturier.com.</div>
       </details>
-      <details>
+      <div class="h-faq-extra" id="faqExtra" hidden>
+        <details>
         <summary>Comment se passe la prise en charge à Orly ?</summary>
         <div class="faq-body">Après votre réservation, vous recevez un email avec toutes les consignes. Le jour J, votre voiturier vous accueille directement au dépose-minute de votre terminal.</div>
       </details>
-      <details>
+        <details>
         <summary>Quels sont vos horaires ?</summary>
         <div class="faq-body">Nos voituriers interviennent 7 jours sur 7, de 4h00 à minuit. Si votre vol part avant 4h00 ou atterrit après minuit, écrivez-nous avant de réserver à contact@directvoiturier.com. <a href="/horaires-voiturier-orly">Voir nos horaires</a></div>
       </details>
-      <details>
+        <details>
         <summary>Comment payer ?</summary>
         <div class="faq-body" id="faq-payment">En ligne par carte bancaire via Stripe (paiement sécurisé, confirmation immédiate) ou sur place en carte ou espèces. Le montant est identique dans les deux cas.</div>
       </details>
-      <details>
+        <details>
         <summary>Où est garée ma voiture pendant mon voyage ?</summary>
         <div class="faq-body">Votre véhicule est gardé sur notre parking à quelques minutes d'Orly. Une option parking couvert est proposée si vous préférez un emplacement à l'abri des intempéries.</div>
       </details>
+      </div>
     </div>
-    <p class="h-faq-more"><a href="/faq">Toutes les questions fréquentes</a></p>
+    <p class="h-faq-more"><button type="button" id="faqToggle" aria-expanded="false" aria-controls="faqExtra">Voir les 7 questions</button></p>
+    <div class="h-contact-bar reveal" id="contact">
+      <b>Besoin d'aide ?</b>
+      <div class="h-contact-btns">
+        <a class="h-btn-call" data-phone hidden href="#">Appeler</a>
+        <a class="h-btn-wa" data-whatsapp hidden href="#" target="_blank" rel="noopener">WhatsApp</a>
+        <a class="h-btn-mail" href="mailto:contact@directvoiturier.com">Email</a>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -317,10 +310,8 @@ window.VO_CONTACT = {
 <section class="h-final">
   <div class="h-wrap">
     <div class="h-final-in reveal">
-      <h2>Le voyage commence<br><span>au dépose-minute</span></h2>
-      <p>Pas de place à chercher, pas de navette. Vous descendez, vous partez.</p>
-      <div class="h-final-btns"><button type="button" class="h-btn lg" onclick="homeBook()"><span>Réserver mon créneau</span><svg class="h-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button><a class="h-btn lg ghost" data-phone hidden href="#">Appeler</a></div>
-      <ul class="h-final-meta"><li>Prix affiché avant paiement</li><li>Confirmation par email</li><li>4,6/5 · 396 avis Google</li></ul>
+      <h2>Prêt à partir ?</h2>
+      <div class="h-final-btns"><button type="button" class="h-btn lg" onclick="homeBook()"><span>Réserver mon créneau</span><svg class="h-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button></div>
     </div>
   </div>
 </section>
