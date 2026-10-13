@@ -1050,6 +1050,9 @@ async function homeQuote(userAction = true) {
   if (!amount || !meta) return;
   if (userAction && !homeTouched) { homeTouched = true; trackEvent('quote_started'); }
   STATE.sim.quotedPrice = 0;
+  const sum = document.getElementById('h-sum');
+  const incl = document.getElementById('h-incl');
+  if (incl) incl.hidden = true;
   const washLine = document.getElementById('h-sum-wash');
   const wash = STATE.booking.data.wash.type;
   if (washLine) washLine.textContent = (wash === 'none' ? 'Sans lavage' : HOME_WASH_LABEL[wash].replace(/^./, c => c.toUpperCase()) + ' inclus');
@@ -1061,7 +1064,9 @@ async function homeQuote(userAction = true) {
       // Aucune date choisie : on n'affiche aucun prix
       amount.textContent = '—';
       meta.textContent = 'Choisissez vos dates';
+      if (sum) sum.hidden = true; // carte prix masquée tant qu'il n'y a pas de dates
     } else {
+      if (sum) sum.hidden = false;
       amount.textContent = 'Vérifiez vos dates';
       meta.textContent = 'Le retour doit suivre le départ';
     }
@@ -1069,6 +1074,7 @@ async function homeQuote(userAction = true) {
     return;
   }
   const seq = ++homeQuoteSeq;
+  if (sum) sum.hidden = false;
   amount.className = 'h-price';
   amount.innerHTML = '<span class="spinner"></span>';
   const s = STATE.sim;
@@ -1095,6 +1101,7 @@ async function homeQuote(userAction = true) {
   amount.className = 'h-price';
   amount.innerHTML = `${res.total}<span class="cur">€</span>`;
   meta.textContent = `${res.days} jour${res.days > 1 ? 's' : ''}`;
+  if (incl) incl.hidden = false;
   homeSticky(res.total);
   const key = JSON.stringify(payload);
   if (homeTouched && key !== homeLastTracked) {

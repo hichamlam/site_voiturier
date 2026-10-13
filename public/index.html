@@ -130,8 +130,8 @@ window.VO_CONTACT = {
           </div>
         </div>
 
-        <div class="h-sum" aria-live="polite">
-          <div class="h-sum-l"><b id="sim-result-meta">Choisissez vos dates</b><small id="h-sum-wash">Sans lavage</small></div>
+        <div class="h-sum" id="h-sum" aria-live="polite" hidden>
+          <div class="h-sum-l"><b id="sim-result-meta">Choisissez vos dates</b><small id="h-sum-wash">Sans lavage</small><span class="h-incl" id="h-incl"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg>Voiturier inclus</span></div>
           <div class="h-sum-r"><small>Total</small><span class="h-price" id="sim-result-amount"></span></div>
         </div>
 
@@ -191,8 +191,8 @@ window.VO_CONTACT = {
       <p>Plus vous partez longtemps, moins la journée vous coûte. Vous voyez le prix total avant de payer.</p>
     </div>
     <div class="h-prices reveal">
-      <div class="h-price-card"><div><b>1 jour</b><span>Idéal pour un aller-retour rapide</span></div><div class="amt"><small>Dès</small><strong>29&nbsp;€</strong></div></div>
-      <div class="h-price-card"><div><b>1 semaine</b><span>Le prix par jour baisse avec la durée</span></div><div class="amt"><small>Dès</small><strong>79&nbsp;€</strong></div></div>
+      <div class="h-price-card"><b>1 jour</b><div class="amt"><small>dès</small><strong>29&nbsp;€</strong></div><span>Aller-retour rapide</span></div>
+      <div class="h-price-card"><b>1 semaine</b><div class="amt"><small>dès</small><strong>79&nbsp;€</strong></div><span>Moins cher par jour</span></div>
     </div>
     <p class="h-prices-note">Votre prix exact s'affiche dès que vous saisissez vos dates en haut de page. <a href="/tarifs">Voir la grille des tarifs</a></p>
   </div>
@@ -247,15 +247,14 @@ window.VO_CONTACT = {
   <div class="h-wrap">
     <div class="h-head reveal">
       <h2>Votre voiturier vous attend à votre terminal</h2>
-      <p>Prise en charge et restitution au dépose-minute d'Orly 1, 2, 3 et 4.</p>
+      <p>Rendez-vous au dépose-minute, à l'aller comme au retour.</p>
     </div>
-    <div class="h-terms reveal">
-      <div class="h-term"><b>Orly 1 et 2</b><span>Ancien Orly Ouest. Rendez-vous au dépose-minute.</span></div>
-      <div class="h-term"><b>Orly 3</b><span>Entre Orly 1-2 et Orly 4. Rendez-vous au dépose-minute.</span></div>
-      <div class="h-term"><b>Orly 4</b><span>Ancien Orly Sud. Rendez-vous au dépose-minute.</span></div>
-      <div class="h-term hours"><b>Horaires</b><span>7j/7, de 4h à minuit. Point exact envoyé par email.</span></div>
+    <div class="h-tlist reveal">
+      <div class="h-trow"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></i><div><b>Orly 1 et 2</b><span>Ancien Orly Ouest</span></div></div>
+      <div class="h-trow"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></i><div><b>Orly 3</b><span>Entre Orly 1-2 et Orly 4</span></div></div>
+      <div class="h-trow"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></i><div><b>Orly 4</b><span>Ancien Orly Sud</span></div></div>
     </div>
-    <p class="h-terms-note reveal">Au retour, prévenez-nous à l'atterrissage : votre voiture vous attend devant votre terminal d'arrivée.</p>
+    <p class="h-thours reveal"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span><b>7j/7, de 4h à minuit.</b> Point exact envoyé par email. Au retour, prévenez-nous à l'atterrissage.</span></p>
   </div>
 </section>
 
@@ -318,10 +317,10 @@ window.VO_CONTACT = {
 <section class="h-final">
   <div class="h-wrap">
     <div class="h-final-in reveal">
-      <h2>Le voyage commence<br><span>au dépose-minute.</span></h2>
-      <p>Pas de place à chercher, pas de navette à attendre. Vous descendez, vous partez.</p>
+      <h2>Le voyage commence<br><span>au dépose-minute</span></h2>
+      <p>Pas de place à chercher, pas de navette. Vous descendez, vous partez.</p>
       <div class="h-final-btns"><button type="button" class="h-btn lg" onclick="homeBook()"><span>Réserver mon créneau</span><svg class="h-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button><a class="h-btn lg ghost" data-phone hidden href="#">Appeler</a></div>
-      <p class="h-final-meta">Prix affiché avant paiement, confirmation par email, 4,6/5 sur 396 avis Google</p>
+      <ul class="h-final-meta"><li>Prix affiché avant paiement</li><li>Confirmation par email</li><li>4,6/5 · 396 avis Google</li></ul>
     </div>
   </div>
 </section>
