@@ -36,8 +36,15 @@ export default async function handler(req, res) {
     const r = await fetch(`${API}/emails/receiving/${encodeURIComponent(id)}`, {
       headers: { Authorization: `Bearer ${key}` },
     });
-    if (!r.ok) return res.status(404).json({ error: 'mail introuvable' });
-    const mail = await r.json();
+    let mail;
+    if (r.ok) {
+      mail = await r.json();
+    } else {
+      // Clé sans droit de lecture (ex. « sending_access ») : on transfère au moins
+      // les infos du webhook plutôt que de perdre le mail.
+      console.error('[inbound] lecture du mail impossible:', r.status, await r.text());
+      mail = { ...body.data, text: `(Le contenu n'a pas pu être lu — code ${r.status}. Ouvre le mail dans resend.com > Emails > Received.)` };
+    }
 
     const FROM = process.env.FROM_EMAIL || 'Direct Voiturier <contact@directvoiturier.com>';
     const dest = await getNotificationEmail();
