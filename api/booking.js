@@ -112,10 +112,16 @@ export default async function handler(req, res) {
         options, surchargesDetail: price.surchargesDetail, paymentMode: 'sur place',
       };
 
-      Promise.all([
+      // On attend l'envoi AVANT de répondre : sur Vercel, la fonction est gelée
+      // dès la réponse, et un envoi « en arrière-plan » peut ne jamais partir.
+      const results = await Promise.allSettled([
         resend.emails.send({ from: FROM, to: customer.email, subject: `Confirmation — ${reference}`, html: clientEmailHTML(ctx) }),
         resend.emails.send({ from: FROM, to: ADMIN, subject: `🛬 Nouvelle résa ${reference} — ${customer.firstname} ${customer.lastname || ''}`, html: adminEmailHTML(ctx) }),
-      ]).catch(err => console.error('[booking] email:', err));
+      ]);
+      results.forEach(r => {
+        if (r.status === 'rejected') console.error('[booking] email:', r.reason);
+        else if (r.value?.error) console.error('[booking] email:', r.value.error);
+      });
     }
 
     return res.status(200).json({ success: true, reference, total: price.total });
