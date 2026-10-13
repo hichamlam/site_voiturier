@@ -41,6 +41,11 @@ export default async function handler(req, res) {
 
     const FROM = process.env.FROM_EMAIL || 'Direct Voiturier <contact@directvoiturier.com>';
     const dest = await getNotificationEmail();
+    // Garde-fou anti-boucle : jamais de transfert vers une adresse du domaine
+    if (/@directvoiturier\.com$/i.test(dest)) {
+      console.error('[inbound] destination = domaine du site, transfert ignoré (renseigne Paramètres > Email de réception)');
+      return res.status(200).json({ skipped: 'no external destination' });
+    }
     const sender = mail.from || body.data?.from || '';
     const senderAddr = (sender.match(/<([^>]+)>/) || [null, sender])[1];
     const senderName = sender.replace(/<[^>]*>/, '').replace(/["']/g, '').trim() || senderAddr;
