@@ -581,3 +581,8 @@ body.home .review-stars, .h-stars { color:#F5A524; }
 .h-stage-layer { padding:0; display:block; }
 .h-stage-layer img { width:100%; height:100%; object-fit:cover; display:block; -webkit-user-drag:none; }
 @media (min-width:768px) { .h-stage { height:auto; } }
+
+/* Étapes 2 et 4 : photos */
+.h-step-photo { padding:0; overflow:hidden; background:#0b1220; }
+.h-step-photo img { width:100%; height:100%; object-fit:cover; display:block; }
+.h-step.last .h-step-photo { border:0; }
