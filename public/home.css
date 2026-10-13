@@ -597,3 +597,14 @@ body.home .review-stars, .h-stars { color:#F5A524; }
 .h-step-top { gap:12px; justify-content:flex-start; align-items:center; }
 .h-step-top i { flex-shrink:0; }
 .h-step .h-step-top h3 { margin:0; font-size:1.15rem; line-height:1.25; }
+
+/* Héros : photo de fond (ciel + avion) avec voile bleu léger */
+.h-hero {
+  background:
+    linear-gradient(180deg, rgba(6,64,122,.50) 0%, rgba(10,100,175,.22) 52%, rgba(248,250,252,.96) 100%),
+    url(/img/hero-ciel.webp) 70% 20% / cover no-repeat, #0A6CC2;
+}
+.h-hero .h-clouds { display:none; }
+.h-hero h1 { text-shadow:0 2px 26px rgba(3,30,70,.5), 0 1px 3px rgba(3,30,70,.25); }
+.h-hero-sub { color:#fff; text-shadow:0 1px 12px rgba(3,30,70,.55); }
+@media (max-width:599px) { .h-hero { background-position:0 0, 74% 100%, 0 0; background-size:auto, auto 100%, auto; } }
