@@ -18,7 +18,7 @@ const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const key = process.env.RESEND_API_KEY;
+  const key = process.env.INBOUND_RESEND_KEY || process.env.RESEND_API_KEY;
   if (!key) return res.status(500).json({ error: 'Resend non configuré' });
 
   // Secret optionnel : si INBOUND_SECRET est défini, l'URL doit contenir ?s=<secret>
