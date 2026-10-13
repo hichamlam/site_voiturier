@@ -586,3 +586,14 @@ body.home .review-stars, .h-stars { color:#F5A524; }
 .h-step-photo { padding:0; overflow:hidden; background:#0b1220; }
 .h-step-photo img { width:100%; height:100%; object-fit:cover; display:block; }
 .h-step.last .h-step-photo { border:0; }
+
+/* Héros : 1re ligne sur toute la largeur quand il y a la place */
+.h-hero h1 { width:min(94vw, 1040px); margin-left:50%; transform:translateX(-50%); text-wrap:wrap; }
+.h-hero h1 .hl { margin-top:2px; }
+@media (min-width:600px) { .h-hero h1 { white-space:nowrap; } }
+@media (max-width:599px) { .h-hero h1 { font-size:clamp(2rem, 9.2vw, 2.6rem); } .h-hero h1 .hl { text-wrap:balance; } }
+
+/* Étapes : titre à côté du numéro, au-dessus de la photo */
+.h-step-top { gap:12px; justify-content:flex-start; align-items:center; }
+.h-step-top i { flex-shrink:0; }
+.h-step .h-step-top h3 { margin:0; font-size:1.15rem; line-height:1.25; }
