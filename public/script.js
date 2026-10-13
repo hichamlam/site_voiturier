@@ -179,18 +179,15 @@ function reviewCardHTML(r) {
    SIMULATEUR HOME (card)
 ═══════════════════════════════════════════════ */
 function simInit() {
-  const today = new Date();
-  const tom = new Date(today); tom.setDate(tom.getDate() + 1);
-  const wk = new Date(today); wk.setDate(wk.getDate() + 8);
+  // Aucune date pré-remplie : le prix n'apparaît que quand le client choisit ses dates
   const iso = d => d.toISOString().split('T')[0];
-
+  const min = iso(new Date());
   const dep = document.getElementById('sim-dep-date');
   const ret = document.getElementById('sim-ret-date');
-  if (dep) { dep.min = iso(today); dep.value = iso(tom); }
-  if (ret) { ret.min = iso(today); ret.value = iso(wk); }
-
-  STATE.sim.depDate = iso(tom);
-  STATE.sim.retDate = iso(wk);
+  if (dep) { dep.min = min; dep.value = ''; }
+  if (ret) { ret.min = min; ret.value = ''; }
+  STATE.sim.depDate = '';
+  STATE.sim.retDate = '';
 }
 
 function simGoToStep(n) {
