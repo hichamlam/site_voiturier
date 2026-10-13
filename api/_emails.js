@@ -42,7 +42,7 @@ export function clientEmailHTML(ctx) {
 <tr><td align="center">
 <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="max-width:600px;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 8px 32px rgba(11,20,38,0.08);">
 
-<tr><td style="background:linear-gradient(135deg,#0B1426 0%,#75234a 50%,#e8732e 100%);padding:48px 40px;text-align:center;">
+<tr><td style="background:#0B1426;background-image:linear-gradient(135deg,#0B1426 0%,#1B5FA8 60%,#2E7FD3 100%);padding:48px 40px;text-align:center;">
   <div style="display:inline-block;background:#E8B362;color:#0B1426;font-weight:800;font-size:14px;padding:8px 16px;border-radius:100px;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:18px;">${paymentMode === 'en ligne' ? 'Paiement reçu' : 'Réservation confirmée'}</div>
   <h1 style="margin:0;color:#fff;font-size:32px;font-weight:800;letter-spacing:-0.02em;line-height:1.1;">Bon voyage,<br><span style="color:#E8B362;font-style:italic;">${escapeHtml(customer.firstname)}</span></h1>
   <p style="margin:14px 0 0;color:rgba(255,255,255,0.85);font-size:16px;font-weight:500;">Votre voiturier vous attend</p>

@@ -55,7 +55,7 @@ export default async function handler(req, res) {
 <table width="100%" cellspacing="0" cellpadding="0" style="background:#f8fafc;padding:40px 20px;">
 <tr><td align="center">
 <table width="600" cellspacing="0" cellpadding="0" style="max-width:600px;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 8px 32px rgba(11,20,38,0.08);">
-<tr><td style="background:linear-gradient(135deg,#0B1426,#75234a,#e8732e);padding:42px 40px;text-align:center;">
+<tr><td style="background:#0B1426;background-image:linear-gradient(135deg,#0B1426,#1B5FA8,#2E7FD3);padding:42px 40px;text-align:center;">
   <div style="display:inline-block;background:#E8B362;color:#0B1426;font-weight:800;font-size:13px;padding:7px 16px;border-radius:100px;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:16px;">Devis personnalisé</div>
   <h1 style="margin:0;color:#fff;font-size:28px;font-weight:800;">Bonjour ${escapeHtml(q.customer_firstname || '')}</h1>
   <p style="margin:10px 0 0;color:rgba(255,255,255,0.85);font-size:15px;">Voici votre devis Direct Voiturier</p>

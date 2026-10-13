@@ -58,7 +58,7 @@ function buildHTML(b, customNote) {
 <tr><td align="center">
 <table role="presentation" width="640" cellspacing="0" cellpadding="0" style="max-width:640px;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 8px 32px rgba(11,20,38,0.08);">
 
-<tr><td style="background:linear-gradient(135deg,#0B1426 0%,#75234a 50%,#e8732e 100%);padding:36px 40px;">
+<tr><td style="background:#0B1426;background-image:linear-gradient(135deg,#0B1426 0%,#1B5FA8 60%,#2E7FD3 100%);padding:36px 40px;">
   <div style="display:inline-block;background:${statusColor(b.status)};color:white;font-weight:800;font-size:11px;padding:6px 12px;border-radius:100px;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:14px;">${statusLabel(b.status)}${b.payment_status === 'paid' ? ' · PAYÉ' : ''}</div>
   <h1 style="margin:0;color:#fff;font-size:26px;font-weight:800;letter-spacing:-0.02em;">Réservation ${b.reference}</h1>
   <p style="margin:8px 0 0;color:rgba(255,255,255,0.8);font-size:14px;">${escapeHtml(b.customer_firstname)} ${escapeHtml(b.customer_lastname)} · ${b.car_brand} ${b.car_model} · ${escapeHtml(b.car_plate)}</p>
