@@ -37,46 +37,8 @@
 {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Le prix affiché est-il vraiment le prix final ?","acceptedAnswer":{"@type":"Answer","text":"Oui. Le tarif calculé inclut la prise en charge, la restitution et le gardiennage à Orly. Les seules options en plus sont celles que vous choisissez vous-même, toujours détaillées dans le récapitulatif avant le paiement."}},{"@type":"Question","name":"Mon vol est retardé, que se passe-t-il ?","acceptedAnswer":{"@type":"Answer","text":"Votre vol a du retard ? Prévenez-nous, on s'adapte : on suit votre numéro de vol et on est là quand vous atterrissez."}},{"@type":"Question","name":"Puis-je annuler ou modifier ma réservation ?","acceptedAnswer":{"@type":"Answer","text":"Un imprévu ? Écrivez-nous à contact@directvoiturier.com, on trouve une solution. Le détail des conditions figure dans nos CGV."}},{"@type":"Question","name":"Comment se passe la prise en charge à Orly ?","acceptedAnswer":{"@type":"Answer","text":"Après votre réservation, vous recevez un email avec toutes les consignes. Le jour J, votre voiturier vous accueille directement au dépose-minute de votre terminal."}},{"@type":"Question","name":"Quels sont vos horaires ?","acceptedAnswer":{"@type":"Answer","text":"Nos voituriers interviennent 7 jours sur 7, de 4h00 à minuit. Si votre vol part avant 4h00 ou atterrit après minuit, écrivez-nous avant de réserver à contact@directvoiturier.com."}},{"@type":"Question","name":"Comment payer ?","acceptedAnswer":{"@type":"Answer","text":"En ligne par carte bancaire via Stripe (paiement sécurisé, confirmation immédiate) ou sur place en carte ou espèces. Le montant est identique dans les deux cas."}},{"@type":"Question","name":"Où est garée ma voiture pendant mon voyage ?","acceptedAnswer":{"@type":"Answer","text":"Votre véhicule est gardé sur notre parking à quelques minutes d'Orly. Une option parking couvert est proposée si vous préférez un emplacement à l'abri des intempéries."}}]}
 </script>
 
-<!-- ═══════════════════════════════════════════════════════════════
-     SUIVI GOOGLE ADS / GA4 — PRÊT MAIS DÉSACTIVÉ
-     Aucun traceur ne se charge tant que les 2 IDs ci-dessous sont vides.
-     Pour activer :
-       1. Crée une propriété GA4 → remplace GA4_ID (format G-XXXXXXX)
-       2. Crée le compte Google Ads → remplace ADS_ID (format AW-XXXXXXXXX)
-       3. Dans Google Ads, crée une action de conversion "Réservation payée"
-          → remplace ADS_CONVERSION_LABEL par le label fourni
-     Consentement : Consent Mode v2 démarre tout en "denied" ; le bandeau
-     cookies (géré dans script.js) passe en "granted" si le visiteur accepte.
-     Les événements envoyés par script.js : quote_started, quote_shown,
-     begin_checkout, add_contact_info, purchase (réservation payée),
-     reservation_sur_place, phone_click, whatsapp_click.
-     ═══════════════════════════════════════════════════════════════ -->
-<script>
-window.VO_ANALYTICS = {
-  GA4_ID: '',                 // ex: 'G-XXXXXXXXXX'
-  ADS_ID: '',                 // ex: 'AW-XXXXXXXXXXX'
-  ADS_CONVERSION_LABEL: '',   // ex: 'AbCdEfGhIj'
-};
-window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-// Consent Mode v2 — tout refusé par défaut (RGPD)
-gtag('consent', 'default', {
-  ad_storage: 'denied', ad_user_data: 'denied',
-  ad_personalization: 'denied', analytics_storage: 'denied',
-});
-(function(){
-  var A = window.VO_ANALYTICS;
-  var id = A.GA4_ID || A.ADS_ID;
-  if (!id) return; // rien ne se charge tant qu'aucun ID n'est renseigné
-  var sc = document.createElement('script');
-  sc.async = true;
-  sc.src = 'https://www.googletagmanager.com/gtag/js?id=' + id;
-  document.head.appendChild(sc);
-  gtag('js', new Date());
-  if (A.GA4_ID) gtag('config', A.GA4_ID);
-  if (A.ADS_ID) gtag('config', A.ADS_ID, { allow_enhanced_conversions: true });
-})();
-</script>
+<!-- Suivi (Google Tag Manager + cookies) : voir /tracking.js -->
+<script src="/tracking.js"></script>
 
 <!-- ═══════════════════════════════════════════════════════════════
      CONTACT DIRECT — TÉLÉPHONE + WHATSAPP

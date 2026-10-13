@@ -848,44 +848,7 @@ document.addEventListener('DOMContentLoaded', () => {
    — Aucun envoi tant que VO_ANALYTICS n'est pas configuré (voir index.html)
    — Consent Mode v2 : denied par défaut, granted si le visiteur accepte
 ═══════════════════════════════════════════════ */
-function trackEvent(name, params = {}) {
-  try {
-    if (typeof gtag !== 'function') return;
-    gtag('event', name, params);
-  } catch {}
-}
-
-function analyticsConfigured() {
-  const A = window.VO_ANALYTICS || {};
-  return !!(A.GA4_ID || A.ADS_ID);
-}
-
-function cookieChoice(accepted) {
-  try { localStorage.setItem('vo_consent', accepted ? 'granted' : 'denied'); } catch {}
-  applyConsent(accepted);
-  const b = document.getElementById('cookieBanner');
-  if (b) b.classList.remove('show');
-}
-
-function applyConsent(accepted) {
-  if (typeof gtag !== 'function') return;
-  const v = accepted ? 'granted' : 'denied';
-  gtag('consent', 'update', {
-    ad_storage: v, ad_user_data: v, ad_personalization: v, analytics_storage: v,
-  });
-}
-
-(function initConsent() {
-  if (!analyticsConfigured()) return; // pas de traceur → pas de bandeau
-  let stored = null;
-  try { stored = localStorage.getItem('vo_consent'); } catch {}
-  if (stored === 'granted') applyConsent(true);
-  else if (stored === 'denied') applyConsent(false);
-  else {
-    const b = document.getElementById('cookieBanner');
-    if (b) b.classList.add('show');
-  }
-})();
+/* trackEvent / consentement cookies : voir /tracking.js (chargé dans le <head>) */
 
 /* Conversion "réservation payée" — envoyée au retour de Stripe (?paid=1) */
 function trackPurchase(ref, value) {
