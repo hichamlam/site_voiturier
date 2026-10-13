@@ -575,3 +575,9 @@ body.home .review-stars, .h-stars { color:#F5A524; }
 .h-hero h1 br { display:none; }
 .h-hero h1 .hl { display:block; margin-top:4px; }
 .h-term { padding:18px 16px; }
+
+/* Comparateur lavage : photos avant / après */
+.h-stage { height:auto; aspect-ratio:1600/893; background:#0b1220; }
+.h-stage-layer { padding:0; display:block; }
+.h-stage-layer img { width:100%; height:100%; object-fit:cover; display:block; -webkit-user-drag:none; }
+@media (min-width:768px) { .h-stage { height:auto; } }
