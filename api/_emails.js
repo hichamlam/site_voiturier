@@ -93,7 +93,7 @@ export function clientEmailHTML(ctx) {
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
       ${step(1, 'Prévoyez d\'arriver à Orly <strong style="color:#0F172A;">3h avant votre vol</strong>.')}
       ${step(2, '<strong style="color:#0F172A;">Contactez-nous 45 min avant votre arrivée sur Orly</strong> au ' + phoneLink + '.')}
-      ${step(3, `Notre voiturier vous retrouve au Terminal ${escapeHtml(dep.terminal || 'indiqué')} avec un panneau « Direct Voiturier » et prend votre véhicule en charge.`)}
+      ${step(3, `Notre voiturier vous attend au Terminal ${escapeHtml(dep.terminal || 'indiqué')}.`)}
     </table>
   </div>
 
