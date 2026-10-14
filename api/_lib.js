@@ -391,6 +391,15 @@ export function calculateLateFee(scheduledTime, actualTime) {
   return { lateMinutes, fee: 10 + extraHours * 15 };
 }
 
+// Téléphone affiché dans les mails clients (réglage admin « Téléphone service client »).
+export async function getContactPhone() {
+  try {
+    const { data } = await supabase.from('settings').select('value').eq('key', 'contact_phone').maybeSingle();
+    return (data?.value || '').trim();
+  } catch {}
+  return '';
+}
+
 // Adresse qui reçoit les notifications de réservation : réglage admin
 // (settings.notification_email) > variable ADMIN_EMAIL > contact@.
 export async function getNotificationEmail() {

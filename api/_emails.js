@@ -36,6 +36,15 @@ function detailRows(detail) {
 
 export function clientEmailHTML(ctx) {
   const { reference, total, customer, car, dep, ret, surchargesDetail, paymentMode } = ctx;
+  const phone = (ctx.contactPhone || '').trim();
+  const phoneLink = phone
+    ? `<a href="tel:${escapeHtml(phone.replace(/[^\d+]/g, ''))}" style="color:#1B5FA8;text-decoration:none;font-weight:800;white-space:nowrap;">${escapeHtml(phone)}</a>`
+    : `<strong style="color:#1B5FA8;">notre numéro (indiqué sur directvoiturier.com)</strong>`;
+  const yearsAtOrly = Math.max(1, new Date().getFullYear() - 2019);
+  const step = (n, html) => `<tr>
+      <td width="30" valign="top" style="padding:0 0 10px;"><div style="width:22px;height:22px;line-height:22px;border-radius:11px;background:#0B1426;color:#E8B362;font-size:12px;font-weight:800;text-align:center;">${n}</div></td>
+      <td valign="top" style="padding:0 0 10px;font-size:14px;color:#334155;line-height:1.55;">${html}</td>
+    </tr>`;
   return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"></head>
 <body style="margin:0;padding:0;background:#f8fafc;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#0F172A;">
 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f8fafc;padding:40px 20px;">
@@ -76,29 +85,52 @@ export function clientEmailHTML(ctx) {
   </div>
 </td></tr>
 
-<tr><td style="padding:0 40px 24px;">
-  <h3 style="margin:0 0 12px;font-size:16px;font-weight:800;color:#0F172A;">📍 Le jour J</h3>
-  <p style="margin:0 0 8px;font-size:14px;color:#475569;line-height:1.6;">Présentez-vous au moins <strong style="color:#0F172A;">2h à 3h avant votre embarquement</strong> au dépose-minute du Terminal ${escapeHtml(dep.terminal || 'indiqué')}. Notre voiturier vous accueille avec un panneau "Direct Voiturier".</p>
-  <p style="margin:8px 0 0;font-size:14px;color:#475569;line-height:1.6;">Au retour, on vous appelle dès l'atterrissage. Le temps de récupérer vos bagages, votre voiture est devant le terminal.</p>
-</td></tr>
+<tr><td style="padding:0 40px 8px;">
+  <h3 style="margin:0 0 14px;font-size:18px;font-weight:800;color:#0F172A;">📍 Le jour J</h3>
 
-<tr><td style="padding:0 40px 24px;">
-  <div style="padding:14px 18px;background:#f8fafc;border-left:3px solid #E8B362;border-radius:6px;">
-    <p style="margin:0 0 6px;font-size:13px;color:#475569;line-height:1.5;"><strong style="color:#0F172A;">Annulation</strong> : étudiée à l'amiable au moins 7 jours avant la date prévue. Pour toute modification : <a href="mailto:contact@directvoiturier.com" style="color:#C9913B;text-decoration:none;font-weight:700;">contact@directvoiturier.com</a></p>
-    <p style="margin:0;font-size:13px;color:#475569;line-height:1.5;"><strong style="color:#0F172A;">Retard</strong> : tolérance 30 min. Au-delà, des frais peuvent s'appliquer (10€ pour la 1re heure, 15€/h ensuite).</p>
+  <div style="padding:18px 20px;background:#EFF6FF;border-radius:12px;margin-bottom:14px;">
+    <p style="margin:0 0 12px;font-size:13px;font-weight:800;color:#1B5FA8;letter-spacing:0.08em;text-transform:uppercase;">🛫 À l'aller</p>
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+      ${step(1, 'Prévoyez d\'arriver à Orly <strong style="color:#0F172A;">3h avant votre vol</strong>.')}
+      ${step(2, '<strong style="color:#0F172A;">Contactez-nous 45 min avant votre arrivée sur Orly</strong> au ' + phoneLink + '.')}
+      ${step(3, `Notre voiturier vous retrouve au Terminal ${escapeHtml(dep.terminal || 'indiqué')} avec un panneau « Direct Voiturier » et prend votre véhicule en charge.`)}
+    </table>
+  </div>
+
+  <div style="padding:18px 20px;background:#EFF6FF;border-radius:12px;">
+    <p style="margin:0 0 12px;font-size:13px;font-weight:800;color:#1B5FA8;letter-spacing:0.08em;text-transform:uppercase;">🛬 Au retour</p>
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+      ${step(1, '<strong style="color:#0F172A;">Dès l\'atterrissage, envoyez-nous un SMS</strong> au ' + phoneLink + ' pour confirmer votre arrivée.')}
+      ${step(2, '<strong style="color:#0F172A;">Une fois vos bagages en soute récupérés, appelez-nous</strong>.')}
+      ${step(3, 'On vous livre votre véhicule devant le terminal.')}
+    </table>
   </div>
 </td></tr>
 
-<tr><td style="padding:0 40px 32px;">
-  <p style="margin:0;font-size:10px;color:#94A3B8;line-height:1.5;font-style:italic;">
-    Sur demande à l'arrivée : état des lieux contradictoire signé — 15€ à régler sur place.
-    En l'absence d'état des lieux contradictoire signé par les deux parties, le prestataire ne peut être tenu responsable d'aucun dommage. Voir conditions générales sur le site.
+<tr><td style="padding:22px 40px 30px;">
+  <p style="margin:0 0 6px;font-size:10px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:0.06em;">Conditions de la prestation — extrait des conditions générales</p>
+  <p style="margin:0 0 5px;font-size:10px;color:#94A3B8;line-height:1.5;">
+    <strong>1. Acceptation.</strong> La validation de la réservation vaut acceptation pleine et entière des conditions générales de vente, consultables en intégralité sur directvoiturier.com (« Conditions générales », bas de page).
+    <strong>2. Annulation.</strong> Toute réservation est ferme et définitive : aucun remboursement en cas d'annulation ou de non-présentation. À titre purement commercial et sans obligation, les annulations communiquées au moins 7 jours avant la prise en charge peuvent être étudiées à l'amiable (contact@directvoiturier.com). Conformément à l'article L221-28 12° du Code de la consommation, le droit de rétractation de 14 jours ne s'applique pas à un service de gardiennage à date déterminée ; le Client y renonce expressément.
+  </p>
+  <p style="margin:0 0 5px;font-size:10px;color:#94A3B8;line-height:1.5;">
+    <strong>3. Retard à l'aller.</strong> Tolérance de 30 minutes. Au-delà, sans préavis téléphonique, le Prestataire peut annuler la réservation sans remboursement ou appliquer 50 € de frais de réorganisation.
+    <strong>4. Retard au retour.</strong> Tolérance de 30 minutes après l'horaire convenu, puis 10 € pour la première heure entamée, 15 € par heure supplémentaire, 50 € par jour entamé au-delà de 24 h, et 50 € de pénalité forfaitaire en l'absence de préavis téléphonique (SMS et appel à l'atterrissage). Ces frais sont dus et facturés au Client.
+  </p>
+  <p style="margin:0 0 5px;font-size:10px;color:#94A3B8;line-height:1.5;">
+    <strong>5. Véhicules de grand gabarit.</strong> Un supplément de 50 € s'applique aux véhicules de grand gabarit : vans, utilitaires, pick-up, minibus et monospaces/ludospaces longs, notamment (liste non exhaustive) Renault Trafic, Master, Espace ; Citroën C4 SpaceTourer et Grand C4 SpaceTourer, SpaceTourer, Jumpy, Jumper, Berlingo ; Peugeot Rifter, Traveller, Expert, Boxer, Partner ; Opel Vivaro, Zafira Life ; Fiat Ducato, Scudo, Talento ; Ford Transit, Tourneo ; Mercedes Vito, Classe V, Sprinter ; VW Transporter, Caravelle, Multivan ; Toyota Proace.
+    <strong>6. État des lieux.</strong> Un état des lieux contradictoire signé par les deux parties peut être réalisé à la prise en charge, sur demande du Client : 15 € à régler sur place. À défaut d'état des lieux contradictoire signé, le Client reconnaît l'absence de dommage préexistant comme de dommage subi pendant la garde, et le Prestataire ne peut être tenu responsable d'aucun dommage allégué. En cas d'état des lieux signé, la responsabilité du Prestataire est limitée à 450 € par sinistre.
+  </p>
+  <p style="margin:0;font-size:10px;color:#94A3B8;line-height:1.5;">
+    <strong>7. Exclusions.</strong> Le Prestataire n'est pas responsable des objets laissés dans le véhicule, du vol par effraction ou de la force majeure, des pannes préexistantes, de la perte ou casse des clés hors faute lourde prouvée, des dommages climatiques, des actes de tiers hors parking surveillé, ni des dommages indirects.
+    <strong>8. Obligations du Client.</strong> Véhicule en état de circulation, en règle (carte grise, contrôle technique, assurance), avec un niveau de carburant suffisant ; le Client en est le propriétaire ou a l'autorisation expresse du propriétaire.
+    <strong>9. Données.</strong> Traitées conformément au RGPD, uniquement pour l'exécution du service ; droit d'accès, de rectification et de suppression : contact@directvoiturier.com.
   </p>
 </td></tr>
 
 <tr><td style="background:#0B1426;padding:24px 40px;text-align:center;">
   <p style="margin:0 0 6px;color:#E8B362;font-weight:800;font-size:15px;">Direct Voiturier</p>
-  <p style="margin:0;color:rgba(255,255,255,0.5);font-size:12px;">Service voiturier premium · Aéroport Paris-Orly · 6 ans à Orly</p>
+  <p style="margin:0;color:rgba(255,255,255,0.5);font-size:12px;">Service voiturier premium · Aéroport Paris-Orly · ${yearsAtOrly} ans à Orly</p>
 </td></tr>
 </table>
 </td></tr>

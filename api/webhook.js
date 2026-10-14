@@ -3,7 +3,7 @@
  */
 import Stripe from 'stripe';
 import { Resend } from 'resend';
-import { supabase, getNotificationEmail } from './_lib.js';
+import { supabase, getNotificationEmail, getContactPhone } from './_lib.js';
 import { clientEmailHTML, adminEmailHTML } from './_emails.js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2024-06-20' });
@@ -77,6 +77,7 @@ export default async function handler(req, res) {
       options: { coveredParking: booking.has_covered_parking, priorityAccess: booking.has_priority_access },
       surchargesDetail: booking.surcharges_detail || [],
       paymentMode: 'en ligne',
+      contactPhone: await getContactPhone(),
     };
 
     try {
