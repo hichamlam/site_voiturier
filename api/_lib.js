@@ -357,9 +357,21 @@ export async function checkDatesAvailable(depDate, retDate) {
 }
 
 export async function upsertClient(customer) {
+  // Email facultatif (réservation saisie à la main) : on retrouve le client par
+  // téléphone, sinon on lui fabrique une adresse interne unique (jamais utilisée
+  // pour écrire au client, voir isRealEmail).
+  const digits = String(customer.phone || '').replace(/\D/g, '');
+  let email = String(customer.email || '').trim().toLowerCase();
+  if (!email) {
+    if (digits) {
+      const { data: byPhone } = await supabase.from('clients').select('id').eq('phone', customer.phone).limit(1).maybeSingle();
+      if (byPhone) return byPhone.id;
+    }
+    email = `sans-email-${digits || Date.now()}@sans-email.invalid`;
+  }
   const { data: existing } = await supabase
     .from('clients').select('id')
-    .eq('email', customer.email.toLowerCase()).maybeSingle();
+    .eq('email', email).maybeSingle();
   if (existing) {
     await supabase.from('clients').update({
       firstname: customer.firstname,
@@ -369,13 +381,15 @@ export async function upsertClient(customer) {
     return existing.id;
   }
   const { data: inserted } = await supabase.from('clients').insert({
-    email: customer.email.toLowerCase(),
+    email,
     firstname: customer.firstname,
     lastname: customer.lastname,
     phone: customer.phone,
   }).select('id').single();
   return inserted ? inserted.id : null;
 }
+
+export const isRealEmail = e => !!e && !/@sans-email\.invalid$/i.test(e);
 
 // ─── Calcul des pénalités de retard ───
 export function calculateLateFee(scheduledTime, actualTime) {

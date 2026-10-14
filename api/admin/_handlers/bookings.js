@@ -74,7 +74,7 @@ async function create(req, res) {
     reference, client_id: clientId,
     customer_firstname: b.customer.firstname,
     customer_lastname: b.customer.lastname || '',
-    customer_email: b.customer.email.toLowerCase(),
+    customer_email: String(b.customer.email || '').trim().toLowerCase(),
     customer_phone: b.customer.phone,
     customer_flight: b.customer.flight || '',
     departure_date: b.departure.date,
