@@ -6,8 +6,6 @@ import { Resend } from 'resend';
 import { supabase, getNotificationEmail, getContactPhone } from './_lib.js';
 import { clientEmailHTML, adminEmailHTML } from './_emails.js';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2024-06-20' });
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const config = { api: { bodyParser: false } };
 
@@ -21,6 +19,14 @@ async function buffer(readable) {
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
+
+  // Les clients sont créés ici (et non au chargement du module) : sans clés
+  // Stripe, la fonction répond proprement 503 au lieu de planter.
+  if (!process.env.STRIPE_SECRET_KEY || !process.env.STRIPE_WEBHOOK_SECRET) {
+    return res.status(503).json({ error: 'Stripe non configuré' });
+  }
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2024-06-20' });
+  const resend = new Resend(process.env.RESEND_API_KEY);
 
   let event;
   try {
