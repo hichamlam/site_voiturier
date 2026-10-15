@@ -306,19 +306,46 @@ function reviewsBlock() {
 /* ═══ ACCUEIL : COMPARATIF ═══ */
 function comparatif() {
   const OP = F.officialParkings;
+  const ecoPriceOk = terminalPricesOk && isSet(OP.eco.checkedOn);
   const YES = `<span class="cmp-yes">${ico('check', '')}</span>`;
   const NO = `<span class="cmp-no" aria-label="Non">${ico('x', '')}</span>`;
+  const bar = (name, val, w, count) => `<li class="cmp-bar">
+            <div class="cmp-bar-top"><b>${name}</b><strong${count ? ` data-count="${count}"` : ''}>${val}</strong></div>
+            <div class="cmp-track" aria-hidden="true"><span style="--w:${w}%"></span></div>
+          </li>`;
 
-  /* A — La course : temps perdu aller + retour */
-  const race = [
-    { name: `Parkings ${OP.terminal.names}`, val: '20 à 40&nbsp;min', w: 30 },
-    { name: OP.eco.names, val: '40&nbsp;min à 1h20', w: 60 },
-    { name: 'Parking privé + navette', val: '1h30 à 2h', w: 100 },
-  ];
-  const raceHTML = race.map((r) => `<li class="cmp-race-i">
-          <div class="cmp-race-top"><b>${r.name}</b><strong>${r.val}</strong></div>
-          <div class="cmp-track" aria-hidden="true"><span style="--w:${r.w}%"></span></div>
-        </li>`).join('\n        ');
+  /* A — Le tableau d'affichage : 2 manches, 1 gagnant (fond sombre, nous en bleu lumineux) */
+  const round1 = `<div class="cmp-round">
+        <div class="cmp-round-h"><span>Manche 1</span><b>Temps perdu</b><em>aller + retour</em></div>
+        <div class="cmp-win">
+          <div class="cmp-win-l"><span class="cmp-crown">${ico('award', '')}Gagnant</span><b>${F.brand}</b></div>
+          <strong class="cmp-win-n">0<small>min</small></strong>
+          <div class="cmp-win-track" aria-hidden="true"><span class="cmp-dot"></span></div>
+        </div>
+        <ul class="cmp-bars">
+          ${bar(`Parkings ${OP.terminal.names}`, '20 à 40&nbsp;min', 30)}
+          ${bar(OP.eco.names, '40&nbsp;min à 1h20', 60)}
+          ${bar('Parking privé + navette', '1h30 à 2h', 100)}
+        </ul>
+      </div>`;
+  const wk = F.prices.week, tw = OP.terminal.counterWeek, ew = OP.eco.counterWeek;
+  const round2 = terminalPricesOk ? `<div class="cmp-round">
+        <div class="cmp-round-h"><span>Manche 2</span><b>Prix 1 semaine</b><em>tarif guichet*</em></div>
+        <div class="cmp-win">
+          <div class="cmp-win-l"><span class="cmp-crown">${ico('award', '')}Gagnant</span><b>${F.brand}</b></div>
+          <strong class="cmp-win-n"><small>dès</small><span data-count="${wk}">${wk}</span><small>€</small></strong>
+          <div class="cmp-win-track" aria-hidden="true"><span style="--w:${Math.round((wk / tw) * 100)}%"></span></div>
+          <p class="cmp-save">${ico('check', '')}<span><b>${eur(tw - wk)} de moins</b> qu'en ${OP.terminal.names}</span></p>
+        </div>
+        <ul class="cmp-bars">
+          ${bar(`Parkings ${OP.terminal.names}`, `${tw}&nbsp;€`, 100)}
+          ${ecoPriceOk ? bar(OP.eco.names, `${ew}&nbsp;€`, Math.round((ew / tw) * 100)) : ''}
+        </ul>
+        <p class="cmp-pct"><strong>&minus;${Math.round((1 - wk / tw) * 100)}&nbsp;%</strong><span>sur votre semaine à Orly</span></p>
+      </div>` : '';
+  const boardNote = terminalPricesOk
+    ? `* Tarif au guichet (payé sur place) des parkings officiels de l'aéroport Paris-Orly, relevé le ${esc(OP.checkedOn)}, indicatif. Temps estimés hors bouchons.`
+    : 'Temps estimés hors bouchons, à titre indicatif.';
 
   /* B — Le tableau : valeurs courtes, coches et croix */
   const rows = [
@@ -327,7 +354,6 @@ function comparatif() {
     ['plane', 'Vol en retard suivi', YES, NO, NO],
     ['bag', 'Aide aux bagages', YES, NO, NO],
     ['sparkle', 'Lavage pendant le voyage', `${YES}<small>dès ${eur(F.prices.wash.exterieur)}</small>`, NO, NO],
-    ...(terminalPricesOk ? [['euro', 'Prix 1 semaine', `<strong>dès ${eur(F.prices.week)}</strong>`, `≈&nbsp;${eur(OP.terminal.counterWeek)}`, `≈&nbsp;${eur(OP.eco.counterWeek)}`]] : []),
   ];
   const cols = [F.brand, OP.terminal.names, OP.eco.names];
   const rowHTML = rows.map(([k, label, a, b, c]) => `<tr>
@@ -336,9 +362,6 @@ function comparatif() {
             <td data-label="${cols[1]}">${b}</td>
             <td data-label="${cols[2]}">${c}</td>
           </tr>`).join('\n          ');
-  const source = terminalPricesOk
-    ? `Tarifs au guichet (payés sur place) des parkings officiels de l'aéroport Paris-Orly, relevés le ${esc(OP.checkedOn)}, indicatifs. Temps estimés hors bouchons.`
-    : 'Temps estimés hors bouchons, à titre indicatif.';
 
   /* C — Le parcours : 8 étapes avec une navette, 2 avec nous */
   const shuttle = [
@@ -349,35 +372,31 @@ function comparatif() {
   const shuttleHTML = `<div class="cmp-path-row"><em>Aller</em><ol class="cmp-path-steps">${shuttle.slice(0, 4).map(stepLi).join('')}</ol></div>
         <div class="cmp-path-row"><em>Retour</em><ol class="cmp-path-steps">${shuttle.slice(4).map(stepLi).join('')}</ol></div>`;
 
-  /* D — Pourquoi nous : icône + titre, une ligne max */
+  /* D — Pourquoi nous : 6 cartes, gros chiffre ou mot-clé */
   const why = [
-    ['clock', '0 min de marche', 'Orly 1, 2, 3 et 4'],
-    ['award', `${cap(nb(F.yearsAtOrly))} à Orly`, `${nb(F.travelers)} voyageurs`],
+    ['clock', '0 min', 'de marche, Orly 1 à 4'],
     ['star', `${ratingFr}/5`, `${F.reviewCount} avis Google`],
-    ['plane', 'Vol suivi', 'Même en retard'],
-    ['bag', 'Bagages chargés', 'Au retour'],
-    ['camera', 'Photos de contrôle', 'À la remise des clés'],
-    ['shield', 'Surveillé 24h/24', `Vidéo · couvert +${eur(F.prices.covered)}`],
-    ['euro', 'Prix total affiché', 'En ligne ou sur place'],
+    ['award', `${cap(nb(F.yearsAtOrly))}`, `à Orly · ${nb(F.travelers)} voyageurs`],
+    ['plane', 'Vol suivi', 'même en retard'],
+    ['bag', 'Bagages', 'chargés au retour'],
+    ['euro', 'Prix total', 'affiché, sans surprise'],
   ];
-  const whyHTML = why.map(([k, t, d]) => `<li class="cmp-why-i"><i>${ico(k, '')}</i><div><b>${t}</b><span>${d}</span></div></li>`).join('\n        ');
+  const whyHTML = why.map(([k, t, d]) => `<li class="cmp-why-i"><i>${ico(k, '')}</i><b>${t}</b><span>${d}</span></li>`).join('\n        ');
 
   return `<section class="h-section h-cmp" id="comparatif" aria-labelledby="cmp-title">
   <div class="h-wrap">
     <div class="h-head reveal">
       <span class="h-eyebrow">Comparatif Orly</span>
       <h2 id="cmp-title">Voiturier ou parking à Orly&nbsp;: <span class="cmp-hl">le&nbsp;match</span></h2>
-      <p>Temps perdu sur l'aller + le retour, sans bouchons.</p>
+      <p>${terminalPricesOk ? '2 manches. Un seul gagnant.' : 'Le temps perdu, sans bouchons.'}</p>
     </div>
 
-    <div class="cmp-race reveal">
-      <div class="cmp-race-us">
-        <div class="cmp-race-us-l"><span class="cmp-pill">Le plus rapide</span><b>${F.brand}</b><span>Clés au dépose-minute de votre terminal</span></div>
-        <strong class="cmp-race-us-n">0<small>min</small></strong>
+    <div class="cmp-board reveal${terminalPricesOk ? ' has-2' : ''}">
+      <div class="cmp-rounds">
+      ${round1}
+      ${round2}
       </div>
-      <ul class="cmp-race-list">
-        ${raceHTML}
-      </ul>
+      <p class="cmp-board-note">${boardNote}</p>
     </div>
 
     <div class="cmp-table-wrap reveal">
@@ -395,22 +414,21 @@ function comparatif() {
           ${rowHTML}
         </tbody>
       </table>
-      <p class="cmp-source">${source}</p>
     </div>
 
     <div class="cmp-path reveal">
       <div class="cmp-path-col is-them">
         <div class="cmp-path-h"><b>Avec une navette</b><strong>8 étapes</strong></div>
         ${shuttleHTML}
-        <p class="cmp-path-r">≈&nbsp;1h30 à 2h perdues</p>
+        <p class="cmp-path-r">${ico('hourglass', '')}≈&nbsp;1h30 à 2h perdues</p>
       </div>
       <div class="cmp-path-col is-us">
         <div class="cmp-path-h"><b>Avec ${F.brand}</b><strong>2 étapes</strong></div>
         <ol class="cmp-path-steps">
-          <li><i>${ico('key', '')}</i><span>Vous donnez vos clés au dépose-minute</span></li>
-          <li><i>${ico('key', '')}</i><span>Vous les récupérez au même endroit</span></li>
+          <li><i>${ico('key', '')}</i><span><em>Aller</em>Vous donnez vos clés au dépose-minute</span></li>
+          <li><i>${ico('key', '')}</i><span><em>Retour</em>Vous les récupérez au même endroit</span></li>
         </ol>
-        <p class="cmp-path-r">0 attente, 0 navette</p>
+        <p class="cmp-path-r">${ico('check', '')}0 attente, 0 navette</p>
       </div>
     </div>
 
@@ -419,9 +437,11 @@ function comparatif() {
       <ul class="cmp-why-grid">
         ${whyHTML}
       </ul>
-      <div class="cmp-cta"><a class="h-btn lg" href="#reserver" data-focus-calc><span>Calculer mon prix en 30 secondes</span>${ico('arrow')}</a></div>
+      <div class="cmp-cta"><a class="h-btn lg" href="#reserver" data-focus-calc><span>Calculer mon prix en 30 secondes</span>${ico('arrow')}</a>
+        <a class="cmp-more" href="/comparatif-parking-orly">Voir le comparatif détaillé des parkings d'Orly ${ico('arrow')}</a></div>
     </div>
   </div>
+  <script>(function(){var r=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;if(r||!('IntersectionObserver' in window))return;var io=new IntersectionObserver(function(es){es.forEach(function(e){if(!e.isIntersecting)return;io.unobserve(e.target);var el=e.target,end=+el.getAttribute('data-count'),html=el.innerHTML,t0=null;function f(t){if(!t0)t0=t;var p=Math.min((t-t0)/1100,1);p=1-Math.pow(1-p,3);el.textContent=Math.round(end*p);if(p<1)requestAnimationFrame(f);else el.innerHTML=html;}requestAnimationFrame(f);});},{threshold:.6});document.querySelectorAll('#comparatif [data-count]').forEach(function(n){io.observe(n);});})();</script>
 </section>`;
 }
 

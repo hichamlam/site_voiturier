@@ -341,28 +341,52 @@ window.VO_CONTACT = {
     <div class="h-head reveal">
       <span class="h-eyebrow">Comparatif Orly</span>
       <h2 id="cmp-title">Voiturier ou parking à Orly&nbsp;: <span class="cmp-hl">le&nbsp;match</span></h2>
-      <p>Temps perdu sur l'aller + le retour, sans bouchons.</p>
+      <p>2 manches. Un seul gagnant.</p>
     </div>
 
-    <div class="cmp-race reveal">
-      <div class="cmp-race-us">
-        <div class="cmp-race-us-l"><span class="cmp-pill">Le plus rapide</span><b>Direct Voiturier</b><span>Clés au dépose-minute de votre terminal</span></div>
-        <strong class="cmp-race-us-n">0<small>min</small></strong>
+    <div class="cmp-board reveal has-2">
+      <div class="cmp-rounds">
+      <div class="cmp-round">
+        <div class="cmp-round-h"><span>Manche 1</span><b>Temps perdu</b><em>aller + retour</em></div>
+        <div class="cmp-win">
+          <div class="cmp-win-l"><span class="cmp-crown"><svg class="" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4zM7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4"/></svg>Gagnant</span><b>Direct Voiturier</b></div>
+          <strong class="cmp-win-n">0<small>min</small></strong>
+          <div class="cmp-win-track" aria-hidden="true"><span class="cmp-dot"></span></div>
+        </div>
+        <ul class="cmp-bars">
+          <li class="cmp-bar">
+            <div class="cmp-bar-top"><b>Parkings P1, P2, P3</b><strong>20 à 40&nbsp;min</strong></div>
+            <div class="cmp-track" aria-hidden="true"><span style="--w:30%"></span></div>
+          </li>
+          <li class="cmp-bar">
+            <div class="cmp-bar-top"><b>P Eco / P Eco 2</b><strong>40&nbsp;min à 1h20</strong></div>
+            <div class="cmp-track" aria-hidden="true"><span style="--w:60%"></span></div>
+          </li>
+          <li class="cmp-bar">
+            <div class="cmp-bar-top"><b>Parking privé + navette</b><strong>1h30 à 2h</strong></div>
+            <div class="cmp-track" aria-hidden="true"><span style="--w:100%"></span></div>
+          </li>
+        </ul>
       </div>
-      <ul class="cmp-race-list">
-        <li class="cmp-race-i">
-          <div class="cmp-race-top"><b>Parkings P1, P2, P3</b><strong>20 à 40&nbsp;min</strong></div>
-          <div class="cmp-track" aria-hidden="true"><span style="--w:30%"></span></div>
-        </li>
-        <li class="cmp-race-i">
-          <div class="cmp-race-top"><b>P Eco / P Eco 2</b><strong>40&nbsp;min à 1h20</strong></div>
-          <div class="cmp-track" aria-hidden="true"><span style="--w:60%"></span></div>
-        </li>
-        <li class="cmp-race-i">
-          <div class="cmp-race-top"><b>Parking privé + navette</b><strong>1h30 à 2h</strong></div>
-          <div class="cmp-track" aria-hidden="true"><span style="--w:100%"></span></div>
-        </li>
-      </ul>
+      <div class="cmp-round">
+        <div class="cmp-round-h"><span>Manche 2</span><b>Prix 1 semaine</b><em>tarif guichet*</em></div>
+        <div class="cmp-win">
+          <div class="cmp-win-l"><span class="cmp-crown"><svg class="" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4zM7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4"/></svg>Gagnant</span><b>Direct Voiturier</b></div>
+          <strong class="cmp-win-n"><small>dès</small><span data-count="79">79</span><small>€</small></strong>
+          <div class="cmp-win-track" aria-hidden="true"><span style="--w:30%"></span></div>
+          <p class="cmp-save"><svg class="" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span><b>186&nbsp;€ de moins</b> qu'en P1, P2, P3</span></p>
+        </div>
+        <ul class="cmp-bars">
+          <li class="cmp-bar">
+            <div class="cmp-bar-top"><b>Parkings P1, P2, P3</b><strong>265&nbsp;€</strong></div>
+            <div class="cmp-track" aria-hidden="true"><span style="--w:100%"></span></div>
+          </li>
+          
+        </ul>
+        <p class="cmp-pct"><strong>&minus;70&nbsp;%</strong><span>sur votre semaine à Orly</span></p>
+      </div>
+      </div>
+      <p class="cmp-board-note">* Tarif au guichet (payé sur place) des parkings officiels de l'aéroport Paris-Orly, relevé le 15 octobre 2026, indicatif. Temps estimés hors bouchons.</p>
     </div>
 
     <div class="cmp-table-wrap reveal">
@@ -409,7 +433,6 @@ window.VO_CONTACT = {
           </tr>
         </tbody>
       </table>
-      <p class="cmp-source">Temps estimés hors bouchons, à titre indicatif.</p>
     </div>
 
     <div class="cmp-path reveal">
@@ -417,33 +440,33 @@ window.VO_CONTACT = {
         <div class="cmp-path-h"><b>Avec une navette</b><strong>8 étapes</strong></div>
         <div class="cmp-path-row"><em>Aller</em><ol class="cmp-path-steps"><li><i><svg class="" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></i><span>Trouver le parking</span></li><li><i><svg class="" viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l3 3M14 9l2 2"/></svg></i><span>Remettre les clés</span></li><li><i><svg class="" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12M6 21h12M7 3c0 5 10 5 10 9s-10 4-10 9M17 3c0 5-10 5-10 9s10 4 10 9"/></svg></i><span>Attendre la navette</span></li><li><i><svg class="" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="15" rx="3"/><path d="M4 11h16M8 21v-3M16 21v-3"/><circle cx="8" cy="14.5" r=".8"/><circle cx="16" cy="14.5" r=".8"/></svg></i><span>Trajet vers Orly</span></li></ol></div>
         <div class="cmp-path-row"><em>Retour</em><ol class="cmp-path-steps"><li><i><svg class="" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12M6 21h12M7 3c0 5 10 5 10 9s-10 4-10 9M17 3c0 5-10 5-10 9s10 4 10 9"/></svg></i><span>Attendre la navette</span></li><li><i><svg class="" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="15" rx="3"/><path d="M4 11h16M8 21v-3M16 21v-3"/><circle cx="8" cy="14.5" r=".8"/><circle cx="16" cy="14.5" r=".8"/></svg></i><span>Trajet retour</span></li><li><i><svg class="" viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l3 3M14 9l2 2"/></svg></i><span>Retrouver la voiture</span></li><li><i><svg class="" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 6.5A6 6 0 1 0 17 17.5M4 10h9M4 14h9"/></svg></i><span>Payer et sortir</span></li></ol></div>
-        <p class="cmp-path-r">≈&nbsp;1h30 à 2h perdues</p>
+        <p class="cmp-path-r"><svg class="" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12M6 21h12M7 3c0 5 10 5 10 9s-10 4-10 9M17 3c0 5-10 5-10 9s10 4 10 9"/></svg>≈&nbsp;1h30 à 2h perdues</p>
       </div>
       <div class="cmp-path-col is-us">
         <div class="cmp-path-h"><b>Avec Direct Voiturier</b><strong>2 étapes</strong></div>
         <ol class="cmp-path-steps">
-          <li><i><svg class="" viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l3 3M14 9l2 2"/></svg></i><span>Vous donnez vos clés au dépose-minute</span></li>
-          <li><i><svg class="" viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l3 3M14 9l2 2"/></svg></i><span>Vous les récupérez au même endroit</span></li>
+          <li><i><svg class="" viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l3 3M14 9l2 2"/></svg></i><span><em>Aller</em>Vous donnez vos clés au dépose-minute</span></li>
+          <li><i><svg class="" viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l3 3M14 9l2 2"/></svg></i><span><em>Retour</em>Vous les récupérez au même endroit</span></li>
         </ol>
-        <p class="cmp-path-r">0 attente, 0 navette</p>
+        <p class="cmp-path-r"><svg class="" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>0 attente, 0 navette</p>
       </div>
     </div>
 
     <div class="cmp-why reveal">
       <h3 class="cmp-why-t">Pourquoi Direct Voiturier</h3>
       <ul class="cmp-why-grid">
-        <li class="cmp-why-i"><i><svg class="" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></i><div><b>0 min de marche</b><span>Orly 1, 2, 3 et 4</span></div></li>
-        <li class="cmp-why-i"><i><svg class="" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4zM7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4"/></svg></i><div><b>Plus&nbsp;de&nbsp;6&nbsp;ans à Orly</b><span>+9&nbsp;000 voyageurs</span></div></li>
-        <li class="cmp-why-i"><i><svg class="" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></i><div><b>4,6/5</b><span>396 avis Google</span></div></li>
-        <li class="cmp-why-i"><i><svg class="" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg></i><div><b>Vol suivi</b><span>Même en retard</span></div></li>
-        <li class="cmp-why-i"><i><svg class="" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="7" width="14" height="13" rx="2"/><path d="M9 7V4h6v3M9 11v5M15 11v5"/></svg></i><div><b>Bagages chargés</b><span>Au retour</span></div></li>
-        <li class="cmp-why-i"><i><svg class="" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8h4l2-3h6l2 3h4v12H3z"/><circle cx="12" cy="13" r="4"/></svg></i><div><b>Photos de contrôle</b><span>À la remise des clés</span></div></li>
-        <li class="cmp-why-i"><i><svg class="" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="m9 12 2 2 4-4"/></svg></i><div><b>Surveillé 24h/24</b><span>Vidéo · couvert +20&nbsp;€</span></div></li>
-        <li class="cmp-why-i"><i><svg class="" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 6.5A6 6 0 1 0 17 17.5M4 10h9M4 14h9"/></svg></i><div><b>Prix total affiché</b><span>En ligne ou sur place</span></div></li>
+        <li class="cmp-why-i"><i><svg class="" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></i><b>0 min</b><span>de marche, Orly 1 à 4</span></li>
+        <li class="cmp-why-i"><i><svg class="" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></i><b>4,6/5</b><span>396 avis Google</span></li>
+        <li class="cmp-why-i"><i><svg class="" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4zM7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4"/></svg></i><b>Plus&nbsp;de&nbsp;6&nbsp;ans</b><span>à Orly · +9&nbsp;000 voyageurs</span></li>
+        <li class="cmp-why-i"><i><svg class="" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg></i><b>Vol suivi</b><span>même en retard</span></li>
+        <li class="cmp-why-i"><i><svg class="" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="7" width="14" height="13" rx="2"/><path d="M9 7V4h6v3M9 11v5M15 11v5"/></svg></i><b>Bagages</b><span>chargés au retour</span></li>
+        <li class="cmp-why-i"><i><svg class="" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 6.5A6 6 0 1 0 17 17.5M4 10h9M4 14h9"/></svg></i><b>Prix total</b><span>affiché, sans surprise</span></li>
       </ul>
-      <div class="cmp-cta"><a class="h-btn lg" href="#reserver" data-focus-calc><span>Calculer mon prix en 30 secondes</span><svg class="h-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a></div>
+      <div class="cmp-cta"><a class="h-btn lg" href="#reserver" data-focus-calc><span>Calculer mon prix en 30 secondes</span><svg class="h-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+        <a class="cmp-more" href="/comparatif-parking-orly">Voir le comparatif détaillé des parkings d'Orly <svg class="h-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a></div>
     </div>
   </div>
+  <script>(function(){var r=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;if(r||!('IntersectionObserver' in window))return;var io=new IntersectionObserver(function(es){es.forEach(function(e){if(!e.isIntersecting)return;io.unobserve(e.target);var el=e.target,end=+el.getAttribute('data-count'),html=el.innerHTML,t0=null;function f(t){if(!t0)t0=t;var p=Math.min((t-t0)/1100,1);p=1-Math.pow(1-p,3);el.textContent=Math.round(end*p);if(p<1)requestAnimationFrame(f);else el.innerHTML=html;}requestAnimationFrame(f);});},{threshold:.6});document.querySelectorAll('#comparatif [data-count]').forEach(function(n){io.observe(n);});})();</script>
 </section>
 <!--/seo:comparatif-->
 

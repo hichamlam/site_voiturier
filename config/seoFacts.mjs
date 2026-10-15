@@ -32,9 +32,9 @@ export const seoFacts = {
   // À VÉRIFIER avant mise en ligne. Tant que checkedOn vaut "TODO_ALEX",
   // la ligne « Prix 1 semaine » du comparatif n'est PAS affichée.
   officialParkings: {
-    checkedOn: "TODO_ALEX",                  // ex: "15/10/2026"
+    checkedOn: "15 octobre 2026",            // vérifié par Alex : P1-P3 = 265 € / 7 jours
     terminal: { names: "P1, P2, P3", counterWeek: 265 },
-    eco: { names: "P Eco / P Eco 2", counterWeek: 170 },
+    eco: { names: "P Eco / P Eco 2", counterWeek: 170, checkedOn: "TODO_ALEX" }, // prix P Eco affiché seulement si vérifié
   },
   // Page Mentions légales — seul endroit du site où une adresse postale apparaît.
   legal: {
