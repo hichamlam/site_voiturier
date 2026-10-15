@@ -22,6 +22,7 @@ import { fileURLToPath } from 'node:url';
 import { seoFacts as F } from '../config/seoFacts.mjs';
 import { reviews as REVIEWS } from '../content/reviews.mjs';
 import { faqAccueil } from '../content/faq-accueil.mjs';
+import { pagesExtra } from '../content/pages-extra.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PUB = path.join(ROOT, 'public');
@@ -111,7 +112,9 @@ function header({ home }) {
 }
 
 /* ═══ PIED DE PAGE (toutes les pages) ═══ */
-function footer() {
+function footer({ wa = false } = {}) {
+  const waNum = isSet(F.whatsapp) ? String(F.whatsapp).replace(/[^0-9]/g, '') : '';
+  const waFloat = wa && waNum ? `\n<a class="wa-float" href="https://wa.me/${waNum}?text=${encodeURIComponent('Bonjour, je souhaite réserver un voiturier à Orly.')}" target="_blank" rel="noopener" aria-label="Nous écrire sur WhatsApp"><svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M16 3C9.4 3 4 8.4 4 15c0 2.1.6 4.2 1.6 6L4 29l8.2-1.5c1.2.6 2.5.9 3.8.9 6.6 0 12-5.4 12-12S22.6 3 16 3zm0 21.8c-1.2 0-2.4-.3-3.5-.8l-.6-.3-4.9.9 1-4.7-.4-.6c-.9-1.5-1.4-3.2-1.4-5 0-5.4 4.4-9.8 9.8-9.8s9.8 4.4 9.8 9.8-4.4 9.5-9.8 9.5zm5.4-7.3c-.3-.1-1.7-.9-2-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-.9 1.2-.2.2-.3.2-.6.1-.3-.1-1.2-.5-2.4-1.5-.9-.8-1.5-1.8-1.6-2.1-.2-.3 0-.4.1-.6l.4-.5c.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5 0-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.1-.3-.2-.6-.4z"/></svg></a>` : '';
   const tel = telHref ? `\n        <li><a href="${telHref}">${esc(F.phone)}</a></li>` : '';
   return `<footer class="h-footer">
   <div class="h-wrap">
@@ -160,7 +163,7 @@ function footer() {
       <p>© ${YEAR} ${F.brand} · Aéroport Paris-Orly</p>
     </div>
   </div>
-</footer>`;
+</footer>${waFloat}`;
 }
 
 /* ═══ ACCUEIL : <head> ═══ */
@@ -200,7 +203,7 @@ function homeJsonLd() {
     name: F.brand,
     url: `${SITE}/`,
     email: F.email,
-    ...(isSet(F.phone) ? { telephone: telHref.slice(4) } : {}),
+    ...(isSet(F.phone) ? { telephone: telHref.slice(4).replace(/^0/, '+33') } : {}),
     image: `${SITE}/og-image.jpg`,
     description: `Service de voiturier à l'aéroport Paris-Orly : prise en charge et restitution au dépose-minute des terminaux Orly 1, 2, 3 et 4, gardiennage sous vidéosurveillance 24h/24. Présent à Orly depuis ${F.yearsAtOrly}.`,
     priceRange: `${P.shortStay} € - ${Math.max(P.wash.premium, P.shortStay)} €`,
@@ -306,7 +309,6 @@ function reviewsBlock() {
 /* ═══ ACCUEIL : COMPARATIF ═══ */
 function comparatif() {
   const OP = F.officialParkings;
-  const ecoPriceOk = terminalPricesOk && isSet(OP.eco.checkedOn);
   const YES = `<span class="cmp-yes">${ico('check', '')}</span>`;
   const NO = `<span class="cmp-no" aria-label="Non">${ico('x', '')}</span>`;
   const bar = (name, val, w, count) => `<li class="cmp-bar">
@@ -324,11 +326,10 @@ function comparatif() {
         </div>
         <ul class="cmp-bars">
           ${bar(`Parkings ${OP.terminal.names}`, '20 à 40&nbsp;min', 30)}
-          ${bar(OP.eco.names, '40&nbsp;min à 1h20', 60)}
           ${bar('Parking privé + navette', '1h30 à 2h', 100)}
         </ul>
       </div>`;
-  const wk = F.prices.week, tw = OP.terminal.counterWeek, ew = OP.eco.counterWeek;
+  const wk = F.prices.week, tw = OP.terminal.counterWeek;
   const round2 = terminalPricesOk ? `<div class="cmp-round">
         <div class="cmp-round-h"><span>Manche 2</span><b>Prix 1 semaine</b><em>tarif guichet*</em></div>
         <div class="cmp-win">
@@ -339,7 +340,6 @@ function comparatif() {
         </div>
         <ul class="cmp-bars">
           ${bar(`Parkings ${OP.terminal.names}`, `${tw}&nbsp;€`, 100)}
-          ${ecoPriceOk ? bar(OP.eco.names, `${ew}&nbsp;€`, Math.round((ew / tw) * 100)) : ''}
         </ul>
         <p class="cmp-pct"><strong>&minus;${Math.round((1 - wk / tw) * 100)}&nbsp;%</strong><span>sur votre semaine à Orly</span></p>
       </div>` : '';
@@ -349,18 +349,17 @@ function comparatif() {
 
   /* B — Le tableau : valeurs courtes, coches et croix */
   const rows = [
-    ['walk', 'Marche avec les valises', `<strong>0&nbsp;min</strong>`, '3 à 10&nbsp;min', 'Navette 15&nbsp;min'],
-    ['pin', 'Où laisser la voiture', `<strong>Devant le terminal</strong>`, 'Dans le parking', 'Parking éloigné'],
-    ['plane', 'Vol en retard suivi', YES, NO, NO],
-    ['bag', 'Aide aux bagages', YES, NO, NO],
-    ['sparkle', 'Lavage pendant le voyage', `${YES}<small>dès ${eur(F.prices.wash.exterieur)}</small>`, NO, NO],
+    ['walk', 'Marche avec les valises', `<strong>0&nbsp;min</strong>`, '3 à 10&nbsp;min'],
+    ['pin', 'Où laisser la voiture', `<strong>Devant le terminal</strong>`, 'Dans le parking'],
+    ['plane', 'Vol en retard suivi', YES, NO],
+    ['bag', 'Aide aux bagages', YES, NO],
+    ['sparkle', 'Lavage pendant le voyage', `${YES}<small>dès ${eur(F.prices.wash.exterieur)}</small>`, NO],
   ];
-  const cols = [F.brand, OP.terminal.names, OP.eco.names];
-  const rowHTML = rows.map(([k, label, a, b, c]) => `<tr>
+  const cols = [F.brand, OP.terminal.names];
+  const rowHTML = rows.map(([k, label, a, b]) => `<tr>
             <th scope="row"><i>${ico(k, '')}</i>${label}</th>
             <td class="is-us" data-label="${cols[0]}">${a}</td>
             <td data-label="${cols[1]}">${b}</td>
-            <td data-label="${cols[2]}">${c}</td>
           </tr>`).join('\n          ');
 
   /* C — Le parcours : 8 étapes avec une navette, 2 avec nous */
@@ -407,7 +406,6 @@ function comparatif() {
             <th scope="col"><span class="h-sr">Critère</span></th>
             <th scope="col" class="is-us"><span class="cmp-rec">Le plus choisi</span>${F.brand}</th>
             <th scope="col">${OP.terminal.names}</th>
-            <th scope="col">${OP.eco.names}</th>
           </tr>
         </thead>
         <tbody>
@@ -598,7 +596,6 @@ ${F.brand} permet aux voyageurs au départ de l'aéroport Paris-Orly (ORY) de co
 
 - Voiturier ${F.brand} : 0 minute de marche, la voiture est remise et récupérée au dépose-minute du terminal. Suivi du vol en cas de retard, aide aux bagages au retour.
 - Parkings officiels P1, P2, P3 : 3 à 10 minutes à pied par trajet avec les valises, soit environ 20 à 40 minutes perdues sur l'aller et le retour.
-- P Eco / P Eco 2 : navette d'environ 15 minutes (passage toutes les 9 à 15 minutes), deux fois, soit environ 40 minutes à 1h20 perdues.
 - Parking privé avec navette : 1h30 à 2h perdues au total (trouver le parking, attendre la navette, le trajet, retrouver la voiture, à l'aller comme au retour).
 - Détail : [Voiturier ou parking à Orly](${SITE}/#comparatif)
 
@@ -701,12 +698,69 @@ const homeRegions = {
 for (const [k, v] of Object.entries(homeRegions)) idx = replaceRegion(idx, k, v, 'index.html');
 write('index.html', idx);
 
+
+/* ═══ PAGES SECONDAIRES : bloc « L'essentiel » + FAQ (contenu : content/pages-extra.mjs) ═══ */
+const EXTRA = pagesExtra(F);
+const ENT = { nbsp: ' ', eacute: 'é', egrave: 'è', ecirc: 'ê', agrave: 'à', Agrave: 'À', Eacute: 'É', ugrave: 'ù', ocirc: 'ô', ccedil: 'ç', amp: '&', middot: '·', euro: '€', minus: '−', rarr: '→', mdash: '—', quot: '"', lt: '<', gt: '>' };
+const decode = (t) => t.replace(/&#x([0-9a-f]+);/gi, (_, x) => String.fromCodePoint(parseInt(x, 16)))
+  .replace(/&#(\d+);/g, (_, d) => String.fromCodePoint(+d)).replace(/&([a-z]+);/gi, (m, n) => (n in ENT ? ENT[n] : m));
+const faqItem = ({ q, a }) => `      <details class="faq-item">
+        <summary>${q}</summary>
+        <div class="faq-body">${a}</div>
+      </details>`;
+const dayLabel = (d) => ({ 1: '1 jour', 7: '1 semaine', 14: '2 semaines', 21: '3 semaines', 30: '1 mois' }[d] || `${d} jours`);
+const WA_NUM = isSet(F.whatsapp) ? String(F.whatsapp).replace(/[^0-9]/g, '') : '';
+const WA_ICON = '<svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M16 3C9.4 3 4 8.4 4 15c0 2.1.6 4.2 1.6 6L4 29l8.2-1.5c1.2.6 2.5.9 3.8.9 6.6 0 12-5.4 12-12S22.6 3 16 3zm0 21.8c-1.2 0-2.4-.3-3.5-.8l-.6-.3-4.9.9 1-4.7-.4-.6c-.9-1.5-1.4-3.2-1.4-5 0-5.4 4.4-9.8 9.8-9.8s9.8 4.4 9.8 9.8-4.4 9.5-9.8 9.5z"/></svg>';
+function contactLinks() {
+  const tel = telHref ? `<a class="px-call" href="${telHref}">${ico('phone', '')}<span>${esc(F.phone)}</span></a>` : '';
+  const wa = WA_NUM ? `<a class="px-wa" href="https://wa.me/${WA_NUM}?text=${encodeURIComponent('Bonjour, je souhaite réserver un voiturier à Orly.')}" target="_blank" rel="noopener">${WA_ICON}<span>WhatsApp</span></a>` : '';
+  return tel + wa;
+}
+function extraBlock(slug, e) {
+  const G = F.prices.grid, OP = F.officialParkings;
+  const tiles = (e.grid || []).filter((d) => G[d]).map((d) => `<li${d === 7 ? ' class="is-key"' : ''}><span>${dayLabel(d)}</span><b>${G[d]}<small>&nbsp;€</small></b></li>`).join('');
+  const vsOk = e.vs && terminalPricesOk;
+  const vs = vsOk ? `<div class="px-vs"><p><span>1 semaine au guichet ${OP.terminal.names}*</span><s>${eur(OP.terminal.counterWeek)}</s></p><p class="is-us"><span>1 semaine avec ${F.brand}</span><b>${eur(G[7])}</b></p><strong>&minus;${eur(OP.terminal.counterWeek - G[7])}</strong></div>` : '';
+  const note = [vsOk ? `* Tarif au guichet des parkings officiels de l'aéroport Paris-Orly, relevé le ${esc(OP.checkedOn)}, indicatif.` : '', tiles ? 'Prix de base tout compris, jour du départ et jour du retour inclus, hors options.' : ''].filter(Boolean).join(' ');
+  return `<section class="px" aria-labelledby="px-t">
+  <div class="container">
+    <div class="section-head">
+      <p class="section-eyebrow">${e.eyebrow}</p>
+      <h2 class="section-title" id="px-t">${e.title}</h2>
+    </div>
+    <div class="px-card">${tiles ? `\n      <ul class="px-tiles">${tiles}</ul>` : ''}${vs ? `\n      ${vs}` : ''}
+      <div class="px-prose">${e.prose.map((t) => `<p>${t}</p>`).join('')}</div>
+      <div class="px-actions"><a class="h-btn" href="/#reserver"><span>Calculer mon prix exact</span>${ico('arrow')}</a>${contactLinks()}</div>${note ? `\n      <p class="px-note">${note}</p>` : ''}
+    </div>
+  </div>
+</section>`;
+}
+// Le FAQPage JSON-LD reprend exactement les questions visibles de la page.
+function syncFaqLd(h) {
+  const items = [...h.matchAll(/<details class="faq-item"[^>]*>\s*<summary>([\s\S]*?)<\/summary>\s*<div class="faq-body"[^>]*>([\s\S]*?)<\/div>\s*<\/details>/g)]
+    .map(([, q, a]) => ({ '@type': 'Question', name: decode(stripTags(q)), acceptedAnswer: { '@type': 'Answer', text: decode(stripTags(a)) } }));
+  const m = h.match(/(<script type="application\/ld\+json">\s*)([\s\S]*?)(\s*<\/script>)/);
+  if (!m || !items.length) return h;
+  let data; try { data = JSON.parse(m[2]); } catch { return h; }
+  if (!data['@graph']) return h;
+  const g = data['@graph'];
+  const i = g.findIndex((n) => n['@type'] === 'FAQPage');
+  const node = { '@type': 'FAQPage', mainEntity: items };
+  if (i >= 0) g[i] = node; else g.push(node);
+  return h.replace(m[0], m[1] + JSON.stringify(data) + m[3]);
+}
+
 // 2. Pages secondaires : en-tête + pied de page communs
-for (const f of fs.readdirSync(PUB).filter((x) => x.endsWith('.html') && x !== 'index.html')) {
+for (const f of fs.readdirSync(PUB).filter((x) => x.endsWith('.html') && !['index.html', 'conditions-generales.html', 'mentions-legales.html'].includes(x))) {
   let h = fs.readFileSync(path.join(PUB, f), 'utf8');
   if (!hasRegion(h, 'header')) continue;
   h = replaceRegion(h, 'header', header({ home: false }), f);
-  h = replaceRegion(h, 'footer', footer(), f);
+  h = replaceRegion(h, 'footer', footer({ wa: true }), f);
+  const slug = f.replace(/\.html$/, '');
+  const ex = EXTRA[slug];
+  if (ex && hasRegion(h, 'extra')) h = replaceRegion(h, 'extra', extraBlock(slug, ex), f);
+  if (ex && hasRegion(h, 'extrafaq')) h = replaceRegion(h, 'extrafaq', (ex.faq || []).map(faqItem).join('\n'), f);
+  h = syncFaqLd(h);
   write(f, h);
 }
 

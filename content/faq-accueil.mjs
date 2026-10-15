@@ -22,7 +22,7 @@ export const faqAccueil = (f) => [
   },
   {
     q: "Voiturier ou parking officiel à Orly : qu'est-ce qui est le plus rapide ?",
-    a: "Avec un voiturier, 0 minute de marche : vous déposez vos clés au dépose-minute de votre terminal. Avec un parking officiel, comptez 3 à 10 min à pied par trajet (P1, P2, P3), ou une navette d'environ 15 min (P Eco). <a href=\"#comparatif\">Voir le comparatif</a>",
+    a: "Avec un voiturier, 0 minute de marche : vous déposez vos clés au dépose-minute de votre terminal. Avec un parking officiel, comptez 3 à 10 min à pied par trajet avec les valises (P1, P2, P3). <a href=\"#comparatif\">Voir le comparatif</a>",
   },
   {
     q: "Depuis quand êtes-vous à Orly ?",

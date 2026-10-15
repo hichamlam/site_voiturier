@@ -13,8 +13,8 @@ export const seoFacts = {
   brand: "Direct Voiturier",
   url: "https://www.directvoiturier.com/",
   email: "contact@directvoiturier.com",
-  phone: "TODO_ALEX",            // ex: "06 12 34 56 78" — affiché seulement si renseigné
-  whatsapp: "TODO_ALEX",         // ex: "33612345678" (sans +, sans espaces)
+  phone: "07 59 54 23 68",        // = Paramètres du back-office (contact_phone)
+  whatsapp: "33759542368",       // = Paramètres du back-office (contact_whatsapp)
   googleReviewsUrl: "TODO_ALEX", // lien de la fiche Google (Maps → ta fiche → Partager → Copier le lien)
   yearsAtOrly: "plus de 6 ans",
   travelers: "+9 000",
@@ -27,6 +27,9 @@ export const seoFacts = {
     covered: 20,     // option parking couvert
     priority: 20,    // option accès prioritaire
     wash: { exterieur: 29, interieur: 49, complet: 69, premium: 99 },
+    // Grille de base (jours calendaires, départ et retour compris), identique au moteur de prix
+    // (vérifiée sur /api/pricing le 15 octobre 2026). Hors options et suppléments horaires.
+    grid: { 1: 29, 2: 49, 3: 59, 4: 65, 5: 69, 6: 75, 7: 79, 8: 89, 10: 109, 14: 139, 21: 209, 30: 299 },
   },
   // Tarifs AU GUICHET (sur place, sans réservation) des parkings officiels Paris-Orly.
   // À VÉRIFIER avant mise en ligne. Tant que checkedOn vaut "TODO_ALEX",
@@ -34,7 +37,6 @@ export const seoFacts = {
   officialParkings: {
     checkedOn: "15 octobre 2026",            // vérifié par Alex : P1-P3 = 265 € / 7 jours
     terminal: { names: "P1, P2, P3", counterWeek: 265 },
-    eco: { names: "P Eco / P Eco 2", counterWeek: 170, checkedOn: "TODO_ALEX" }, // prix P Eco affiché seulement si vérifié
   },
   // Page Mentions légales — seul endroit du site où une adresse postale apparaît.
   legal: {

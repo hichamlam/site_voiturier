@@ -692,6 +692,11 @@ async function applyPaymentConfig() {
     cfg = await res.json();
   } catch { return; }
   initPromoBanner(cfg);
+  // Le numéro saisi dans le back-office (Paramètres) prime sur celui figé au build
+  const ct = cfg.contact || {};
+  if (ct.contact_phone || ct.contact_whatsapp) {
+    applyContact({ PHONE: ct.contact_phone || '', WHATSAPP: ct.contact_whatsapp || '', GOOGLE_PROFILE: ct.google_business_url || '' });
+  }
   if (cfg.paiementEnLigne !== false) return;
 
   const stripeOpt = document.getElementById('payment-option-stripe');
@@ -944,9 +949,10 @@ function trackPurchase(ref, value) {
 })();
 
 /* Contact direct — active les boutons tél/WhatsApp dès que VO_CONTACT est rempli */
-(function(){
-  const C = window.VO_CONTACT || {};
-  const phoneRaw = (C.PHONE || '').trim();
+function applyContact(C){
+  C = C || {};
+  let phoneRaw = (C.PHONE || '').trim();
+  if (/^0\d{9}$/.test(phoneRaw.replace(/\s/g, ''))) phoneRaw = phoneRaw.replace(/\s/g, '').replace(/(\d{2})(?=\d)/g, '$1 ');
   if (phoneRaw) {
     const tel = phoneRaw.replace(/[^+0-9]/g, '');
     const nav = document.getElementById('navPhone');
@@ -990,7 +996,8 @@ function trackPurchase(ref, value) {
       f.hidden = false;
     }
   }
-})();
+}
+applyContact(window.VO_CONTACT);
 
 /* Clics tel: / WhatsApp / mailto (délégation — couvre les liens futurs) */
 document.addEventListener('click', e => {

@@ -10,7 +10,6 @@ Direct Voiturier permet aux voyageurs au départ de l'aéroport Paris-Orly (ORY)
 
 - Voiturier Direct Voiturier : 0 minute de marche, la voiture est remise et récupérée au dépose-minute du terminal. Suivi du vol en cas de retard, aide aux bagages au retour.
 - Parkings officiels P1, P2, P3 : 3 à 10 minutes à pied par trajet avec les valises, soit environ 20 à 40 minutes perdues sur l'aller et le retour.
-- P Eco / P Eco 2 : navette d'environ 15 minutes (passage toutes les 9 à 15 minutes), deux fois, soit environ 40 minutes à 1h20 perdues.
 - Parking privé avec navette : 1h30 à 2h perdues au total (trouver le parking, attendre la navette, le trajet, retrouver la voiture, à l'aller comme au retour).
 - Détail : [Voiturier ou parking à Orly](https://www.directvoiturier.com/#comparatif)
 
@@ -49,3 +48,4 @@ Direct Voiturier permet aux voyageurs au départ de l'aéroport Paris-Orly (ORY)
 ## Contact
 
 - Email : contact@directvoiturier.com
+- Téléphone : 07 59 54 23 68
