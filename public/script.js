@@ -126,19 +126,10 @@ const obs = new IntersectionObserver(es => {
 }, { threshold: 0.12 });
 document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 
-/* AVIS : coller ici de VRAIS avis Google, mot pour mot (prénom + initiale, date).
-   Ne pas inventer d'avis : c'est interdit (pratique commerciale trompeuse) et ça se voit. */
-const REVIEWS = [
-  { name:'Marie C.',   trip:'Bali · 14 jours',     text:'Voyage à Bali, retour épuisée à 6h du matin. La voiture m\'attendait, propre, à l\'endroit prévu. C\'est la deuxième fois. Ce sera la troisième.' },
-  { name:'Thomas R.',  trip:'Voyageur fréquent',   text:'Je voyage chaque mois pour le travail. Ils savent mon prénom, ma plaque, mes habitudes. C\'est ça, le vrai service premium.' },
-  { name:'Sophie L.',  trip:'Lisbonne · 7 jours',  text:'Première fois que je laisse ma voiture à quelqu\'un. Lavage premium au retour. Je ne reconnaissais plus l\'intérieur. Adoptée.' },
-  { name:'David M.',   trip:'New York · 10 jours', text:'Service ultra rapide à l\'aller comme au retour. Plus jamais de parking longue durée pour moi. Que du gain de temps.' },
-  { name:'Aïcha B.',   trip:'Marrakech · 5 jours', text:'Avec deux enfants en bas âge et les bagages, c\'était un soulagement. Le voiturier nous a même aidés à sortir la poussette.' },
-  { name:'Julien P.',  trip:'Rome · 4 jours',      text:'Ponctuel, pro, courtois. Voiture rendue impeccable. Le prix est plus que correct vu la qualité du service. Bravo.' },
-  { name:'Camille D.', trip:'Athènes · 8 jours',   text:'Réservation en 2 minutes, confirmation immédiate. Le retour à 23h, le voiturier était là dans les 10 minutes. Parfait.' },
-  { name:'Karim S.',   trip:'Tokyo · 12 jours',    text:'Ma voiture a été garée comme si c\'était la leur. Aucune rayure, intérieur nickel grâce à l\'option premium. Recommandé à toute ma famille.' },
-  { name:'Élodie V.',  trip:'Barcelone · 3 jours', text:'Honnêtement, je ne savais pas que ça existait. Maintenant je ne peux plus m\'en passer. Zéro stress avant un vol, ça n\'a pas de prix.' },
-];
+/* AVIS : les vrais avis Google sont écrits dans content/reviews.mjs et rendus
+   directement dans le HTML (lisibles par Google et les IA) par « npm run seo ».
+   Ici on se contente de dupliquer la liste pour le défilement continu. */
+const REVIEWS = [];
 function starsHTML() {
   return Array(5).fill(0).map(() =>
     '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>'
@@ -169,11 +160,20 @@ function reviewCardHTML(r) {
 }
 (function() {
   const target = document.getElementById('reviewsTrack');
-  if (target) {
-    const html = REVIEWS.map(reviewCardHTML).join('');
-    target.innerHTML = html + html;
-  }
+  if (!target || !target.children.length) return;
+  Array.from(target.children).forEach(c => {
+    const clone = c.cloneNode(true);
+    clone.setAttribute('aria-hidden', 'true');
+    target.appendChild(clone);
+  });
 })();
+/* Bouton « Calculer mon prix » du comparatif : remonte au calculateur et ouvre la date */
+document.addEventListener('click', e => {
+  const a = e.target.closest('[data-focus-calc]');
+  if (!a) return;
+  const d = document.getElementById('sim-dep-date');
+  if (d) setTimeout(() => { try { d.focus({ preventScroll:true }); } catch (_) {} }, 600);
+});
 
 /* ════════════════════════════════════════════════
    SIMULATEUR HOME (card)
@@ -960,8 +960,10 @@ function trackPurchase(ref, value) {
     if (ld) {
       try {
         const data = JSON.parse(ld.textContent);
-        data.telephone = tel;
-        ld.textContent = JSON.stringify(data);
+        if (!data['@graph']) { // le @graph de l'accueil contient déjà le numéro (npm run seo)
+          data.telephone = tel;
+          ld.textContent = JSON.stringify(data);
+        }
       } catch (e) {}
     }
   }
@@ -1190,5 +1192,5 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 (function(){ var t=document.getElementById('faqToggle'), x=document.getElementById('faqExtra'); if(!t||!x) return;
-  t.addEventListener('click', function(){ var open=x.hidden; x.hidden=!open; t.setAttribute('aria-expanded', open); t.textContent= open ? 'Masquer les questions' : 'Voir les 7 questions'; });
+  t.addEventListener('click', function(){ var open=x.hidden; x.hidden=!open; t.setAttribute('aria-expanded', open); t.textContent= open ? 'Masquer les questions' : 'Voir les ' + (t.dataset.count || '') + ' questions'; });
 })();

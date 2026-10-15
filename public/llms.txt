@@ -2,38 +2,49 @@
 
 > Service de voiturier et parking à l'aéroport Paris-Orly. Prise en charge au terminal, gardiennage surveillé du véhicule, restitution au retour. Tarif calculé en 30 secondes, prix total affiché avant paiement, dès 29€. Note 4,6/5 sur 396 avis Google.
 
-Direct Voiturier permet aux voyageurs au départ de l'aéroport Paris-Orly (ORY) de confier leur véhicule à un voiturier directement au dépose-minute de leur terminal, sans navette à attendre. Le véhicule est gardé sous vidéosurveillance 24h/24 et restitué au terminal d'arrivée au retour du client. Le prix est dégressif selon la durée, tout compris (prise en charge, gardiennage, restitution), et affiché avant le paiement.
+Présent à l'aéroport Paris-Orly depuis plus de 6 ans, plus de 9 000 voyageurs accompagnés. Horaires : 7j/7, de 4h à minuit. Court séjour dès 29 €, 1 semaine dès 79 €.
+
+Direct Voiturier permet aux voyageurs au départ de l'aéroport Paris-Orly (ORY) de confier leur véhicule à un voiturier directement au dépose-minute de leur terminal (Orly 1, 2, 3 et 4), sans navette à attendre. Le véhicule est gardé sous vidéosurveillance 24h/24 et restitué au terminal d'arrivée au retour du client. Le prix est dégressif selon la durée, tout compris (prise en charge, gardiennage, restitution), et affiché avant le paiement.
+
+## Comparatif
+
+- Voiturier Direct Voiturier : 0 minute de marche, la voiture est remise et récupérée au dépose-minute du terminal. Suivi du vol en cas de retard, aide aux bagages au retour.
+- Parkings officiels P1, P2, P3 : 3 à 10 minutes à pied par trajet avec les valises, soit environ 20 à 40 minutes perdues sur l'aller et le retour.
+- P Eco / P Eco 2 : navette d'environ 15 minutes (passage toutes les 9 à 15 minutes), deux fois, soit environ 40 minutes à 1h20 perdues.
+- Parking privé avec navette : 1h30 à 2h perdues au total (trouver le parking, attendre la navette, le trajet, retrouver la voiture, à l'aller comme au retour).
+- Détail : [Voiturier ou parking à Orly](https://www.directvoiturier.com/#comparatif)
 
 ## Pages
 
-- [Accueil](https://www.directvoiturier.com/): présentation du service, calcul du tarif, avis clients.
-- [Voiturier à l'aéroport Paris-Orly](https://www.directvoiturier.com/voiturier-orly): détail du service de voiturier à Orly.
+- [Accueil](https://www.directvoiturier.com/): présentation du service, calcul du tarif, comparatif voiturier / parkings d'Orly, avis clients, FAQ.
 - [Parking Orly avec voiturier](https://www.directvoiturier.com/parking-orly): présentation du parking sécurisé associé au service voiturier.
 - [Tarifs](https://www.directvoiturier.com/tarifs): grille tarifaire et détail de ce qui est inclus.
 - [Comment ça marche](https://www.directvoiturier.com/comment-ca-marche): étapes du service, de la réservation à la restitution.
 - [FAQ](https://www.directvoiturier.com/faq): réponses aux questions fréquentes (tarifs, retard de vol, annulation, paiement, assurance des véhicules).
 - [Voiturier Orly 1, 2, 3 et 4](https://www.directvoiturier.com/voiturier-orly-terminaux): prise en charge au dépose-minute des terminaux Orly 1-2, Orly 3 et Orly 4, restitution au terminal d'arrivée.
-- [Voiturier Orly 1 et Orly 2](https://www.directvoiturier.com/voiturier-orly-1-2): prise en charge au dépose-minute d'Orly 1-2.
-- [Voiturier Orly 3](https://www.directvoiturier.com/voiturier-orly-3): prise en charge au dépose-minute d'Orly 3.
-- [Voiturier Transavia Orly](https://www.directvoiturier.com/voiturier-transavia-orly): voiturier pour les vols Transavia (Orly 1 ou Orly 2).
-- [Voiturier Orly 4](https://www.directvoiturier.com/voiturier-orly-4): prise en charge au dépose-minute d'Orly 4.
-- [Horaires du voiturier à Orly](https://www.directvoiturier.com/horaires-voiturier-orly): service 7 jours sur 7, de 4h00 à minuit.
 - [Parking Orly pas cher](https://www.directvoiturier.com/parking-orly-pas-cher): tarifs dès 29€ la journée et dès 79€ la semaine, prix dégressif et tout compris, identique en ligne ou sur place.
-- [Code promo voiturier Orly](https://www.directvoiturier.com/code-promo-voiturier-orly): code BIENVENUE, -10% sur la première réservation (vérifiée par adresse email), réduction affichée avant paiement, en ligne ou sur place.
-- [Suivi de réservation voiturier Orly](https://www.directvoiturier.com/suivi-reservation-voiturier-orly): espace client personnel, statut de la réservation à chaque étape (confirmée, prise en charge, stationnée, restituée), notifications automatiques, factures.
 - [Parking longue durée Orly](https://www.directvoiturier.com/parking-longue-duree-orly): gardiennage sous vidéosurveillance 24h/24, parking couvert et lavage en option.
-- [Lavage voiture Orly](https://www.directvoiturier.com/lavage-voiture-orly): lavage pendant le voyage, Express 29€, Complet 69€, Premium 99€.
+- [Lavage voiture Orly](https://www.directvoiturier.com/lavage-voiture-orly): lavage pendant le voyage, Extérieur 29€, Intérieur 49€, Complet 69€, Premium 99€.
 - [Guides Orly](https://www.directvoiturier.com/guides-voiturier-orly): index de tous les guides (comparatifs, prix, terminaux, vacances, options).
-- [Meilleur voiturier Orly : bien choisir](https://www.directvoiturier.com/meilleur-voiturier-orly): Les critères qui comptent pour choisir un voiturier à Orly, et comment Direct Voiturier y répond.
-- [Comparatif parking Orly](https://www.directvoiturier.com/comparatif-parking-orly): Voiturier, parking navette, parking de l'aéroport, taxi : quelle solution pour aller à Orly ?
-- [Voiturier ou parking navette à Orly ?](https://www.directvoiturier.com/voiturier-ou-parking-navette-orly): Les différences concrètes entre un voiturier et un parking avec navette.
-- [Parking Orly vacances de la Toussaint 2026](https://www.directvoiturier.com/parking-orly-vacances-toussaint): Partir d'Orly du 17 octobre au 2 novembre 2026 sans stress.
-- [Parking Orly vacances de Noël 2026](https://www.directvoiturier.com/parking-orly-vacances-noel): Partir d'Orly pour les fêtes, du 19 décembre 2026 au 4 janvier 2027.
-- [Parking Orly week-end](https://www.directvoiturier.com/parking-orly-week-end): Un voiturier pour un week-end ou un court séjour, dès 29€ la journée.
-- [Parking Orly une semaine](https://www.directvoiturier.com/parking-orly-une-semaine): Une semaine de voyage, dès 79€ tout compris.
-- [Parking couvert Orly](https://www.directvoiturier.com/parking-couvert-orly): Votre voiture à l'abri des intempéries pendant votre voyage.
-- [Réserver un voiturier à Orly](https://www.directvoiturier.com/reserver-voiturier-orly): Tarif en 30 secondes, paiement en ligne ou sur place, confirmation par email.
-- [Vol retardé à Orly : que devient votre voiture ?](https://www.directvoiturier.com/voiturier-orly-vol-retarde): Suivi du numéro de vol et adaptation à votre heure d'atterrissage.
+- [Meilleur voiturier Orly : bien choisir](https://www.directvoiturier.com/meilleur-voiturier-orly): les critères qui comptent pour choisir un voiturier à Orly, et comment Direct Voiturier y répond.
+- [Comparatif parking Orly](https://www.directvoiturier.com/comparatif-parking-orly): voiturier, parking navette, parking de l'aéroport, taxi : quelle solution pour aller à Orly ?
+- [Voiturier ou parking navette à Orly ?](https://www.directvoiturier.com/voiturier-ou-parking-navette-orly): les différences concrètes entre un voiturier et un parking avec navette.
+- [Parking Orly vacances de la Toussaint 2026](https://www.directvoiturier.com/parking-orly-vacances-toussaint): partir d'Orly du 17 octobre au 2 novembre 2026 sans stress.
+- [Parking Orly vacances de Noël 2026](https://www.directvoiturier.com/parking-orly-vacances-noel): partir d'Orly pour les fêtes, du 19 décembre 2026 au 4 janvier 2027.
+- [Parking Orly week-end](https://www.directvoiturier.com/parking-orly-week-end): un voiturier pour un week-end ou un court séjour, dès 29€.
+- [Parking Orly une semaine](https://www.directvoiturier.com/parking-orly-une-semaine): une semaine de voyage, dès 79€ tout compris.
+- [Parking couvert Orly](https://www.directvoiturier.com/parking-couvert-orly): votre voiture à l'abri des intempéries pendant votre voyage.
+- [Réserver un voiturier à Orly](https://www.directvoiturier.com/reserver-voiturier-orly): tarif en 30 secondes, paiement en ligne ou sur place, confirmation par email.
+- [Vol retardé à Orly : que devient votre voiture ?](https://www.directvoiturier.com/voiturier-orly-vol-retarde): suivi du numéro de vol et adaptation à votre heure d'atterrissage.
+- [Voiturier Orly 1 et Orly 2](https://www.directvoiturier.com/voiturier-orly-1-2): prise en charge au dépose-minute d'Orly 1-2.
+- [Suivi de réservation voiturier Orly](https://www.directvoiturier.com/suivi-reservation-voiturier-orly): espace client personnel, statut de la réservation à chaque étape (confirmée, prise en charge, stationnée, restituée), notifications automatiques, factures.
+- [Code promo voiturier Orly](https://www.directvoiturier.com/code-promo-voiturier-orly): code BIENVENUE, -10% sur la première réservation (vérifiée par adresse email), réduction affichée avant paiement, en ligne ou sur place.
+- [Conditions générales de vente](https://www.directvoiturier.com/conditions-generales): tarifs, paiement, annulation, retards, responsabilité.
+- [Horaires du voiturier à Orly](https://www.directvoiturier.com/horaires-voiturier-orly): service 7j/7, de 4h à minuit.
+- [Mentions légales](https://www.directvoiturier.com/mentions-legales): éditeur du site, hébergeur, contact.
+- [Voiturier Orly 3](https://www.directvoiturier.com/voiturier-orly-3): prise en charge au dépose-minute d'Orly 3.
+- [Voiturier Orly 4](https://www.directvoiturier.com/voiturier-orly-4): prise en charge au dépose-minute d'Orly 4.
+- [Voiturier Transavia Orly](https://www.directvoiturier.com/voiturier-transavia-orly): voiturier pour les vols Transavia (Orly 1 ou Orly 2).
 
 ## Contact
 

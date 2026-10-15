@@ -332,3 +332,19 @@ Voici la checklist exhaustive de ce que tu dois faire à la main :
 Si tu bloques sur une étape, dis-moi exactement où et je te débloque.
 
 **Bonne route 🚗**
+
+---
+
+## SEO / GEO : chiffres, avis et FAQ de l'accueil
+
+Tous les chiffres du site (prix « dès », note Google, nombre d'avis, ancienneté, horaires, tarifs guichet des parkings officiels, coordonnées, mentions légales) sont dans **`config/seoFacts.mjs`**. Les avis Google affichés sont dans **`content/reviews.mjs`**, la FAQ de l'accueil dans **`content/faq-accueil.mjs`**.
+
+Après toute modification :
+
+```bash
+npm run seo
+```
+
+Le script `scripts/build-seo.mjs` réécrit les zones `<!--seo:…-->` des pages (en-tête, pied de page, comparatif, tarifs, avis, FAQ, JSON-LD), génère `/conditions-generales`, `/mentions-legales`, `llms.txt` et `sitemap.xml` (lastmod = vraie date git), puis liste les valeurs `TODO_ALEX` restantes. Ne pas modifier à la main le contenu entre deux balises `seo`.
+
+Règles : une valeur contenant `TODO_ALEX` n'est jamais affichée (ligne « Prix 1 semaine » du comparatif masquée tant que `officialParkings.checkedOn` n'est pas rempli ; avis masqués tant qu'ils ne sont pas collés). Ne jamais écrire « Athis-Mons » ailleurs que dans `legal.headOffice`.

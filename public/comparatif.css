@@ -1,0 +1,118 @@
+/* ════════════════════════════════════════════════════════════════
+   ACCUEIL — section « Comparatif Orly » (#comparatif)
+   Aucune nouvelle couleur : uniquement les variables et gris déjà
+   utilisés dans home.css (royal, royal-50/100/800, ink, line, slate).
+   Mobile d'abord (360 px), puis min-width.
+═══════════════════════════════════════════════════════════════ */
+.h-cmp .h-head h2 { margin-top:14px; }
+.h-cmp .h-head { margin-bottom:28px; }
+.cmp-h3 { font-size:1.12rem; font-weight:900; letter-spacing:-.01em; color:var(--ink); line-height:1.3; text-align:left; }
+
+/* Carte de base (même famille que .h-step) */
+.cmp-card { background:#fff; border:1px solid var(--line); border-radius:24px; padding:20px; box-shadow:0 1px 2px rgba(2,6,23,.04); }
+.h-cmp .cmp-card + .cmp-shuttle, .cmp-shuttle + .cmp-table-wrap, .cmp-table-wrap + .cmp-why { margin-top:20px; }
+.h-cmp > .h-wrap > .cmp-card, .cmp-shuttle, .cmp-table-wrap, .cmp-why { max-width:1040px; margin-left:auto; margin-right:auto; }
+
+/* 2.A — Barres de temps perdu */
+.cmp-bars { list-style:none; margin:18px 0 0; padding:0; display:grid; gap:16px; }
+.cmp-bar-top { display:flex; align-items:baseline; justify-content:space-between; gap:12px; }
+.cmp-bar-top b { font-size:.92rem; font-weight:800; color:var(--ink); }
+.cmp-bar-top strong { font-size:.92rem; font-weight:900; color:#475569; white-space:nowrap; }
+.cmp-bar-track { margin-top:8px; height:12px; border-radius:999px; background:#F1F5F9; overflow:hidden; }
+.cmp-bar-track span { display:block; height:100%; width:var(--w); border-radius:999px; background:#CBD5E1; }
+.cmp-bar p { margin-top:6px; font-size:.8rem; line-height:1.45; color:#64748B; }
+.cmp-bar.is-us { padding:14px 14px 12px; margin:0 -6px; border-radius:16px; background:var(--royal-50); border:1px solid var(--royal-100); }
+.cmp-bar.is-us .cmp-bar-top b { color:var(--royal-800); font-weight:900; }
+.cmp-bar.is-us .cmp-bar-top strong { font-size:1.9rem; line-height:1; color:var(--royal-800); letter-spacing:-.03em; }
+.cmp-bar.is-us .cmp-bar-track { background:#fff; }
+.cmp-bar.is-us .cmp-bar-track span { background:var(--royal); min-width:10px; }
+.cmp-bar.is-us p { color:#475569; }
+.cmp-zero { margin-top:18px; padding-top:16px; border-top:1px solid #EEF2F6; font-size:.92rem; line-height:1.6; color:#475569; }
+.cmp-zero b { color:var(--royal-800); }
+/* Les barres se remplissent quand la carte apparaît */
+.reveal .cmp-bar-track span { transform-origin:left; transform:scaleX(0); transition:transform 1s cubic-bezier(.16,1,.3,1) .15s; }
+.reveal.visible .cmp-bar-track span { transform:scaleX(1); }
+
+/* 2.B — Navette : les étapes, deux fois */
+.cmp-shuttle-cols { display:grid; gap:12px; margin-top:14px; }
+.cmp-col-t { display:block; font-size:.78rem; font-weight:900; letter-spacing:.06em; text-transform:uppercase; color:#64748B; margin-bottom:12px; }
+.cmp-steps { list-style:none; margin:0; padding:0; display:grid; gap:12px; position:relative; }
+.cmp-steps li { display:flex; align-items:flex-start; gap:12px; font-size:.9rem; line-height:1.45; color:#334155; position:relative; }
+.cmp-steps li:not(:last-child)::after { content:''; position:absolute; left:14px; top:30px; bottom:-12px; width:2px; background:#E2E8F0; }
+.cmp-steps i { font-style:normal; flex-shrink:0; width:30px; height:30px; border-radius:50%; background:#F1F5F9; color:#475569; font-size:.82rem; font-weight:900;
+  display:flex; align-items:center; justify-content:center; position:relative; z-index:1; }
+.cmp-steps span { padding-top:5px; }
+.cmp-result { margin-top:12px; padding:18px 20px; border-radius:22px; background:var(--royal-50); border:2px solid var(--royal-100); }
+.cmp-result p { font-size:.92rem; line-height:1.6; color:#334155; }
+.cmp-result p + p { margin-top:6px; }
+.cmp-result b { color:var(--royal-800); font-weight:900; }
+
+/* 2.C — Tableau (cartes empilées sur mobile, vrai tableau sur ordinateur) */
+.cmp-table-wrap { background:#fff; border:1px solid var(--line); border-radius:24px; padding:20px 16px; }
+.cmp-table { width:100%; border-collapse:separate; border-spacing:0; }
+.cmp-table caption { padding:0 4px 14px; }
+.cmp-table thead { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+.cmp-table tbody, .cmp-table tr, .cmp-table th, .cmp-table td { display:block; }
+.cmp-table tbody { display:grid; gap:12px; }
+.cmp-table tr { border:1px solid var(--line); border-radius:18px; overflow:hidden; background:#F8FAFC; }
+.cmp-table th[scope="row"] { padding:12px 14px; font-size:.95rem; font-weight:900; color:var(--ink); text-align:left; background:#fff; border-bottom:1px solid var(--line); }
+.cmp-table td { display:grid; grid-template-columns:minmax(0,42%) minmax(0,1fr); gap:10px; padding:10px 14px; font-size:.86rem; line-height:1.45; color:#475569; }
+.cmp-table td + td { border-top:1px solid #EEF2F6; }
+.cmp-table td::before { content:attr(data-label); font-size:.76rem; font-weight:800; color:#64748B; }
+.cmp-table td.is-us { background:var(--royal-50); color:var(--royal-800); font-weight:800; }
+.cmp-table td.is-us::before { color:var(--royal-800); font-weight:900; }
+.cmp-table td strong { font-weight:900; }
+.cmp-rec { display:block; width:max-content; margin:0 auto 8px; padding:3px 10px; border-radius:999px; font-size:.62rem; font-weight:900; letter-spacing:.04em; text-transform:uppercase;
+  background:#fff; color:var(--royal-800); }
+.cmp-source { margin-top:14px; font-size:.75rem; line-height:1.5; color:#94A3B8; text-align:center; }
+
+/* 2.D — Pourquoi Direct Voiturier */
+.cmp-why .cmp-h3 { text-align:center; font-size:clamp(1.25rem,4.5vw,1.6rem); margin:12px 0 16px; }
+.cmp-why-grid { list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+.cmp-why-i { display:flex; flex-direction:column; gap:4px; padding:16px 14px; border-radius:18px; background:#fff; border:1px solid var(--line); }
+.cmp-why-i i { width:38px; height:38px; border-radius:12px; background:var(--royal-50); display:flex; align-items:center; justify-content:center; margin-bottom:6px; }
+.cmp-why-i i svg { width:20px; height:20px; fill:none; stroke:var(--royal); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.cmp-why-i b { font-size:.9rem; font-weight:900; line-height:1.25; color:var(--ink); }
+.cmp-why-i span { font-size:.78rem; line-height:1.45; color:#64748B; }
+.cmp-cta { margin-top:22px; text-align:center; }
+.cmp-cta .h-btn { width:100%; max-width:420px; }
+
+/* Héros : les chiffres de confiance deviennent des liens vers le comparatif */
+.h-trust-i b small { display:block; font-size:.5em; font-weight:800; letter-spacing:0; color:#475569; line-height:1.2; }
+a.h-trust-i { transition:box-shadow .2s, border-color .2s; }
+a.h-trust-i:hover { border-color:var(--blue-light); box-shadow:0 8px 20px rgba(7,74,134,.10); }
+
+@media (min-width:640px) {
+  .cmp-card, .cmp-table-wrap { padding:26px; }
+  .cmp-shuttle-cols { grid-template-columns:1fr 1fr; }
+  .cmp-bar.is-us { margin:0 -10px; padding:16px 18px 14px; }
+  .cmp-bar p { font-size:.84rem; }
+}
+@media (min-width:768px) {
+  .cmp-table thead { position:static; width:auto; height:auto; overflow:visible; clip:auto; white-space:normal; display:table-header-group; }
+  .cmp-table tbody { display:table-row-group; }
+  .cmp-table tr { display:table-row; border:0; border-radius:0; background:none; }
+  .cmp-table th, .cmp-table td { display:table-cell; vertical-align:top; padding:14px 16px; border-bottom:1px solid #EEF2F6; }
+  .cmp-table td + td { border-top:0; }
+  .cmp-table td::before { content:none; }
+  .cmp-table thead th { font-size:.9rem; font-weight:900; color:var(--ink); text-align:left; vertical-align:bottom; }
+  .cmp-table th[scope="row"] { background:none; border-bottom:1px solid #EEF2F6; font-size:.9rem; width:22%; }
+  .cmp-table td { font-size:.9rem; width:26%; }
+  .cmp-table thead th.is-us { background:var(--royal); color:#fff; border-radius:16px 16px 0 0; text-align:center; }
+  .cmp-table td.is-us { text-align:center; border-left:2px solid var(--royal); border-right:2px solid var(--royal); border-bottom-color:var(--royal-100); }
+  .cmp-table tbody tr:last-child td.is-us { border-bottom:2px solid var(--royal); border-radius:0 0 16px 16px; }
+  .cmp-table tbody tr:last-child th, .cmp-table tbody tr:last-child td { border-bottom:0; }
+  .cmp-table tbody tr:last-child td.is-us { border-bottom:2px solid var(--royal); }
+  .cmp-rec { margin:0 auto 6px; }
+}
+@media (min-width:1000px) {
+  .cmp-why-grid { grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; }
+  .cmp-why-i { padding:20px 18px; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .reveal .cmp-bar-track span { transition:none; transform:none; }
+}
+
+/* Héros : le H1 SEO est plus long (« Voiturier à l'aéroport Paris-Orly : »).
+   Même style, taille ajustée pour que la 1re ligne tienne sur une ligne dès 600 px. */
+@media (min-width:600px) { .h-hero h1 { font-size:min(6vw, 4.15rem); } }
