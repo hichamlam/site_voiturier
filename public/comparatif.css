@@ -1,0 +1,155 @@
+/* ════════════════════════════════════════════════════════════════
+   ACCUEIL — section « Comparatif Orly » (#comparatif)
+   Règle visuelle : Direct Voiturier = bleu royal vif (dégradé du bouton),
+   les autres solutions = gris. Aucune nouvelle couleur : uniquement les
+   variables de home.css (royal, royal-700/800/50/100, ink, line, slate, muted).
+   Mobile d'abord (360 px), puis min-width.
+═══════════════════════════════════════════════════════════════ */
+.h-cmp .h-head { margin-bottom:26px; }
+.h-cmp .h-head h2 { margin-top:14px; }
+.cmp-hl { color:var(--royal); }
+.cmp-race, .cmp-table-wrap, .cmp-path, .cmp-why { max-width:980px; margin-left:auto; margin-right:auto; }
+.cmp-race + .cmp-table-wrap, .cmp-table-wrap + .cmp-path, .cmp-path + .cmp-why { margin-top:20px; }
+
+/* ── A. La course : temps perdu ── */
+.cmp-race { background:#fff; border:1px solid var(--line); border-radius:26px; padding:10px; box-shadow:0 1px 2px rgba(2,6,23,.04); }
+.cmp-race-us { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:18px 18px 18px 20px; border-radius:20px;
+  background:linear-gradient(135deg, var(--royal) 0%, var(--royal-700) 60%, var(--royal-800) 100%); color:#fff; box-shadow:0 18px 40px -12px rgba(37,99,235,.55); }
+.cmp-race-us-l { display:flex; flex-direction:column; align-items:flex-start; gap:4px; min-width:0; }
+.cmp-race-us-l b { font-size:1.15rem; font-weight:900; letter-spacing:-.01em; }
+.cmp-race-us-l > span:last-child { font-size:.8rem; color:rgba(255,255,255,.85); line-height:1.35; }
+.cmp-pill { display:inline-block; padding:3px 10px; border-radius:999px; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35);
+  font-size:.62rem; font-weight:900; letter-spacing:.06em; text-transform:uppercase; color:#fff; }
+.cmp-race-us-n { font-size:3.6rem; font-weight:900; line-height:.9; letter-spacing:-.05em; white-space:nowrap; }
+.cmp-race-us-n small { font-size:.32em; font-weight:800; letter-spacing:0; margin-left:4px; }
+.cmp-race-list { list-style:none; margin:0; padding:16px 12px 10px; display:grid; gap:14px; }
+.cmp-race-top { display:flex; align-items:baseline; justify-content:space-between; gap:10px; }
+.cmp-race-top b { font-size:.84rem; font-weight:700; color:#64748B; }
+.cmp-race-top strong { font-size:.88rem; font-weight:900; color:#64748B; white-space:nowrap; }
+.cmp-track { margin-top:7px; height:10px; border-radius:999px; background:#F1F5F9; overflow:hidden; }
+.cmp-track span { display:block; height:100%; width:var(--w); border-radius:999px; background:#CBD5E1; }
+.reveal .cmp-track span { transform-origin:left; transform:scaleX(0); transition:transform 1.1s cubic-bezier(.16,1,.3,1) .2s; }
+.reveal.visible .cmp-track span { transform:scaleX(1); }
+
+/* ── B. Le tableau ── (mobile : 3 colonnes de valeurs sous chaque critère) */
+.cmp-table-wrap { background:#fff; border:1px solid var(--line); border-radius:26px; padding:16px 12px; box-shadow:0 1px 2px rgba(2,6,23,.04); }
+.cmp-table { width:100%; border-collapse:separate; border-spacing:0; display:block; }
+.cmp-table caption { display:block; }
+.cmp-table thead, .cmp-table tbody { display:block; }
+.cmp-table tr { display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:6px; }
+.cmp-table tbody tr { padding:12px 0; border-top:1px solid #EEF2F6; }
+.cmp-table thead th:first-child { display:none; }
+.cmp-table thead th { font-size:.72rem; font-weight:800; color:#94A3B8; text-align:center; line-height:1.25; padding:0 2px 10px; align-self:end; }
+.cmp-table thead th.is-us { color:var(--royal); font-weight:900; font-size:.8rem; }
+.cmp-rec { display:block; width:max-content; max-width:100%; margin:0 auto 5px; padding:3px 8px; border-radius:999px;
+  background:var(--royal); color:#fff; font-size:.56rem; font-weight:900; letter-spacing:.05em; text-transform:uppercase; }
+.cmp-table th[scope="row"] { grid-column:1 / -1; display:flex; align-items:center; gap:8px; font-size:.86rem; font-weight:800; color:var(--ink); text-align:left; }
+.cmp-table th[scope="row"] i { width:26px; height:26px; border-radius:8px; background:#F1F5F9; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.cmp-table th[scope="row"] svg { width:15px; height:15px; fill:none; stroke:#64748B; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.cmp-table td { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; min-height:48px; padding:8px 4px; border-radius:12px;
+  background:#F8FAFC; color:#94A3B8; font-size:.76rem; font-weight:600; line-height:1.25; text-align:center; }
+.cmp-table td.is-us { background:linear-gradient(135deg, var(--royal) 0%, var(--royal-700) 100%); color:#fff; font-weight:800; box-shadow:0 8px 18px -8px rgba(37,99,235,.6); }
+.cmp-table td strong { font-weight:900; }
+.cmp-table td small { font-size:.68rem; font-weight:700; opacity:.9; }
+.cmp-yes, .cmp-no { display:flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:50%; }
+.cmp-yes { background:rgba(255,255,255,.22); }
+.cmp-no { background:#F1F5F9; width:24px; height:24px; }
+.cmp-yes svg, .cmp-no svg { width:16px; height:16px; fill:none; stroke-width:3; stroke-linecap:round; stroke-linejoin:round; }
+.cmp-yes svg { stroke:#fff; }
+.cmp-no svg { stroke:#94A3B8; width:12px; height:12px; }
+.cmp-source { margin-top:10px; font-size:.68rem; line-height:1.5; color:#94A3B8; text-align:center; }
+
+/* ── C. Le parcours : 8 étapes vs 2 ── */
+.cmp-path { display:grid; gap:12px; }
+.cmp-path-col { border-radius:26px; padding:18px 16px; display:flex; flex-direction:column; }
+.cmp-path-col .cmp-path-r { margin-top:auto; }
+.cmp-path-col .cmp-path-steps + .cmp-path-r, .cmp-path-row + .cmp-path-r { margin-top:14px; }
+.cmp-path-col.is-them { background:#fff; border:1px solid var(--line); }
+.cmp-path-col.is-us { background:linear-gradient(135deg, var(--royal) 0%, var(--royal-700) 60%, var(--royal-800) 100%); color:#fff; box-shadow:0 18px 40px -12px rgba(37,99,235,.55); }
+.cmp-path-h { display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:14px; }
+.cmp-path-h b { font-size:1rem; font-weight:900; }
+.cmp-path-h strong { font-size:1.5rem; font-weight:900; letter-spacing:-.03em; white-space:nowrap; }
+.is-them .cmp-path-h b, .is-them .cmp-path-h strong { color:#64748B; }
+.cmp-path-row { display:grid; gap:6px; }
+.cmp-path-row + .cmp-path-row { margin-top:12px; }
+.cmp-path-row em { font-style:normal; font-size:.66rem; font-weight:900; letter-spacing:.08em; text-transform:uppercase; color:#94A3B8; }
+.cmp-path-steps { list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:6px; }
+.cmp-path-steps li { display:flex; flex-direction:column; align-items:center; gap:6px; text-align:center; font-size:.68rem; font-weight:600; line-height:1.25; color:#64748B; }
+.cmp-path-steps i { width:38px; height:38px; border-radius:12px; background:#F1F5F9; display:flex; align-items:center; justify-content:center; }
+.cmp-path-steps svg { width:18px; height:18px; fill:none; stroke:#94A3B8; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.is-us .cmp-path-steps { grid-template-columns:1fr; gap:10px; }
+.is-us .cmp-path-steps li { flex-direction:row; text-align:left; gap:12px; font-size:.9rem; font-weight:700; color:#fff; }
+.is-us .cmp-path-steps i { background:rgba(255,255,255,.18); flex-shrink:0; }
+.is-us .cmp-path-steps svg { stroke:#fff; }
+.cmp-path-r { margin-top:14px; padding-top:12px; border-top:1px solid #EEF2F6; font-size:.9rem; font-weight:900; color:#64748B; text-align:center; }
+.is-us .cmp-path-r { border-top-color:rgba(255,255,255,.25); color:#fff; font-size:1rem; }
+
+/* ── D. Pourquoi nous ── */
+.cmp-why-t { text-align:center; font-size:clamp(1.25rem,4.5vw,1.6rem); font-weight:900; letter-spacing:-.02em; color:var(--ink); margin:14px 0 16px; }
+.cmp-why-grid { list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px; }
+.cmp-why-i { display:flex; align-items:center; gap:10px; padding:12px 10px; border-radius:18px; background:#fff; border:1px solid var(--line); min-width:0; }
+.cmp-why-i i { width:36px; height:36px; border-radius:11px; flex-shrink:0; display:flex; align-items:center; justify-content:center;
+  background:linear-gradient(135deg, var(--royal) 0%, var(--royal-700) 100%); box-shadow:0 6px 14px -6px rgba(37,99,235,.6); }
+.cmp-why-i i svg { width:18px; height:18px; fill:none; stroke:#fff; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.cmp-why-i div { min-width:0; }
+.cmp-why-i b { display:block; font-size:.8rem; font-weight:900; line-height:1.2; color:var(--ink); }
+.cmp-why-i span { display:block; margin-top:2px; font-size:.7rem; line-height:1.3; color:#94A3B8; font-weight:600; }
+.cmp-cta { margin-top:22px; text-align:center; }
+.cmp-cta .h-btn { width:100%; max-width:420px; }
+
+@media (min-width:640px) {
+  .cmp-race { padding:12px; }
+  .cmp-race-us { padding:22px 26px; }
+  .cmp-race-us-l b { font-size:1.35rem; }
+  .cmp-race-us-n { font-size:4.4rem; }
+  .cmp-race-list { padding:20px 16px 12px; gap:16px; }
+  .cmp-race-top b, .cmp-race-top strong { font-size:.92rem; }
+  .cmp-table-wrap { padding:22px 22px 16px; }
+  .cmp-table td { font-size:.85rem; }
+  .cmp-path { grid-template-columns:1.6fr 1fr; }
+  .cmp-path-col { padding:22px; }
+  .cmp-path-col .cmp-path-r { margin-top:auto !important; }
+  .is-us .cmp-path-steps { margin:auto 0 18px; }
+  .cmp-path-steps li { font-size:.74rem; }
+  .cmp-why-i { padding:14px; }
+  .cmp-why-i b { font-size:.88rem; }
+  .cmp-why-i span { font-size:.76rem; }
+}
+/* Ordinateur : vrai tableau, colonne Direct Voiturier en bleu continu */
+@media (min-width:768px) {
+  .cmp-table { display:table; }
+  .cmp-table thead { display:table-header-group; }
+  .cmp-table tbody { display:table-row-group; }
+  .cmp-table tr { display:table-row; }
+  .cmp-table tbody tr { padding:0; border:0; }
+  .cmp-table th, .cmp-table td { display:table-cell; vertical-align:middle; }
+  .cmp-table thead th:first-child { display:table-cell; }
+  .cmp-table thead th { padding:16px 12px 14px; font-size:.86rem; width:22%; }
+  .cmp-table thead th.is-us { font-size:1rem; color:#fff; border-radius:18px 18px 0 0;
+    background:linear-gradient(180deg, var(--royal) 0%, var(--royal-700) 100%); }
+  .cmp-rec { background:#fff; color:var(--royal-800); margin-bottom:6px; font-size:.6rem; }
+  .cmp-table th[scope="row"] { display:table-cell; padding:14px 12px; border-top:1px solid #EEF2F6; font-size:.92rem; width:34%; }
+  .cmp-table th[scope="row"] i { display:inline-flex; vertical-align:middle; margin-right:10px; }
+  .cmp-table td { padding:14px 12px; border-radius:0; background:none; border-top:1px solid #EEF2F6; font-size:.9rem; min-height:0; }
+  .cmp-table td > * { margin:0 auto; }
+  .cmp-table td small { display:block; margin-top:2px; }
+  .cmp-table td.is-us { background:var(--royal-700); box-shadow:none; border-top-color:rgba(255,255,255,.18); font-size:.95rem; }
+  .cmp-table tbody tr:last-child td.is-us { border-radius:0 0 18px 18px; box-shadow:0 18px 30px -14px rgba(37,99,235,.6); }
+}
+@media (min-width:1000px) {
+  .cmp-why-grid { grid-template-columns:repeat(4, minmax(0,1fr)); gap:12px; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .reveal .cmp-track span { transition:none; transform:none; }
+}
+
+/* Héros : chiffres de confiance cliquables vers le comparatif + note « * » */
+.h-trust-i b small { display:block; font-size:.5em; font-weight:800; letter-spacing:0; color:#475569; line-height:1.2; }
+.h-trust-i b sup { font-size:.55em; font-weight:700; margin-left:1px; color:#64748B; }
+a.h-trust-i { transition:box-shadow .2s, border-color .2s; }
+a.h-trust-i:hover { border-color:var(--blue-light); box-shadow:0 8px 20px rgba(7,74,134,.10); }
+.h-trust-note { margin-top:10px; font-size:.62rem; font-weight:400; line-height:1.4; color:rgba(255,255,255,.78); text-align:center; letter-spacing:.01em; }
+
+/* Héros : le H1 SEO est plus long (« Voiturier à l'aéroport Paris-Orly : »).
+   Même style, taille ajustée pour que la 1re ligne tienne sur une ligne dès 600 px. */
+@media (min-width:600px) { .h-hero h1 { font-size:min(6vw, 4.15rem); } }

@@ -1,0 +1,88 @@
+/* ════════════════════════════════════════════════════════════════
+   PAGES SECONDAIRES — gabarit actuel (celui de l'accueil)
+   Chargé après style.css et home.css, uniquement sur body.page.
+   Les variables de body.home (home.css) donnent déjà les bonnes couleurs
+   et la bonne police ; ce fichier aligne les blocs de l'ancien gabarit
+   (héros, titres, cartes, FAQ, bandeau final) sur ceux de l'accueil.
+   Aucune nouvelle couleur.
+═══════════════════════════════════════════════════════════════ */
+body.page { --hand: var(--font); padding-bottom:0; }
+body.page .container { max-width:1120px; padding:0 16px; }
+
+/* Héros : même ciel que l'accueil, plus compact */
+body.page .page-hero { position:relative; text-align:center; color:#fff; padding:44px 0 56px;
+  background:
+    linear-gradient(180deg, rgba(6,64,122,.62) 0%, rgba(10,100,175,.40) 60%, rgba(10,108,194,.30) 100%),
+    url(/img/hero-ciel.webp) 30% 40% / cover no-repeat, #0A6CC2; }
+body.page .page-hero .section-eyebrow { margin-bottom:14px; background:rgba(255,255,255,.16); color:#fff; border:1px solid rgba(255,255,255,.35); letter-spacing:.08em; }
+body.page .page-hero h1 { font-size:clamp(1.9rem, 7.4vw, 3.2rem); font-weight:900; letter-spacing:-.03em; line-height:1.08; text-wrap:balance;
+  text-shadow:0 2px 22px rgba(3,30,70,.45); max-width:860px; margin:0 auto; }
+body.page .page-hero-sub { max-width:640px; margin:16px auto 0; color:#fff; font-size:1rem; line-height:1.6; text-shadow:0 1px 12px rgba(3,30,70,.5); }
+body.page .page-hero-sub b, body.page .page-hero-sub strong { color:#fff; }
+body.page .page-hero-cta { margin-top:26px; background:#fff; color:var(--royal-800); box-shadow:0 14px 30px rgba(2,6,23,.22); }
+body.page .page-hero-cta:hover { background:var(--royal-50); }
+@media (min-width:640px) { body.page .page-hero { padding:64px 0 72px; } body.page .page-hero-sub { font-size:1.1rem; } }
+
+/* Têtes de section */
+body.page .section-head { max-width:640px; margin:0 auto 32px; }
+body.page .section-eyebrow { display:inline-block; font-size:.72rem; font-weight:900; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--royal); background:var(--royal-50); border:1px solid var(--royal-100); padding:6px 14px; border-radius:999px; margin-bottom:14px; }
+body.page .section-title { font-size:clamp(1.55rem, 5.6vw, 2.5rem); font-weight:900; letter-spacing:-.025em; line-height:1.15; color:var(--ink); }
+body.page .section-title .accent, body.page .accent { color:var(--royal); font-style:normal; }
+body.page .section-sub { font-size:.95rem; color:var(--slate); line-height:1.6; }
+
+/* Sections : fond clair de l'accueil, rythme plus serré */
+body.page main > section, body.page > section { background:transparent; }
+body.page .steps, body.page .options, body.page .faq { padding:56px 0; }
+body.page .pricing-teaser { padding:56px 0 !important; background:transparent; }
+body.page .steps + .steps, body.page .options + .faq, body.page .steps + .faq { padding-top:16px; }
+
+/* Cartes : même famille que .h-step */
+body.page .steps-grid::before { display:none; }
+body.page .step-card, body.page .option-card, body.page .price-card { background:#fff; border:1px solid var(--line); border-radius:24px; box-shadow:0 1px 2px rgba(2,6,23,.04); }
+body.page .step-card:hover, body.page .option-card:hover, body.page .price-card:hover { transform:none; border-color:var(--blue-light); box-shadow:0 10px 24px rgba(2,6,23,.06); }
+body.page .step-num { background:var(--royal); color:#fff; }
+body.page .step-illu { background:var(--royal-50); }
+body.page .step-tag, body.page .option-tag { color:var(--royal); letter-spacing:.06em; }
+body.page .option-card.featured { background:var(--royal-50); border:2px solid var(--royal-100); }
+body.page .option-card.featured::before { content:'Le plus choisi'; background:var(--royal); color:#fff; letter-spacing:.04em; }
+
+/* FAQ : même rendu que l'accueil */
+body.page .faq-item { background:#fff; border:1px solid var(--line); border-radius:18px; }
+body.page .faq-item[open] { border-color:var(--blue-light); box-shadow:0 8px 20px rgba(37,99,235,.06); }
+body.page .faq-item summary { font-weight:800; padding:16px 52px 16px 18px; }
+body.page .faq-item summary::after { content:'+'; right:16px; width:28px; height:28px; border:0; border-radius:50%; background:var(--royal-50); color:var(--royal);
+  display:flex; align-items:center; justify-content:center; font-size:1.1rem; font-weight:800; transform:translateY(-50%); }
+body.page .faq-item[open] summary::after { transform:translateY(-50%) rotate(45deg); }
+body.page .faq-body { color:#475569; }
+body.page .faq-body a { color:var(--royal); font-weight:700; text-decoration:underline; }
+
+/* Bandeau final : celui de l'accueil */
+body.page .final-cta { padding:8px 16px 48px; background:none; overflow:visible; }
+body.page .final-cta::before, body.page .final-cta::after { display:none; }
+body.page .final-cta-inner { max-width:900px; padding:36px 22px; border-radius:28px;
+  background:linear-gradient(160deg,#0B6FB8 0%,#0A6CC2 55%,#074A86 100%); box-shadow:0 25px 50px -12px rgba(7,74,134,.45); }
+body.page .final-cta h2 { font-size:clamp(1.5rem,5vw,2.2rem); font-weight:900; }
+body.page .final-cta h2 .accent { color:#CDEBFF; font-style:normal; }
+body.page .final-cta p { font-size:.98rem; margin-bottom:22px; }
+body.page .final-cta-btn { border-radius:14px; background:#fff; color:var(--royal-800); box-shadow:0 14px 30px rgba(2,6,23,.25); padding:16px 28px; }
+body.page .final-cta-btn:hover { background:var(--royal-50); box-shadow:0 14px 30px rgba(2,6,23,.25); }
+
+/* Liens « Voir aussi » */
+body.page .see-also { padding:0 0 32px !important; }
+
+/* Pages légales */
+body.page .legal-page { padding:40px 0 56px; }
+body.page .legal-content { max-width:760px; margin:0 auto; background:#fff; border:1px solid var(--line); border-radius:24px; padding:24px 20px; color:#475569; line-height:1.7; font-size:.95rem; }
+body.page .legal-content h3 { color:var(--ink); font-size:1.05rem; font-weight:900; margin:22px 0 8px; }
+body.page .legal-content h3:first-child { margin-top:0; }
+body.page .legal-content p + p { margin-top:10px; }
+body.page .legal-content ul { margin:8px 0 0 20px; display:grid; gap:6px; }
+body.page .legal-content a { color:var(--royal); font-weight:700; text-decoration:underline; }
+body.page .legal-content .legal-date { color:var(--muted); font-size:.8rem; margin-bottom:6px; }
+body.page .legal-content .legal-fineprint { margin-top:22px; padding-top:14px; border-top:1px solid var(--line); font-size:.8rem; color:var(--muted); }
+body.page .legal-todo { color:var(--muted); }
+@media (min-width:640px) { body.page .legal-content { padding:36px 40px; } }
+
+/* Barre mobile collante (reprend le style de l'accueil) */
+body.page .sticky-cta-btn { border-radius:16px; }
