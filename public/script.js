@@ -890,6 +890,8 @@ function trackPurchase(ref, value) {
     if (!already) {
       try { sessionStorage.setItem('vo_paid_' + ref, '1'); } catch {}
       trackPurchase(ref);
+      // GA4 : réservation payée en ligne avec succès (retour Stripe)
+      if (window.DVAnalytics) window.DVAnalytics.trackEvent('demande_devis_validee', { mode_paiement: 'en_ligne', currency: 'EUR', transaction_id: ref || undefined });
     }
     history.replaceState(null, '', window.location.pathname);
   } else if (q.get('canceled') === '1') {
@@ -1200,4 +1202,96 @@ document.addEventListener('DOMContentLoaded', () => {
 
 (function(){ var t=document.getElementById('faqToggle'), x=document.getElementById('faqExtra'); if(!t||!x) return;
   t.addEventListener('click', function(){ var open=x.hidden; x.hidden=!open; t.setAttribute('aria-expanded', open); t.textContent= open ? 'Masquer les questions' : 'Voir les ' + (t.dataset.count || '') + ' questions'; });
+})();
+
+/* ════════════════════════════════════════════════
+   GA4 — ENTONNOIR DE DEVIS / RÉSERVATION (voir /utils/analytics.js)
+   Hooks non intrusifs : on enveloppe les fonctions existantes sans
+   changer leur comportement.
+   Étapes réelles du tunnel :
+     0 tarif_affiche               (calculateur de l'accueil)
+     1 dates_et_coordonnees        (tunnel, écran 1)
+     2 vehicule_et_options         (tunnel, écran 2)
+     3 recapitulatif_et_paiement   (tunnel, écran 3 : clic « Confirmer »)
+═══════════════════════════════════════════════ */
+(function ga4Funnel() {
+  const T = (name, params) => { try { return window.DVAnalytics && window.DVAnalytics.trackEvent(name, params); } catch (e) {} };
+  const ETAPES = { 0: 'tarif_affiche', 1: 'dates_et_coordonnees', 2: 'vehicule_et_options', 3: 'recapitulatif_et_paiement' };
+  const CHAMPS = {
+    'bk-dep-date': 'date_depart', 'bk-ret-date': 'date_retour', 'bk-firstname': 'prenom', 'bk-lastname': 'nom',
+    'bk-phone': 'telephone', 'bk-email': 'email', 'bk-brand': 'marque', 'bk-model': 'modele', 'bk-plate': 'immatriculation',
+  };
+  const etape = (n, extra) => T('devis_etape', Object.assign({ etape: n, nom_etape: ETAPES[n] }, extra || {}));
+
+  // devis_debut : une seule fois par page (premier champ touché ou ouverture du tunnel)
+  let started = false;
+  const debut = (source) => { if (started) return; started = true; T('devis_debut', { source }); };
+  const card = document.getElementById('bookingHeroCard');
+  if (card) {
+    const onFirst = (e) => { if (e.target.closest('input, select, button, [role="button"]')) debut('calculateur_accueil'); };
+    card.addEventListener('focusin', onFirst);
+    card.addEventListener('pointerdown', onFirst);
+  }
+  const _open = window.openBookingModal;
+  window.openBookingModal = function () { debut('tunnel_reservation'); return _open.apply(this, arguments); };
+
+  // Erreurs de saisie : champs marqués en rouge par bkValidateStep1/2
+  const erreurs = (n) => {
+    const step = document.querySelector(`.modal-step[data-step="${n}"]`);
+    if (!step) return;
+    const ids = [...step.querySelectorAll('.form-group.has-error input, .form-group.has-error select')].map(i => CHAMPS[i.id] || i.id);
+    if (!ids.length) return;
+    T('devis_erreur', { champ_erreur: ids[0], champs_erreur: ids.join(','), nb_erreurs: ids.length, etape: n, nom_etape: ETAPES[n], formulaire: 'tunnel_reservation' });
+  };
+
+  // Étapes 1 et 2 du tunnel
+  [['bkNext1', 1], ['bkNext2', 2]].forEach(([fn, n]) => {
+    const orig = window[fn];
+    window[fn] = async function () {
+      const before = STATE.booking.step;
+      const r = await orig.apply(this, arguments);
+      if (before === n && STATE.booking.step === n + 1) etape(n);
+      else if (STATE.booking.step === n) erreurs(n);
+      return r;
+    };
+  });
+
+  // Étape 3 (clic « Confirmer ») puis succès / échec de l'envoi
+  const _confirm = window.bkConfirm;
+  window.bkConfirm = async function () {
+    const paiement = STATE.booking.payment === 'stripe' ? 'en_ligne' : 'sur_place';
+    const total = STATE.booking.serverPrice ? STATE.booking.serverPrice.total : undefined;
+    etape(3, { mode_paiement: paiement, value: total, currency: 'EUR' });
+    const r = await _confirm.apply(this, arguments);
+    const btn = document.getElementById('bk-confirm-btn');
+    if (STATE.booking.step === 4 && paiement === 'sur_place') {
+      const ref = (document.getElementById('bk-confirm-ref').textContent || '').replace(/^RÉF\s*—\s*/, '');
+      T('demande_devis_validee', { mode_paiement: paiement, value: total, currency: 'EUR', transaction_id: ref || undefined });
+    } else if (STATE.booking.step !== 4 && btn && !btn.disabled) {
+      // L'envoi a échoué (bouton réactivé) — pour Stripe, le bouton reste désactivé pendant la redirection
+      T('devis_erreur', { champ_erreur: 'envoi_serveur', etape: 3, nom_etape: ETAPES[3], formulaire: 'tunnel_reservation' });
+    }
+    return r;
+  };
+
+  // Calculateur de l'accueil : tarif affiché (une fois) et tentative de réserver avec des dates invalides
+  let tarifVu = false;
+  const _quote = window.homeQuote;
+  window.homeQuote = async function (userAction = true) {
+    const r = await _quote.apply(this, arguments);
+    if (userAction !== false && !tarifVu && STATE.sim.quotedPrice > 0) {
+      tarifVu = true;
+      etape(0, { value: STATE.sim.quotedPrice, currency: 'EUR', formulaire: 'calculateur_accueil' });
+    }
+    return r;
+  };
+  const _book = window.homeBook;
+  window.homeBook = function () {
+    if (document.getElementById('sim-dep-date') && !homeReadInputs()) {
+      const s = STATE.sim;
+      const champ = !s.depDate ? 'date_depart' : (!s.retDate ? 'date_retour' : 'date_retour_avant_depart');
+      T('devis_erreur', { champ_erreur: champ, etape: 0, nom_etape: ETAPES[0], formulaire: 'calculateur_accueil' });
+    }
+    return _book.apply(this, arguments);
+  };
 })();

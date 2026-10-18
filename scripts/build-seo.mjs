@@ -503,6 +503,7 @@ function pageShell({ slug, title, description, h1, eyebrow, body, breadcrumbName
 ${JSON.stringify(ld)}
 </script>
 <script src="/tracking.js"></script>
+<script src="/utils/analytics.js"></script>
 </head>
 <body class="home page">
 <!--seo:header-->
