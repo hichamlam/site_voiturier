@@ -5,9 +5,9 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "vercel dev",
     "deploy": "vercel --prod",
-    "seo": "node scripts/build-seo.mjs"
+    "seo": "node scripts/build-seo.mjs",
+    "dev:vercel": "vercel dev"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.4",
