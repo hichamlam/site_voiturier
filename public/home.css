@@ -80,6 +80,32 @@ body.home :focus-visible { outline:3px solid var(--sky-400); outline-offset:2px;
   .h-nav-links a { font-size:.88rem; font-weight:700; color:#475569; padding:10px 12px; border-radius:10px; }
   .h-nav-links a:hover { color:var(--royal); background:#F1F5F9; }
 }
+/* Anti-chevauchement header (logo / menu / téléphone / CTA) */
+@media (max-width:359px) {
+  .h-logo { gap:8px; }
+  .h-logo-mark { width:36px; height:36px; border-radius:12px; }
+  .h-logo-mark svg { width:19px; height:19px; }
+  .h-logo-name { font-size:.85rem; }
+  .h-logo-sub { font-size:.62rem; }
+  .h-nav-cta { padding:10px 14px; }
+  .h-nav-cta .h-ico { display:none; }
+}
+@media (min-width:1024px) {
+  .h-logo { flex-shrink:0; }
+  .h-nav-links { flex:1 1 auto; justify-content:center; min-width:0; gap:0; }
+  .h-nav-links a { white-space:nowrap; }
+  .h-nav-phone { padding:10px; }
+  .h-nav-phone span { display:none; }
+}
+@media (min-width:1024px) and (max-width:1279px) {
+  .h-logo-mark { width:42px; height:42px; border-radius:14px; }
+  .h-logo-name { font-size:1.15rem; }
+  .h-nav-links a { font-size:.82rem; padding:8px 8px; }
+  .h-nav-cta { padding:11px 16px; font-size:.88rem; }
+}
+@media (min-width:1280px) {
+  .h-nav-links a { padding:10px 10px; }
+}
 
 /* ─── HERO ─── */
 .h-hero { position:relative; overflow:hidden; padding:36px 0 64px;
