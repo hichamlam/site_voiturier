@@ -202,27 +202,27 @@ export function adminEmailHTML(ctx) {
  * Email envoyé au client ET à l'admin après une modification faite dans
  * l'espace « Gérer ma réservation ».
  */
-export function modificationEmailHTML({ booking, summary, toPay, paidOnline, manageUrl, forAdmin = false }) {
+export function modificationEmailHTML({ booking, summary, toPay, paidOnline, manageUrl, forAdmin = false, heading = '', moneyHtml = '' }) {
   const b = booking;
   const lines = summary.map((s) => `<li style="margin:0 0 6px;">${escapeHtml(s)}</li>`).join('');
   const money = toPay > 0
     ? (paidOnline ? `Supplément réglé en ligne : <strong>${toPay}€</strong> (différence + frais de modification).`
                   : `Supplément de <strong>${toPay}€</strong> (différence + frais de modification) à régler sur place.`)
     : 'Aucun supplément.';
-  const due = b.payment_method === 'stripe' && b.payment_status === 'paid' ? 'payé' : 'à régler sur place';
+  const due = b.payment_status === 'paid' ? 'payé' : 'à régler sur place';
   return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"></head>
 <body style="margin:0;padding:0;background:#f8fafc;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#0F172A;">
 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f8fafc;padding:40px 20px;"><tr><td align="center">
 <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="max-width:600px;background:#fff;border-radius:16px;overflow:hidden;">
 <tr><td style="background:#0B1426;background-image:linear-gradient(135deg,#0B1426 0%,#1B5FA8 100%);padding:34px 40px;text-align:center;">
-  <p style="margin:0 0 8px;color:rgba(255,255,255,.75);font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;">${forAdmin ? '✏️ Modification client' : 'Modification enregistrée'}</p>
+  <p style="margin:0 0 8px;color:rgba(255,255,255,.75);font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;">${escapeHtml(heading || (forAdmin ? '✏️ Modification client' : 'Modification enregistrée'))}</p>
   <h1 style="margin:0;color:#fff;font-size:24px;font-weight:800;">Réservation ${escapeHtml(b.reference)}</h1>
   ${forAdmin ? `<p style="margin:8px 0 0;color:rgba(255,255,255,.8);font-size:14px;">${escapeHtml(b.customer_firstname)} ${escapeHtml(b.customer_lastname || '')} · ${escapeHtml(b.customer_phone)}</p>` : ''}
 </td></tr>
 <tr><td style="padding:28px 40px 8px;">
-  <h2 style="margin:0 0 10px;font-size:16px;font-weight:800;">Ce qui a changé</h2>
+  <h2 style="margin:0 0 10px;font-size:16px;font-weight:800;">${heading ? 'Détail' : 'Ce qui a changé'}</h2>
   <ul style="margin:0 0 16px;padding-left:20px;font-size:14px;color:#334155;line-height:1.5;">${lines}</ul>
-  <p style="margin:0 0 18px;font-size:14px;color:#334155;">${money}</p>
+  <p style="margin:0 0 18px;font-size:14px;color:#334155;">${moneyHtml || money}</p>
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border:1px solid rgba(11,20,38,0.08);border-radius:12px;overflow:hidden;">
     ${row('🛫 Aller', `${fmtDate(b.departure_date)} à ${String(b.departure_time).slice(0, 5)}${b.departure_terminal ? '<br>' + escapeHtml(b.departure_terminal) : ''}`)}
     ${row('🛬 Retour', `${fmtDate(b.return_date)} à ${String(b.return_time).slice(0, 5)}`)}

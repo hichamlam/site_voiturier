@@ -144,11 +144,24 @@
   }
 
   /* ═══ PAGE : CONFIRMATION ═══════════════════════════════════════ */
+  /* Paramètres secrets (jeton, session Stripe) : lus dans l'URL puis retirés
+     par le script en tête de page, avant tout outil de mesure. */
+  function param(name) {
+    var P = window.__EC_PARAMS;
+    if (P && P[name]) return String(P[name]);
+    return new URLSearchParams(location.search).get(name) || '';
+  }
+  function forgetParam(name) {
+    try {
+      var P = window.__EC_PARAMS || {}; delete P[name];
+      sessionStorage.setItem('ec_params:' + location.pathname, JSON.stringify(P));
+    } catch (e) {}
+  }
+
   function initConfirm() {
     var root = $('#ec-root');
-    var q = new URLSearchParams(location.search);
-    var sessionId = q.get('session_id') || '';
-    var t = q.get('t') || '';
+    var sessionId = param('session_id');
+    var t = param('t');
     if (!sessionId && !t) {
       root.innerHTML = '<section class="ec-card ec-center"><h1 style="font-size:1.4rem;margin:0 0 10px">Retrouver ma réservation</h1>' +
         '<p class="ec-muted">Ce lien est incomplet. Connectez-vous avec la référence reçue par email.</p>' +
@@ -166,7 +179,8 @@
             }
             root.innerHTML = '<section class="ec-card ec-center"><h1 style="font-size:1.4rem;margin:0 0 10px">Paiement en cours de validation</h1>' +
               '<p class="ec-muted">Votre banque n\'a pas encore confirmé le paiement de la réservation <strong>' + esc(r.reference) + '</strong>. Vous recevrez l\'email de confirmation dès que c\'est fait. Aucun double paiement : inutile de recommencer.</p>' +
-              '<div class="ec-actions"><button class="ec-btn ec-btn-ghost" type="button" onclick="location.reload()">Actualiser</button></div></section>';
+              '<div class="ec-actions"><button class="ec-btn ec-btn-ghost" type="button" id="ec-retry">Actualiser</button></div></section>';
+            $('#ec-retry').addEventListener('click', function () { tries = 0; load(); });
             return;
           }
           renderConfirm(root, r.booking, r.token, !!sessionId);
@@ -221,8 +235,11 @@
 
   function initManage() {
     var q = new URLSearchParams(location.search);
-    var t = q.get('t'), modif = q.get('modif');
+    var t = param('t'), modif = param('modif');
     if (t) setToken(t, false);
+    // Usage unique : un rechargement ne doit pas rejouer l'attente de paiement
+    // ni écraser une session plus récente.
+    forgetParam('t'); forgetParam('modif');
     if (t || modif || q.get('ref')) history.replaceState(null, '', location.pathname);
     STATE.prefillRef = q.get('ref') || '';
     if (!getToken()) return renderLogin();
@@ -475,6 +492,11 @@
     var top = $('.ec-topbar'); if (top) top.insertAdjacentElement('afterend', box);
     (function poll() {
       api('modstatus', { query: 'session_id=' + encodeURIComponent(sessionId) }).then(function (r) {
+        if (r.refunded) {
+          box.className = 'ec-error';
+          box.textContent = 'Cette modification n\'a pas pu être appliquée (créneau devenu indisponible). Votre réservation est inchangée et le paiement vous sera intégralement remboursé. Un email vient de partir.';
+          return;
+        }
         if (r.applied) {
           return api('view').then(function (b) { STATE.b = b; renderDashboard('✓ Paiement reçu et modification enregistrée. Un email de confirmation vient de partir.'); });
         }

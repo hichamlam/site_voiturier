@@ -157,8 +157,13 @@ async function update(req, res) {
       updates.wash_surcharge = price.washSurcharge;
       updates.time_surcharges = price.timeSurcharges;
       updates.options_total = price.optionsTotal;
-      updates.total_price = price.total;
-      updates.surcharges_detail = price.surchargesDetail;
+      // Les frais de modification payés par le client (espace client) ne font
+      // pas partie de la grille : on les conserve lors d'un recalcul.
+      const fees = (Array.isArray(existing.surcharges_detail) ? existing.surcharges_detail : [])
+        .filter((d) => d && d.kind === 'modification_fee');
+      const feeSum = fees.reduce((s, d) => s + Number(d.amount || 0), 0);
+      updates.total_price = Math.round((Number(price.total) + feeSum) * 100) / 100;
+      updates.surcharges_detail = [...(price.surchargesDetail || []), ...fees];
     }
   }
 

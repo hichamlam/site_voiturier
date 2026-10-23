@@ -8,6 +8,7 @@
 import Stripe from 'stripe';
 import { runAutoEmails } from './_autoemails.js';
 import { reconcilePendingPayments, checkWebhookHealth } from './_confirm.js';
+import { reconcileModifications } from './_manage.js';
 
 export default async function handler(req, res) {
   const secret = process.env.CRON_SECRET;
@@ -24,6 +25,7 @@ export default async function handler(req, res) {
         payments = {
           ...(await reconcilePendingPayments(stripe, { source: 'cron' })),
           ...(await checkWebhookHealth(stripe)),
+          ...(await reconcileModifications(stripe)),
         };
       } catch (err) {
         console.error('[cron] paiements', err);
