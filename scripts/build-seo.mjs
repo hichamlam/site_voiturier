@@ -123,6 +123,7 @@ function footer({ wa = false } = {}) {
       <div class="h-foot-quick">
         <a href="/voiturier-orly-terminaux">Terminaux 1, 2, 3 &amp; 4</a>
         <a href="/comment-ca-marche">Dépose-minute</a>
+        <a href="/gerer-ma-reservation">Gérer ma réservation</a>
         <a href="mailto:${F.email}">Assistance directe</a>
         <a href="/conditions-generales">Conditions générales</a>
       </div>
@@ -133,6 +134,7 @@ function footer({ wa = false } = {}) {
         <li><a href="/tarifs">Tarifs</a></li>
         <li><a href="/lavage-voiture-orly">Lavages</a></li>
         <li><a href="/reserver-voiturier-orly">Réserver</a></li>
+        <li><a href="/gerer-ma-reservation">Gérer ma réservation</a></li>
         <li><a href="/horaires-voiturier-orly">Horaires</a></li>
       </ul></div>
       <div><h3>Orly</h3><ul>
@@ -655,7 +657,9 @@ function buildSitemap() {
   const prev = fs.existsSync(path.join(PUB, 'sitemap.xml')) ? fs.readFileSync(path.join(PUB, 'sitemap.xml'), 'utf8') : '';
   const meta = {};
   for (const m of prev.matchAll(/<loc>([^<]+)<\/loc>[\s\S]*?<changefreq>([^<]+)<\/changefreq>[\s\S]*?<priority>([^<]+)<\/priority>/g)) meta[m[1]] = { cf: m[2], pr: m[3] };
-  const files = fs.readdirSync(PUB).filter((f) => f.endsWith('.html')).sort((a, b) => (a === 'index.html' ? -1 : b === 'index.html' ? 1 : 0));
+  // Pages privées (noindex : confirmation, espace client) hors sitemap
+  const isPrivate = (f) => /<meta name="robots" content="noindex/.test(fs.readFileSync(path.join(PUB, f), 'utf8'));
+  const files = fs.readdirSync(PUB).filter((f) => f.endsWith('.html') && !isPrivate(f)).sort((a, b) => (a === 'index.html' ? -1 : b === 'index.html' ? 1 : 0));
   const urls = files.map((f) => {
     const slug = f === 'index.html' ? '' : f.replace(/\.html$/, '');
     const loc = `${SITE}/${slug}`;

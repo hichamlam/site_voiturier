@@ -4,6 +4,7 @@
 import { Resend } from 'resend';
 import { supabase, calculatePrice, checkDatesAvailable, checkVehicleAllowed, upsertClient, getNotificationEmail, getContactPhone } from './_lib.js';
 import { clientEmailHTML, adminEmailHTML } from './_emails.js';
+import { magicToken, manageUrl } from './_manage.js';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -51,7 +52,7 @@ export default async function handler(req, res) {
 
     const clientId = await upsertClient(customer);
 
-    const { error: bookingErr } = await supabase.from('bookings').insert({
+    const { data: inserted, error: bookingErr } = await supabase.from('bookings').insert({
       reference,
       client_id: clientId,
       customer_firstname: customer.firstname,
@@ -86,7 +87,7 @@ export default async function handler(req, res) {
       status: 'confirmed',
       payment_method: 'onsite',
       payment_status: 'pending',
-    });
+    }).select('id, return_date').single();
 
     if (bookingErr) {
       console.error('[booking] supabase err:', bookingErr);
@@ -111,6 +112,7 @@ export default async function handler(req, res) {
         reference, total: price.total, customer, car, dep: departure, ret, wash: wash || { type: 'none' },
         options, surchargesDetail: price.surchargesDetail, paymentMode: 'sur place',
         contactPhone: await getContactPhone(),
+        manageUrl: manageUrl(inserted),
       };
 
       // On attend l'envoi AVANT de répondre : sur Vercel, la fonction est gelée
@@ -125,7 +127,7 @@ export default async function handler(req, res) {
       });
     }
 
-    return res.status(200).json({ success: true, reference, total: price.total });
+    return res.status(200).json({ success: true, reference, total: price.total, manageToken: magicToken(inserted) });
 
   } catch (err) {
     console.error('[booking]', err);

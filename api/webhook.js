@@ -5,6 +5,7 @@ import Stripe from 'stripe';
 import { Resend } from 'resend';
 import { supabase, getNotificationEmail, getContactPhone } from './_lib.js';
 import { clientEmailHTML, adminEmailHTML } from './_emails.js';
+import { loadBooking, quoteChanges, applyChanges, notifyModification, manageUrl } from './_manage.js';
 
 
 export const config = { api: { bodyParser: false } };
@@ -53,6 +54,13 @@ export default async function handler(req, res) {
   } catch (err) {
     console.error('[webhook]', err.message);
     return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  // Paiement d'une MODIFICATION faite dans « Gérer ma réservation ».
+  // Traité avant le bloc suivant, qui ignorerait l'événement (réservation déjà payée).
+  if (event.type === 'checkout.session.completed' && event.data.object.metadata?.kind === 'modification') {
+    await handleModificationPaid(event.data.object);
+    return res.status(200).json({ received: true });
   }
 
   if (event.type === 'checkout.session.completed') {
@@ -112,6 +120,7 @@ export default async function handler(req, res) {
       surchargesDetail: booking.surcharges_detail || [],
       paymentMode: 'en ligne',
       contactPhone: await getContactPhone(),
+      manageUrl: manageUrl(booking),
     };
 
     try {
@@ -138,4 +147,43 @@ export default async function handler(req, res) {
   }
 
   return res.status(200).json({ received: true });
+}
+
+/**
+ * Supplément d'une modification payé : on rejoue la validation sur la
+ * réservation actuelle (sans re-contrôler le délai de 24 h, déjà vérifié au
+ * moment du paiement) puis on enregistre. Idempotent : l'id de session Stripe
+ * est inscrit dans internal_notes, un rejeu du webhook ne double rien.
+ */
+async function handleModificationPaid(session) {
+  if (session.payment_status !== 'paid') return;
+  const b = await loadBooking(session.metadata?.mod_booking_id);
+  if (!b) { console.error('[webhook] modif : réservation introuvable', session.id); return; }
+  if (String(b.internal_notes || '').includes(session.id)) {
+    console.log('[webhook] modif %s déjà appliquée — rejeu ignoré', session.id);
+    return;
+  }
+  const paid = Math.round(Number(session.amount_total || 0)) / 100;
+  let changes = {};
+  try { changes = JSON.parse(session.metadata?.changes || '{}'); } catch {}
+
+  let q;
+  try {
+    // « now » = création de la session : le délai de 24 h était respecté à ce moment-là.
+    q = await quoteChanges(b, changes, (session.created || 0) * 1000 || Date.now());
+  } catch (err) {
+    // Cas très rare (dates bloquées entre-temps…) : le client a payé, on ne
+    // perd rien — on note le paiement et on prévient l'admin pour qu'il traite.
+    console.error('[webhook] modif non applicable', session.id, err.message);
+    const line = `[${new Date().toLocaleString('fr-FR', { timeZone: 'Europe/Paris' })}] ⚠️ Modification payée ${paid} € (Stripe ${session.id}) NON appliquée automatiquement (${err.message}). Demande : ${JSON.stringify(changes)}`;
+    await supabase.from('bookings').update({ internal_notes: [b.internal_notes, line].filter(Boolean).join('\n') }).eq('id', b.id);
+    await notifyModification(b, { summary: [`⚠️ À traiter à la main : ${err.message}`, `Demande : ${JSON.stringify(changes)}`], toPay: paid }, { paidOnline: true, adminOnly: true });
+    return;
+  }
+  // On facture ce que le client a réellement payé (montant validé au devis).
+  if (paid > 0 && Math.abs(paid - q.toPay) > 0.009) {
+    q = { ...q, toPay: paid, extra: Math.round((paid - q.fee) * 100) / 100 };
+  }
+  const updated = await applyChanges(b, q, { source: 'espace client, payé en ligne', stripeSessionId: session.id });
+  await notifyModification(updated, q, { paidOnline: true });
 }
