@@ -714,6 +714,12 @@ async function bkConfirm() {
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || 'Erreur');
+      // Lien vers l'espace client (récap complet + modifications)
+      const manageBox = document.getElementById('bk-confirm-manage');
+      if (manageBox && json.manageToken) {
+        document.getElementById('bk-confirm-manage-link').href = '/reservation-confirmee?t=' + encodeURIComponent(json.manageToken);
+        manageBox.hidden = false;
+      }
     }
     document.getElementById('bk-confirm-name').textContent = STATE.booking.data.customer.firstname + ' !';
     document.getElementById('bk-confirm-ref').textContent = 'RÉF — ' + ref;

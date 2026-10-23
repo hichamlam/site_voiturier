@@ -111,7 +111,8 @@ export default async function handler(req, res) {
         quantity: 1,
       }],
       metadata: { booking_id: booking.id, reference },
-      success_url: `${process.env.SITE_URL}/?paid=1&ref=${reference}`,
+      // Page de confirmation avec récap (lit la résa via l'id de session, jamais via l'URL seule)
+      success_url: `${process.env.SITE_URL}/reservation-confirmee?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.SITE_URL}/?canceled=1&ref=${reference}`,
       locale: 'fr',
     });

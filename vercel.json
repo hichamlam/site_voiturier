@@ -10,6 +10,11 @@
       "statusCode": 301
     },
     {
+      "source": "/ma-reservation",
+      "destination": "/gerer-ma-reservation",
+      "statusCode": 301
+    },
+    {
       "source": "/voiturier-orly.html",
       "destination": "/",
       "statusCode": 301

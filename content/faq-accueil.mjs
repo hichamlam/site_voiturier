@@ -18,7 +18,7 @@ export const faqAccueil = (f) => [
   {
     visible: true,
     q: "Puis-je annuler ou modifier ma réservation ?",
-    a: `Les réservations sont fermes selon nos conditions générales, mais nous étudions chaque demande au cas par cas et faisons un geste quand c'est possible, surtout si vous nous prévenez au moins 7 jours avant. Écrivez-nous à ${f.email}.`,
+    a: `Oui pour la modification : dates, horaires, vol ou options se changent en ligne depuis <a href="/gerer-ma-reservation">Gérer ma réservation</a>, jusqu'à 24 h avant le rendez-vous (si c'est plus cher : la différence + 20 € de frais ; si c'est moins cher, pas de remboursement). Les annulations, elles, sont fermes selon nos conditions générales, mais nous étudions chaque demande au cas par cas, surtout si vous nous prévenez au moins 7 jours avant. Écrivez-nous à ${f.email}.`,
   },
   {
     q: "Voiturier ou parking officiel à Orly : qu'est-ce qui est le plus rapide ?",
