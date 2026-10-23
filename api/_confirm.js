@@ -17,6 +17,7 @@
 import { Resend } from 'resend';
 import { supabase, getNotificationEmail, getContactPhone } from './_lib.js';
 import { clientEmailHTML, adminEmailHTML } from './_emails.js';
+import { manageUrl } from './_manage.js';
 
 const FROM = () => process.env.FROM_EMAIL || 'Direct Voiturier <contact@directvoiturier.com>';
 
@@ -86,6 +87,7 @@ async function sendConfirmationEmails(booking) {
     surchargesDetail: booking.surcharges_detail || [],
     paymentMode: 'en ligne',
     contactPhone: await getContactPhone(),
+    manageUrl: manageUrl(booking),   // lien « Gérer ma réservation » dans l'email
   };
 
   try {
