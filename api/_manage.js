@@ -93,11 +93,14 @@ export function rulesFor(b, now = Date.now()) {
   const depOk = b.status === 'confirmed' && hoursUntil(b.departure_date, b.departure_time, now) >= MIN_HOURS_BEFORE;
   const retOk = active && hoursUntil(b.return_date, b.return_time, now) >= MIN_HOURS_BEFORE;
   const notOver = active && hoursUntil(b.return_date, b.return_time, now) > 0;
+  const blockedPay = ['refunded', 'failed'].includes(b.payment_status);
   let reason = '';
-  if (b.status === 'cancelled') reason = 'Cette réservation est annulée.';
+  if (blockedPay) reason = 'Cette réservation a été remboursée ou son paiement a échoué : appelez-nous.';
+  else if (b.status === 'cancelled') reason = 'Cette réservation est annulée.';
   else if (b.status === 'returned') reason = 'Cette réservation est terminée : votre véhicule vous a été restitué.';
   else if (!retOk) reason = `Votre retour est dans moins de ${MIN_HOURS_BEFORE} h : pour tout changement, appelez-nous.`;
   else if (!depOk && b.status === 'confirmed') reason = `Votre prise en charge est dans moins de ${MIN_HOURS_BEFORE} h : l'aller ne peut plus être modifié en ligne, appelez-nous.`;
+  if (blockedPay) return { departure: false, return: false, options: false, contact: false, reason };
   return {
     departure: depOk,          // date/heure/terminal aller
     return: retOk,             // date/heure retour
@@ -248,6 +251,7 @@ export function validateChanges(b, input, now = Date.now()) {
   if (want('flight') && String(input.flight).trim() !== cur.customer.flight) {
     const f = String(input.flight).trim().toUpperCase().replace(/\s+/g, ' ');
     if (f.length > 20) throw new ChangeError('Numéro de vol trop long.');
+    if (!/^[A-Z0-9 .-]*$/.test(f)) throw new ChangeError('Numéro de vol invalide (lettres et chiffres uniquement).');
     if (!rules.contact) throw new ChangeError(rules.reason || 'Réservation non modifiable.', 409);
     fields.customer_flight = f;
     summary.push(`Vol retour : ${cur.customer.flight || 'non précisé'} → ${f || 'non précisé'}`);
@@ -308,7 +312,9 @@ export async function quoteChanges(b, input, now = Date.now()) {
     extra, fee, toPay,
     currentTotal: r2(b.total_price),
     newTotal: r2(Number(b.total_price) + toPay),
-    payOnline: toPay > 0 && b.payment_method === 'stripe' && b.payment_status === 'paid',
+    // Réservation déjà réglée (en ligne OU sur place, encaissée par l'admin) :
+    // le supplément se paie en ligne, sinon il ne serait jamais encaissé.
+    payOnline: toPay > 0 && b.payment_status === 'paid',
     newCalc,
   };
 }
@@ -337,9 +343,101 @@ export async function applyChanges(b, q, { source, stripeSessionId = null, now =
   const line = `[${stamp}] Modifié par le client (${source})${paid} : ${q.summary.join(' ; ')}`;
   updates.internal_notes = [b.internal_notes, line].filter(Boolean).join('\n');
 
-  const { data, error } = await supabase.from('bookings').update(updates).eq('id', b.id).select().single();
+  // Verrou optimiste : si la ligne a bougé depuis la lecture (admin, autre
+  // onglet, webhook concurrent), on n'écrase rien.
+  let query = supabase.from('bookings').update(updates).eq('id', b.id);
+  if (b.updated_at) query = query.eq('updated_at', b.updated_at);
+  const { data, error } = await query.select().maybeSingle();
   if (error) throw error;
+  if (!data) throw new ConflictError();
+
+  // Nouvelle date d'aller : le rappel de la veille doit repartir pour la bonne date.
+  if (q.fields.departure_date && q.fields.departure_date !== b.departure_date) {
+    try { await supabase.from('settings').delete().eq('key', `autosent:${b.reference}:reminder_d1_email`); }
+    catch (e) { console.error('[manage] reset rappel', e.message); }
+  }
   return data;
+}
+
+export class ConflictError extends ChangeError {
+  constructor() { super('Votre réservation vient d’être mise à jour. Rechargez la page et recommencez.', 409); this.conflict = true; }
+}
+
+/**
+ * Modification payée sur Stripe → appliquée. Appelé par le webhook ET par la
+ * page de retour (si le webhook tarde). Idempotent : l'id de session est
+ * inscrit dans internal_notes ; verrou optimiste contre les appels simultanés.
+ * Si la modification n'est plus applicable, le client est remboursé
+ * automatiquement et l'admin prévenu. Renvoie 'applied' | 'duplicate' | 'refunded' | 'skipped'.
+ */
+export async function applyPaidModification(session, stripe) {
+  if (session?.metadata?.kind !== 'modification' || session.payment_status !== 'paid') return 'skipped';
+  const paid = Math.round(Number(session.amount_total || 0)) / 100;
+  let changes = {};
+  try { changes = JSON.parse(session.metadata?.changes || '{}'); } catch {}
+
+  for (let attempt = 0; attempt < 4; attempt++) {
+    const b = await loadBooking(session.metadata?.mod_booking_id);
+    if (!b) { console.error('[manage] modif : réservation introuvable', session.id); return 'skipped'; }
+    if (String(b.internal_notes || '').includes(session.id)) return 'duplicate';
+
+    let q;
+    try {
+      // « now » = création de la session : le délai de 24 h était respecté à ce moment-là.
+      q = await quoteChanges(b, changes, (session.created || 0) * 1000 || Date.now());
+    } catch (err) {
+      if (!(err instanceof ChangeError)) throw err;
+      return refundUnapplicable(b, session, stripe, paid, changes, err.message);
+    }
+    // On facture ce que le client a réellement payé (montant validé au devis).
+    if (paid > 0 && Math.abs(paid - q.toPay) > 0.009) {
+      const fee = q.fee || MODIFICATION_FEE;
+      q = { ...q, toPay: paid, fee, extra: r2(paid - fee) };
+    }
+    try {
+      const updated = await applyChanges(b, q, { source: 'espace client, payé en ligne', stripeSessionId: session.id });
+      await notifyModification(updated, q, { paidOnline: true });
+      return 'applied';
+    } catch (err) {
+      if (err instanceof ConflictError) continue;   // relire et réessayer
+      throw err;
+    }
+  }
+  throw new Error('modification : conflit persistant ' + session.id);
+}
+
+async function refundUnapplicable(b, session, stripe, paid, changes, why) {
+  const stamp = new Date().toLocaleString('fr-FR', { timeZone: 'Europe/Paris' });
+  let refunded = false;
+  if (stripe && session.payment_intent) {
+    try {
+      await stripe.refunds.create({ payment_intent: session.payment_intent }, { idempotencyKey: `dv-modif-refund-${session.id}` });
+      refunded = true;
+    } catch (e) { console.error('[manage] remboursement auto impossible', session.id, e.message); }
+  }
+  const line = `[${stamp}] ⚠️ Modification payée ${paid} € (Stripe ${session.id}) NON appliquée (${why}) — ${refunded ? 'client remboursé automatiquement' : 'REMBOURSEMENT À FAIRE À LA MAIN'}. Demande : ${JSON.stringify(changes)}`;
+  // Écriture sans verrou : on ajoute seulement une ligne de note.
+  const fresh = (await loadBooking(b.id)) || b;
+  await supabase.from('bookings').update({ internal_notes: [fresh.internal_notes, line].filter(Boolean).join('\n') }).eq('id', b.id);
+
+  if (process.env.RESEND_API_KEY) {
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    const FROM = process.env.FROM_EMAIL || 'Direct Voiturier <contact@directvoiturier.com>';
+    const ADMIN = await getNotificationEmail();
+    const summary = [`Demande non appliquée : ${why}`];
+    const sends = [
+      resend.emails.send({ from: FROM, to: ADMIN, subject: `⚠️ Modif ${b.reference} non appliquée${refunded ? ' — remboursée' : ' — REMBOURSER'}`,
+        html: modificationEmailHTML({ booking: fresh, summary: [...summary, `Demande : ${JSON.stringify(changes)}`], toPay: paid, paidOnline: true, forAdmin: true,
+          heading: '⚠️ Modification non appliquée', moneyHtml: refunded ? `${paid}€ remboursés automatiquement au client.` : `<strong>${paid}€ à rembourser à la main</strong> (remboursement automatique impossible).` }) }),
+    ];
+    if (refunded && isRealEmail(b.customer_email)) {
+      sends.push(resend.emails.send({ from: FROM, to: b.customer_email, subject: `Modification non effectuée — ${b.reference} (remboursée)`,
+        html: modificationEmailHTML({ booking: fresh, summary, toPay: 0, paidOnline: true, manageUrl: manageUrl(fresh),
+          heading: 'Modification non effectuée', moneyHtml: `Votre réservation est inchangée et vos <strong>${paid}€</strong> vous sont intégralement remboursés (sous 5 à 10 jours sur votre carte). Appelez-nous si besoin.` }) }));
+    }
+    (await Promise.allSettled(sends)).forEach((r) => { if (r.status === 'rejected') console.error('[manage] email remboursement', r.reason); });
+  }
+  return 'refunded';
 }
 
 export async function loadBooking(id) {
@@ -384,3 +482,24 @@ export async function notifyModification(booking, q, { paidOnline, adminOnly = f
   });
 }
 
+
+/**
+ * Rattrapage (cron) : modifications payées sur Stripe ces derniers jours mais
+ * pas encore appliquées (webhook en panne ET client parti avant la page de
+ * retour). Idempotent : une modif déjà appliquée est ignorée.
+ */
+export async function reconcileModifications(stripe, { days = 3 } = {}) {
+  const gte = Math.floor((Date.now() - days * 86400000) / 1000);
+  const applied = [], refunded = [];
+  let checked = 0;
+  for await (const s of stripe.checkout.sessions.list({ created: { gte }, status: 'complete', limit: 100 })) {
+    if (s.metadata?.kind !== 'modification' || s.payment_status !== 'paid') continue;
+    checked++;
+    try {
+      const r = await applyPaidModification(s, stripe);
+      if (r === 'applied') applied.push(s.metadata.reference);
+      if (r === 'refunded') refunded.push(s.metadata.reference);
+    } catch (e) { console.error('[manage] rattrapage modif', s.id, e.message); }
+  }
+  return { modifChecked: checked, modifApplied: applied, modifRefunded: refunded };
+}

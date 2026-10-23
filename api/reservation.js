@@ -12,14 +12,16 @@
  * Une seule fonction serverless pour tout l'espace client (limite du plan Vercel).
  */
 import Stripe from 'stripe';
-import { supabase, getContactPhone } from './_lib.js';
+import { supabase, getContactPhone, isRealEmail } from './_lib.js';
+import { confirmFromSession } from './_confirm.js';
 import {
   signManageToken, verifyManageToken, magicToken, publicView, rulesFor,
   normalizeReference, identifierMatches, quoteChanges, applyChanges, loadBooking,
-  optionCatalog, ChangeError, compactChanges, notifyModification,
+  optionCatalog, ChangeError, ConflictError, compactChanges, notifyModification, applyPaidModification,
 } from './_manage.js';
 
 const SESSION_TTL = 2 * 3600 * 1000; // connexion par référence + nom : 2 h
+const CONFIRM_LINK_TTL = 7 * 86400000; // lien de retour Stripe : 7 jours
 
 /* Anti-force brute (par instance) : 8 essais ratés / 15 min / IP */
 const attempts = new Map();
@@ -31,6 +33,29 @@ function tooMany(ip) {
   return list.length >= 8;
 }
 const fail = (ip) => attempts.set(ip, [...(attempts.get(ip) || []), Date.now()]);
+/* Verrou persistant par référence (toutes instances confondues) : 10 échecs / h.
+   Stocké dans la table settings, déjà utilisée en clé/valeur — aucune migration. */
+const REF_MAX_FAILS = 10, REF_WINDOW = 3600 * 1000;
+async function refLocked(ref) {
+  try {
+    const { data } = await supabase.from('settings').select('value').eq('key', `loginfail:${ref}`).maybeSingle();
+    const v = data?.value ? JSON.parse(data.value) : null;
+    return !!v && v.n >= REF_MAX_FAILS && Date.now() - v.since < REF_WINDOW;
+  } catch { return false; }
+}
+async function refFail(ref) {
+  try {
+    const key = `loginfail:${ref}`;
+    const { data } = await supabase.from('settings').select('value').eq('key', key).maybeSingle();
+    let v = data?.value ? JSON.parse(data.value) : null;
+    if (!v || Date.now() - v.since >= REF_WINDOW) v = { n: 0, since: Date.now() };
+    v.n += 1;
+    await supabase.from('settings').upsert({ key, value: JSON.stringify(v) }, { onConflict: 'key' });
+  } catch (e) { console.error('[reservation] refFail', e.message); }
+}
+async function refReset(ref) {
+  try { await supabase.from('settings').delete().eq('key', `loginfail:${ref}`); } catch {}
+}
 const clientIp = (req) => String(req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket?.remoteAddress || 'x';
 
 function stripeClient() {
@@ -96,6 +121,11 @@ async function confirmation(req, res) {
     const { data } = await supabase.from('bookings').select('*').eq('stripe_session_id', sessionId).maybeSingle();
     b = data;
     if (!b) return res.status(404).json({ error: 'Réservation introuvable.' });
+    // Le lien de retour Stripe reste dans l'historique du navigateur : il ne
+    // donne accès à la réservation que 7 jours, ensuite → connexion classique.
+    if (b.created_at && Date.now() - new Date(b.created_at).getTime() > CONFIRM_LINK_TTL) {
+      return res.status(401).json({ error: 'Ce lien a expiré. Connectez-vous avec votre référence et votre nom.' });
+    }
     if (b.payment_status !== 'paid') {
       // Le webhook peut arriver quelques secondes après le retour du client :
       // on interroge Stripe directement pour ne pas l'inquiéter pour rien.
@@ -104,7 +134,12 @@ async function confirmation(req, res) {
         try {
           const s = await stripe.checkout.sessions.retrieve(sessionId);
           paidNow = s.payment_status === 'paid' && s.metadata?.booking_id === b.id;
-        } catch (e) { console.error('[reservation] stripe retrieve', e.message); }
+          // Filet de sécurité : si Stripe dit « payé », on ENREGISTRE la
+          // confirmation et on envoie les e-mails (sans doublon si le webhook
+          // passe en même temps). Avant, on se contentait de l'afficher : si le
+          // webhook était en panne, la résa restait « pending » pour toujours.
+          if (paidNow) await confirmFromSession(s, { source: 'retour client' });
+        } catch (e) { console.error('[reservation] stripe retrieve/confirm', e.message); }
       }
       if (!paidNow) return res.status(200).json({ state: 'processing', reference: b.reference });
     }
@@ -131,8 +166,13 @@ async function login(req, res) {
   const notFound = () => { fail(ip); return res.status(404).json({ error: 'Aucune réservation ne correspond. Vérifiez la référence (dans votre email) et le nom.' }); };
   if (!reference || !identifier) return notFound();
 
+  if (await refLocked(reference)) {
+    return res.status(429).json({ error: 'Trop d’essais sur cette référence. Réessayez dans une heure ou appelez-nous.' });
+  }
   const { data: b } = await supabase.from('bookings').select('*').eq('reference', reference).maybeSingle();
-  if (!b || b.status === 'pending' || !identifierMatches(b, identifier)) return notFound();
+  if (!b || b.status === 'pending') return notFound();
+  if (!identifierMatches(b, identifier)) { await refFail(reference); return notFound(); }
+  await refReset(reference);
 
   return res.status(200).json({ token: signManageToken(b.id, SESSION_TTL) });
 }
@@ -158,7 +198,7 @@ async function modify(req, res) {
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       payment_method_types: ['card'],
-      customer_email: b.customer_email,
+      ...(isRealEmail(b.customer_email) ? { customer_email: b.customer_email } : {}),
       line_items: [
         { price_data: { currency: 'eur', unit_amount: Math.round(q.extra * 100), product_data: { name: `Modification ${b.reference} — supplément`, description: q.summary.join(' · ').slice(0, 500) } }, quantity: 1 },
         { price_data: { currency: 'eur', unit_amount: Math.round(q.fee * 100), product_data: { name: 'Frais de modification' } }, quantity: 1 },
@@ -180,8 +220,17 @@ async function modify(req, res) {
     return res.status(200).json({ url: session.url, toPay: q.toPay });
   }
 
-  // Gratuit, ou paiement sur place : on applique tout de suite.
-  const updated = await applyChanges(b, q, { source: 'espace client' });
+  // Gratuit, ou paiement sur place : on applique tout de suite
+  // (une relecture si la réservation a bougé entre-temps).
+  let updated;
+  try { updated = await applyChanges(b, q, { source: 'espace client' }); }
+  catch (err) {
+    if (!(err instanceof ConflictError)) throw err;
+    const fresh = await loadBooking(b.id);
+    const q2 = await quoteChanges(fresh, req.body?.changes);
+    if (q2.toPay !== q.toPay || q2.payOnline) throw err;
+    updated = await applyChanges(fresh, q2, { source: 'espace client' });
+  }
   await notifyModification(updated, q, { paidOnline: false });
   return res.status(200).json({ applied: true, toPay: q.toPay, booking: await fullView(updated) });
 }
@@ -191,7 +240,9 @@ async function modstatus(req, res) {
   const b = await authed(req, res); if (!b) return;
   const sessionId = String(req.query.session_id || '');
   if (!/^cs_[A-Za-z0-9_]+$/.test(sessionId)) return res.status(400).json({ error: 'Lien invalide.' });
-  const applied = String(b.internal_notes || '').includes(sessionId);
+  const noteLine = String(b.internal_notes || '').split('\n').find((l) => l.includes(sessionId));
+  if (noteLine && noteLine.includes('NON appliquée')) return res.status(200).json({ applied: false, paid: true, refunded: true });
+  let applied = !!noteLine;
   let paid = applied;
   if (!applied) {
     const stripe = stripeClient();
@@ -200,7 +251,13 @@ async function modstatus(req, res) {
         const s = await stripe.checkout.sessions.retrieve(sessionId);
         if (s.metadata?.mod_booking_id !== b.id) return res.status(404).json({ error: 'Paiement introuvable.' });
         paid = s.payment_status === 'paid';
-      } catch { /* on répond « en cours » */ }
+        // Webhook en retard : on applique nous-mêmes (idempotent, verrouillé).
+        if (paid) {
+          const r = await applyPaidModification(s, stripe);
+          if (r === 'applied' || r === 'duplicate') applied = true;
+          if (r === 'refunded') return res.status(200).json({ applied: false, paid: true, refunded: true });
+        }
+      } catch (e) { console.error('[reservation] modstatus', e.message); /* on répond « en cours » */ }
     }
   }
   return res.status(200).json({ applied, paid });
