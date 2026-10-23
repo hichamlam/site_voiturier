@@ -2,9 +2,8 @@
  * Webhook Stripe — checkout.session.completed
  */
 import Stripe from 'stripe';
-import { Resend } from 'resend';
-import { supabase, getNotificationEmail, getContactPhone } from './_lib.js';
-import { clientEmailHTML, adminEmailHTML } from './_emails.js';
+import { supabase } from './_lib.js';
+import { confirmFromSession } from './_confirm.js';
 import { loadBooking, quoteChanges, applyChanges, notifyModification, manageUrl } from './_manage.js';
 
 
@@ -41,7 +40,6 @@ export default async function handler(req, res) {
     return res.status(503).json({ error: 'Stripe non configuré' });
   }
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2024-06-20' });
-  const resend = new Resend(process.env.RESEND_API_KEY);
 
   let event;
   try {
@@ -64,72 +62,14 @@ export default async function handler(req, res) {
   }
 
   if (event.type === 'checkout.session.completed') {
-    const session = event.data.object;
-    const bookingId = session.metadata?.booking_id;
-    if (!bookingId) return res.status(200).json({ received: true });
-
-    // « completed » ne signifie pas « encaissé » : certains moyens de paiement
-    // se dénouent de façon asynchrone. On ne confirme que sur paiement avéré.
-    if (session.payment_status !== 'paid') {
-      return res.status(200).json({ received: true, ignored: session.payment_status });
-    }
-
-    const { data: booking } = await supabase.from('bookings').select('*').eq('id', bookingId).single();
-    if (!booking) return res.status(200).json({ received: true });
-
-    // Stripe rejoue le webhook tant qu'il n'a pas obtenu un 2xx (timeout, 5xx…).
-    // Sans ce garde-fou, chaque rejeu réincrémente `uses_count` du code promo
-    // et renvoie une deuxième fois les deux e-mails au client.
-    if (booking.payment_status === 'paid') {
-      console.log('[webhook] %s déjà encaissée — rejeu ignoré', booking.reference);
-      return res.status(200).json({ received: true, duplicate: true });
-    }
-
-    await supabase.from('bookings').update({
-      status: 'confirmed', payment_status: 'paid',
-    }).eq('id', bookingId);
-
-    if (booking.promo_code) {
-      const { data: pc } = await supabase.from('promo_codes').select('uses_count').eq('code', booking.promo_code).maybeSingle();
-      if (pc) {
-        await supabase.from('promo_codes').update({ uses_count: (pc.uses_count || 0) + 1 }).eq('code', booking.promo_code);
-      }
-    }
-
-    const FROM = process.env.FROM_EMAIL || 'Direct Voiturier <contact@directvoiturier.com>';
-    const ADMIN = await getNotificationEmail();
-    const ctx = {
-      reference: booking.reference,
-      total: Number(booking.total_price),
-      customer: {
-        firstname: booking.customer_firstname,
-        lastname: booking.customer_lastname,
-        email: booking.customer_email,
-        phone: booking.customer_phone,
-        flight: booking.customer_flight,
-      },
-      car: {
-        brand: booking.car_brand, model: booking.car_model,
-        color: booking.car_color, plate: booking.car_plate,
-        categoryCode: booking.car_category_code,
-      },
-      dep: { date: booking.departure_date, time: booking.departure_time, terminal: booking.departure_terminal },
-      ret: { date: booking.return_date, time: booking.return_time, terminal: booking.return_terminal },
-      wash: { type: booking.wash_type, price: Number(booking.wash_price || 0) },
-      options: { coveredParking: booking.has_covered_parking, priorityAccess: booking.has_priority_access },
-      surchargesDetail: booking.surcharges_detail || [],
-      paymentMode: 'en ligne',
-      contactPhone: await getContactPhone(),
-      manageUrl: manageUrl(booking),
-    };
-
+    // Bascule atomique + e-mails : voir _confirm.js (partagé avec le retour
+    // client et le cron de rattrapage — aucun doublon possible).
     try {
-      await Promise.all([
-        resend.emails.send({ from: FROM, to: booking.customer_email, subject: `Confirmation — ${booking.reference}`, html: clientEmailHTML(ctx) }),
-        resend.emails.send({ from: FROM, to: ADMIN, subject: `💳 Paiement reçu — ${booking.reference}`, html: adminEmailHTML(ctx) }),
-      ]);
+      const r = await confirmFromSession(event.data.object, { source: 'webhook' });
+      if (!r.confirmed) console.log('[webhook] non confirmée :', r.reason);
     } catch (err) {
-      console.error('[webhook] email:', err);
+      console.error('[webhook]', err.message);
+      return res.status(500).json({ error: 'confirm failed' }); // Stripe rejouera
     }
   }
 
