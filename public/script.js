@@ -44,11 +44,40 @@ function fmtDateShort(iso) {
 /* ════════════════════════════════════════════════
    API CALLS
 ═══════════════════════════════════════════════ */
-// Cache mémoire des tarifs déjà calculés (clé = payload JSON) : revenir sur
-// un choix déjà tarifé est instantané, sans requête serveur.
+/* Tarif INSTANTANÉ : le calcul tourne dans le navigateur avec le même moteur
+   que le serveur (/pricing-engine.js) et la grille publique (/api/pricing-data,
+   servie par le cache CDN). Plus aucun aller-retour réseau à chaque clic.
+   Le serveur reste la référence : il recalcule tout au paiement, et le
+   récapitulatif est revérifié en arrière-plan. Si le moteur ne se charge pas,
+   on retombe automatiquement sur /api/pricing. */
+let pricingEngine = null;
+let pricingRef = null;
+const pricingReady = Promise.all([
+  import('/pricing-engine.js'),
+  fetch('/api/pricing-data').then(r => r.ok ? r.json() : Promise.reject(new Error('pricing-data ' + r.status))),
+]).then(([engine, ref]) => { pricingEngine = engine; pricingRef = ref; })
+  .catch(e => console.warn('[tarif] calcul local indisponible, repli serveur', e));
+
+// Verdict du serveur par code promo (+ e-mail, pour les codes « 1re réservation ») :
+// une fois connu, la remise se recalcule localement elle aussi.
+const promoVerdicts = new Map();
+const promoKey = p => String(p.promoCode).trim().toUpperCase() + '|' + String(p.customerEmail || '').trim().toLowerCase();
+
+function computePriceLocal(payload) {
+  if (!pricingEngine || !pricingRef) return null;
+  let promo = null;
+  if (payload.promoCode) {
+    promo = promoVerdicts.get(promoKey(payload));
+    if (!promo) return null; // code jamais vérifié : le serveur doit trancher
+  }
+  const blocks = pricingEngine.findBlocks(payload.depDate, payload.retDate, pricingRef.blockedDates);
+  if (blocks.length) return { dateBlocked: true, blocks, message: 'Ces dates ne sont pas disponibles' };
+  const input = { ...payload, depTime: payload.depTime || '08:00', retTime: payload.retTime || '20:00' };
+  return { ...pricingEngine.computePrice(input, pricingRef, promo), dateBlocked: false, source: 'local' };
+}
+
+// ── Repli / vérification serveur ──
 const priceCache = new Map();
-// Appels fetchPrice en attente d'une réponse, requête réseau en cours, et
-// minuteur d'anti-rebond.
 let priceWaiters = [];
 let priceDebounceTimer = null;
 let priceAbortController = null;
@@ -60,15 +89,14 @@ async function priceRunBatch() {
   // Seul le dernier appel compte : c'est lui qui reflète l'état actuel de l'UI.
   const { payload, key } = priceWaiters[priceWaiters.length - 1];
 
-  // Annule la requête précédente encore en vol pour qu'une réponse lente
-  // n'écrase pas une réponse plus récente (course entre requêtes).
+  // Annule la requête précédente encore en vol (une réponse lente ne doit pas
+  // écraser une réponse plus récente).
   if (priceAbortController) priceAbortController.abort();
   const controller = new AbortController();
   priceAbortController = controller;
 
-  // Résout tous les appels en attente, y compris ceux dont la requête a été
-  // annulée : sans ça, un `await fetchPrice(...)` supplanté resterait bloqué
-  // pour toujours et l'écran garderait son spinner.
+  // Résout tous les appels en attente (sinon un `await` supplanté resterait
+  // bloqué et l'écran garderait son spinner).
   const flush = (value) => {
     const waiters = priceWaiters;
     priceWaiters = [];
@@ -84,25 +112,37 @@ async function priceRunBatch() {
     });
     if (!res.ok) { flush(null); return; }
     const data = await res.json();
+    if (payload.promoCode && !data.dateBlocked && 'promoRule' in data) {
+      promoVerdicts.set(promoKey(payload), { rule: data.promoRule, rejectedReason: data.promoRejectedReason });
+    }
     priceCache.set(key, data);
     flush(data);
   } catch (e) {
-    // Requête annulée : les appels en attente le restent, c'est le lot
-    // suivant (déjà lancé) qui les résoudra avec un résultat plus récent.
-    if (e.name === 'AbortError') return;
+    if (e.name === 'AbortError') return; // le lot suivant résoudra les appels en attente
     flush(null);
   }
 }
 
-function fetchPrice(payload) {
+function fetchPriceServer(payload, { fresh = false } = {}) {
   const key = JSON.stringify(payload);
-  if (priceCache.has(key)) return Promise.resolve(priceCache.get(key));
-
+  if (!fresh && priceCache.has(key)) return Promise.resolve(priceCache.get(key));
   return new Promise(resolve => {
     priceWaiters.push({ payload, key, resolve });
     if (priceDebounceTimer) clearTimeout(priceDebounceTimer);
-    priceDebounceTimer = setTimeout(priceRunBatch, 250);
+    priceDebounceTimer = setTimeout(priceRunBatch, 60);
   });
+}
+
+async function fetchPrice(payload) {
+  let local = computePriceLocal(payload);
+  if (local) return local;
+  if (!pricingEngine) {
+    // Premier calcul avant la fin du chargement du moteur (quelques ms) : on l'attend.
+    await pricingReady;
+    local = computePriceLocal(payload);
+    if (local) return local;
+  }
+  return fetchPriceServer(payload);
 }
 
 /* ════════════════════════════════════════════════
@@ -518,23 +558,32 @@ document.addEventListener('click', e => {
   }
 });
 
-/* Calcul de prix live (mise à jour bouton continue) */
-async function bkUpdatePriceLive() {
+/* Payload de tarif du tunnel : construit à UN seul endroit */
+function bkPricePayload() {
   const data = STATE.booking.data;
-  if (!data.departure.date || !data.return.date) return;
-
-  const res = await fetchPrice({
-    depDate: data.departure.date,
-    depTime: data.departure.time,
-    retDate: data.return.date,
-    retTime: data.return.time,
+  return {
+    depDate: data.departure.date, depTime: data.departure.time,
+    retDate: data.return.date, retTime: data.return.time,
     carCategoryCode: data.car.categoryCode,
     washType: data.wash.type,
     hasCoveredParking: data.options.coveredParking,
     hasPriorityAccess: data.options.priorityAccess,
     promoCode: data.promoCode,
     customerEmail: data.customer?.email || null,
-  });
+  };
+}
+
+/* Calcul de prix live (mise à jour bouton continue).
+   `seq` : seule la DERNIÈRE demande a le droit d'écrire à l'écran. Avant, une
+   réponse lente (ex. « avec lavage ») arrivait après le clic « sans lavage »
+   et réaffichait l'ancien prix. */
+let bkLiveSeq = 0;
+async function bkUpdatePriceLive() {
+  const data = STATE.booking.data;
+  if (!data.departure.date || !data.return.date) return;
+  const seq = ++bkLiveSeq;
+  const res = await fetchPrice(bkPricePayload());
+  if (seq !== bkLiveSeq) return; // un clic plus récent a pris le relais
   if (!res || res.dateBlocked) return;
   STATE.booking.serverPrice = res;
 
@@ -544,24 +593,30 @@ async function bkUpdatePriceLive() {
   });
 }
 
-/* Étape 3 : récap */
+/* Étape 3 : récap — affiché instantanément (calcul local), puis revérifié en
+   arrière-plan par le serveur, qui fait foi : en cas d'écart (tarif modifié
+   à l'instant dans le back-office), le récap se met à jour tout seul. */
+let bkRecapSeq = 0;
 async function bkRenderRecap() {
+  const seq = ++bkRecapSeq;
+  const payload = bkPricePayload();
+  const res = await fetchPrice(payload);
+  if (seq !== bkRecapSeq) return;
+  bkPaintRecap(res);
+  if (res && res.source === 'local') {
+    fetchPriceServer(payload).then(srv => {
+      if (seq !== bkRecapSeq || !srv) return;
+      if (srv.dateBlocked || srv.total !== res.total || srv.promoCode !== res.promoCode) bkPaintRecap(srv);
+    });
+  }
+}
+
+function bkPaintRecap(res) {
   const data = STATE.booking.data;
-
-  // Recalcule pour avoir le détail à jour
-  const res = await fetchPrice({
-    depDate: data.departure.date, depTime: data.departure.time,
-    retDate: data.return.date, retTime: data.return.time,
-    carCategoryCode: data.car.categoryCode,
-    washType: data.wash.type,
-    hasCoveredParking: data.options.coveredParking,
-    hasPriorityAccess: data.options.priorityAccess,
-    promoCode: data.promoCode,
-    customerEmail: data.customer?.email || null,
-  });
-
-  if (!res) {
-    document.getElementById('bk-recap').innerHTML = '<p style="color:var(--error)">Erreur de calcul</p>';
+  if (!res || res.dateBlocked) {
+    document.getElementById('bk-recap').innerHTML = res && res.dateBlocked
+      ? '<p style="color:var(--error)">Ces dates ne sont plus disponibles</p>'
+      : '<p style="color:var(--error)">Erreur de calcul</p>';
     return;
   }
   STATE.booking.serverPrice = res;

@@ -2180,6 +2180,7 @@ function nfPrice() {
           carCategoryCode: g('cat'), washType: g('wash'),
           hasCoveredParking: document.getElementById('nf-cov').checked, hasPriorityAccess: document.getElementById('nf-pri').checked,
           promoCode: (g('promo') || '').toUpperCase() || undefined, customerEmail: g('email') || undefined,
+          fresh: true, // back-office : toujours la grille à jour, sans cache
         }),
       }).then(r => r.json());
       if (!document.getElementById('nf-price')) return;

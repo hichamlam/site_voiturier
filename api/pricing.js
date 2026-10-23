@@ -17,7 +17,20 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'depDate et retDate requis' });
     }
 
-    const avail = await checkDatesAvailable(depDate, retDate);
+    // Disponibilité et tarif en parallèle (avant : l'un après l'autre).
+    const [avail, price] = await Promise.all([
+      checkDatesAvailable(depDate, retDate),
+      calculatePrice({
+        depDate, depTime, retDate, retTime,
+        carCategoryCode: body.carCategoryCode || 'citadine',
+        washType: body.washType || 'none',
+        hasCoveredParking: !!body.hasCoveredParking,
+        hasPriorityAccess: !!body.hasPriorityAccess,
+        promoCode: body.promoCode,
+        customerEmail: body.customerEmail,
+      }, { cached: !body.fresh }),
+    ]);
+
     if (!avail.available) {
       return res.status(200).json({
         dateBlocked: true,
@@ -25,16 +38,6 @@ export default async function handler(req, res) {
         message: 'Ces dates ne sont pas disponibles',
       });
     }
-
-    const price = await calculatePrice({
-      depDate, depTime, retDate, retTime,
-      carCategoryCode: body.carCategoryCode || 'citadine',
-      washType: body.washType || 'none',
-      hasCoveredParking: !!body.hasCoveredParking,
-      hasPriorityAccess: !!body.hasPriorityAccess,
-      promoCode: body.promoCode,
-      customerEmail: body.customerEmail,
-    });
 
     return res.status(200).json({ ...price, dateBlocked: false });
   } catch (err) {

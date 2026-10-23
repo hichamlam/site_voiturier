@@ -4,6 +4,7 @@
  */
 import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
+import { computePrice } from '../public/pricing-engine.js';
 
 export const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -45,292 +46,103 @@ export function requireAdmin(req, res) {
   return session;
 }
 
-// ─── Utils horaire ───
-function timeToMinutes(t) {
-  if (!t) return 0;
-  const [h, m] = t.split(':').map(Number);
-  return h * 60 + m;
+// ─── Calcul de prix v3 ───
+// Le calcul lui-même vit dans public/pricing-engine.js (partagé avec le
+// navigateur, qui affiche ainsi le tarif instantanément). Ici on ne fait que
+// charger la grille depuis Supabase — en PARALLÈLE (avant : 6 à 9 requêtes
+// enchaînées l'une après l'autre) — puis valider le code promo.
+// Toute la grille publique en une seule vague de requêtes parallèles.
+export async function loadPricingRef() {
+  // Pas de filtre de date ici : le back-office peut recalculer une réservation
+  // passée. /api/pricing-data élague ce qui est révolu avant de publier.
+  const [rules, categories, specials, surcharges, holidays, blocked] = await Promise.all([
+    supabase.from('pricing_rules').select('price_eur, days_min, days_max, extra_per_day_eur').order('days_min'),
+    supabase.from('vehicle_categories').select('code, name, surcharge_eur, wash_surcharge_eur, active').eq('active', true),
+    supabase.from('pricing_special').select('name, date_start, date_end, multiplier, flat_extra, active').eq('active', true).order('date_start'),
+    supabase.from('surcharges').select('kind, name, description, amount_eur, time_start, time_end, applies_to, option_code, active, display_order').eq('active', true).in('kind', ['time_window', 'option']).order('display_order'),
+    supabase.from('holidays').select('date, name, surcharge_eur, active').eq('active', true),
+    supabase.from('blocked_dates').select('date_start, date_end, reason'),
+  ]);
+  const err = [rules, categories, specials, surcharges, holidays, blocked].find(r => r.error);
+  if (err) throw new Error('Grille tarifaire illisible : ' + err.error.message);
+  const sur = surcharges.data || [];
+  return {
+    rules: rules.data || [],
+    categories: categories.data || [],
+    specials: specials.data || [],
+    timeWindows: sur.filter(s => s.kind === 'time_window'),
+    options: sur.filter(s => s.kind === 'option'),
+    holidays: holidays.data || [],
+    blockedDates: blocked.data || [],
+  };
 }
 
-// Vérifie si une heure tombe dans un créneau (gère les créneaux qui passent minuit)
-function isInTimeWindow(time, windowStart, windowEnd) {
-  const t = timeToMinutes(time);
-  const s = timeToMinutes(windowStart);
-  const e = timeToMinutes(windowEnd);
-  if (s <= e) {
-    return t >= s && t < e;
-  } else {
-    // Créneau qui passe minuit (ex. 22:00 → 03:30)
-    return t >= s || t < e;
-  }
+// Cache court (instance serverless « chaude ») pour le devis public
+// /api/pricing. La réservation et le paiement relisent TOUJOURS la base.
+let refCache = null;
+export async function getPricingRefCached(ttlMs = 30000) {
+  if (refCache && Date.now() - refCache.at < ttlMs) return refCache.promise;
+  const promise = loadPricingRef();
+  refCache = { at: Date.now(), promise };
+  promise.catch(() => { if (refCache && refCache.promise === promise) refCache = null; });
+  return promise;
 }
 
-// ─── Calcul de prix v2 ───
-export async function calculatePrice(input) {
-  const {
-    depDate, depTime, retDate, retTime,
-    carCategoryCode = 'citadine',
-    washType = 'none',
-    hasCoveredParking = false,
-    hasPriorityAccess = false,
-    promoCode = null,
-    customerEmail = null,
-  } = input;
-
-  const detail = []; // détail pour affichage facture
-
-  // 1. Durée
-  const d1 = new Date(depDate);
-  const d2 = new Date(retDate);
-  // Comptage par date calendaire inclusive (ex: 2 au 5 septembre = 4 jours), pas par tranche de 24h.
-  const days = Math.max(1, Math.round((d2 - d1) / 86400000) + 1);
-
-  // 2. Tarif de base depuis la grille
-  const { data: rule } = await supabase
-    .from('pricing_rules')
-    .select('price_eur, days_min, days_max, extra_per_day_eur')
-    .lte('days_min', days)
-    .gte('days_max', days)
-    .order('days_min', { ascending: false })
-    .limit(1)
+// Validation d'un code promo → { rule, rejectedReason }
+async function resolvePromo(promoCode, customerEmail) {
+  if (!promoCode) return null;
+  const code = promoCode.trim().toUpperCase();
+  const { data: promo } = await supabase
+    .from('promo_codes')
+    .select('*')
+    .eq('code', code)
+    .eq('active', true)
     .maybeSingle();
+  if (!promo) return { rule: null, rejectedReason: 'invalid' };
 
-  let basePrice;
-  if (rule) {
-    basePrice = Number(rule.price_eur);
-    // Palier dégressif : au-delà de days_min, on ajoute extra_per_day_eur par jour.
-    if (rule.extra_per_day_eur && days > rule.days_min) {
-      basePrice += (days - rule.days_min) * Number(rule.extra_per_day_eur);
-    }
-  } else {
-    // Aucun palier ne couvre `days` (séjour plus long que la grille, ou trou
-    // dans la grille) : on se replie sur le dernier palier situé EN DESSOUS
-    // de `days`, et on extrapole avec son extra_per_day_eur au-delà de SON
-    // days_max, pour ne pas retomber sur un tarif plancher inférieur aux
-    // paliers existants.
-    const { data: lastRule } = await supabase
-      .from('pricing_rules')
-      .select('price_eur, days_max, extra_per_day_eur')
-      .lt('days_max', days)
-      .order('days_max', { ascending: false })
+  const today = new Date().toISOString().slice(0, 10);
+  const validFrom = !promo.valid_from || promo.valid_from <= today;
+  const validUntil = !promo.valid_until || promo.valid_until >= today;
+  const usesOk = !promo.max_uses || promo.uses_count < promo.max_uses;
+
+  // Code « première réservation » : au stade du devis (sans e-mail) on
+  // l'accepte ; le contrôle réel a lieu à la réservation (booking/checkout
+  // transmettent customerEmail). On ne compte que les réservations réellement
+  // passées : `pending` = paiement Stripe jamais abouti, `cancelled` = annulée.
+  let firstBookingOk = true;
+  if (promo.first_booking_only && customerEmail) {
+    const { data: existingBooking } = await supabase
+      .from('bookings')
+      .select('id')
+      .eq('customer_email', customerEmail.trim().toLowerCase())
+      .not('status', 'in', '(pending,cancelled)')
       .limit(1)
       .maybeSingle();
-
-    if (lastRule) {
-      basePrice = Number(lastRule.price_eur);
-      if (lastRule.extra_per_day_eur && days > lastRule.days_max) {
-        basePrice += (days - lastRule.days_max) * Number(lastRule.extra_per_day_eur);
-      }
-    } else {
-      // Grille totalement vide : dernier recours.
-      basePrice = 29;
-    }
-  }
-  basePrice = Math.round(basePrice * 100) / 100;
-  detail.push({ kind: 'base', label: `Voiturier ${days} jour${days > 1 ? 's' : ''}`, amount: basePrice });
-
-  // 3. Surcharge catégorie véhicule
-  let vehicleSurcharge = 0;
-  let washSurchargeFromCategory = 0;
-  let categoryName = 'Citadine';
-
-  const { data: category } = await supabase
-    .from('vehicle_categories')
-    .select('*')
-    .eq('code', carCategoryCode)
-    .eq('active', true)
-    .maybeSingle();
-
-  if (category) {
-    vehicleSurcharge = Number(category.surcharge_eur || 0);
-    washSurchargeFromCategory = Number(category.wash_surcharge_eur || 0);
-    categoryName = category.name;
-    if (vehicleSurcharge > 0) {
-      detail.push({ kind: 'vehicle', label: `Catégorie ${category.name}`, amount: vehicleSurcharge });
-    }
+    firstBookingOk = !existingBooking;
   }
 
-  // 4. Tarifs spéciaux période
-  const { data: specials } = await supabase
-    .from('pricing_special')
-    .select('*')
-    .eq('active', true)
-    .lte('date_start', depDate)
-    .gte('date_end', depDate);
-
-  if (specials && specials.length > 0) {
-    for (const sp of specials) {
-      const before = basePrice;
-      basePrice = basePrice * Number(sp.multiplier || 1) + Number(sp.flat_extra || 0);
-      const diff = Math.round((basePrice - before) * 100) / 100;
-      if (diff > 0) {
-        detail.push({ kind: 'special', label: `Période : ${sp.name}`, amount: diff });
-      }
-    }
+  if (validFrom && validUntil && usesOk && firstBookingOk) {
+    return { rule: { code, discount_type: promo.discount_type, discount_val: Number(promo.discount_val) }, rejectedReason: null };
   }
+  return { rule: null, rejectedReason: firstBookingOk ? 'invalid' : 'first_booking_only' };
+}
 
-  // 5. Lavage
-  const washPrices = { none: 0, exterieur: 29, interieur: 49, complet: 69, premium: 99 };
-  const washPrice = washPrices[washType] || 0;
-  let washSurcharge = 0;
-
-  if (washPrice > 0) {
-    detail.push({ kind: 'wash', label: `Lavage ${washType}`, amount: washPrice });
-    // Supplément lavage selon catégorie (sauf extérieur seul)
-    if (washType !== 'exterieur' && washSurchargeFromCategory > 0) {
-      washSurcharge = washSurchargeFromCategory;
-      detail.push({ kind: 'wash_surcharge', label: `Supplément lavage (${categoryName})`, amount: washSurcharge });
-    }
-  }
-
-  // 6. Suppléments horaires (sur dep_time et ret_time)
-  let timeSurcharges = 0;
-  const { data: timeWindows } = await supabase
-    .from('surcharges')
-    .select('*')
-    .eq('kind', 'time_window')
-    .eq('active', true);
-
-  if (timeWindows) {
-    // Pour le DÉPART
-    for (const w of timeWindows) {
-      if (w.applies_to !== 'departure' && w.applies_to !== 'both') continue;
-      if (isInTimeWindow(depTime, w.time_start, w.time_end)) {
-        timeSurcharges += Number(w.amount_eur);
-        detail.push({ kind: 'time_dep', label: `Horaire départ (${w.description || w.name})`, amount: Number(w.amount_eur) });
-        break; // un seul créneau qui matche au départ
-      }
-    }
-    // Pour le RETOUR
-    for (const w of timeWindows) {
-      if (w.applies_to !== 'return' && w.applies_to !== 'both') continue;
-      if (isInTimeWindow(retTime, w.time_start, w.time_end)) {
-        timeSurcharges += Number(w.amount_eur);
-        detail.push({ kind: 'time_ret', label: `Horaire retour (${w.description || w.name})`, amount: Number(w.amount_eur) });
-        break;
-      }
-    }
-  }
-
-  // 7. Jours fériés (départ ou retour)
-  const { data: holidays } = await supabase
-    .from('holidays')
-    .select('*')
-    .eq('active', true)
-    .in('date', [depDate, retDate]);
-
-  if (holidays && holidays.length > 0) {
-    for (const h of holidays) {
-      timeSurcharges += Number(h.surcharge_eur);
-      const which = h.date === depDate ? 'départ' : 'retour';
-      detail.push({ kind: 'holiday', label: `Jour férié ${which} (${h.name})`, amount: Number(h.surcharge_eur) });
-    }
-  }
-
-  // 8. Options (parking couvert, accès prioritaire)
-  let optionsTotal = 0;
-  if (hasCoveredParking || hasPriorityAccess) {
-    const { data: options } = await supabase
-      .from('surcharges')
-      .select('*')
-      .eq('kind', 'option')
-      .eq('active', true);
-
-    if (options) {
-      for (const opt of options) {
-        if (opt.option_code === 'covered_parking' && hasCoveredParking) {
-          optionsTotal += Number(opt.amount_eur);
-          detail.push({ kind: 'option', label: opt.name, amount: Number(opt.amount_eur) });
-        }
-        if (opt.option_code === 'priority_access' && hasPriorityAccess) {
-          optionsTotal += Number(opt.amount_eur);
-          detail.push({ kind: 'option', label: opt.name, amount: Number(opt.amount_eur) });
-        }
-      }
-    }
-  }
-
-  // 9. Sous-total avant promo
-  let subtotal = basePrice + vehicleSurcharge + washPrice + washSurcharge + timeSurcharges + optionsTotal;
-  subtotal = Math.round(subtotal * 100) / 100;
-
-  // 10. Code promo
-  let promoDiscount = 0;
-  let promoApplied = null;
-  let promoRejectedReason = null;
-
-  if (promoCode) {
-    const code = promoCode.trim().toUpperCase();
-    const { data: promo } = await supabase
-      .from('promo_codes')
-      .select('*')
-      .eq('code', code)
-      .eq('active', true)
-      .maybeSingle();
-
-    if (promo) {
-      const today = new Date().toISOString().slice(0, 10);
-      const validFrom = !promo.valid_from || promo.valid_from <= today;
-      const validUntil = !promo.valid_until || promo.valid_until >= today;
-      const usesOk = !promo.max_uses || promo.uses_count < promo.max_uses;
-
-      // Code réservé à une première réservation : au stade du devis/simulateur
-      // (calculatePrice appelé sans customerEmail), on ne connaît pas encore le
-      // client, donc on ne peut pas le disqualifier — on l'accepte par défaut.
-      // Le contrôle réel a lieu à la réservation, où api/booking.js et
-      // api/checkout.js transmettent bien customerEmail.
-      let firstBookingOk = true;
-      if (promo.first_booking_only && customerEmail) {
-        // On ne compte que les réservations qui ont réellement eu lieu :
-        // `pending` désigne un paiement Stripe jamais abouti (la ligne est
-        // créée avant la redirection), et `cancelled` une réservation annulée.
-        // Sans cette exclusion, un paiement abandonné brûlerait définitivement
-        // le droit du client à son code de bienvenue, sans recours possible.
-        const { data: existingBooking } = await supabase
-          .from('bookings')
-          .select('id')
-          .eq('customer_email', customerEmail.trim().toLowerCase())
-          .not('status', 'in', '(pending,cancelled)')
-          .limit(1)
-          .maybeSingle();
-        firstBookingOk = !existingBooking;
-      }
-
-      if (validFrom && validUntil && usesOk && firstBookingOk) {
-        if (promo.discount_type === 'percent') {
-          promoDiscount = Math.round((subtotal * Number(promo.discount_val) / 100) * 100) / 100;
-        } else {
-          promoDiscount = Number(promo.discount_val);
-        }
-        promoDiscount = Math.min(promoDiscount, subtotal);
-        promoApplied = code;
-        detail.push({ kind: 'promo', label: `Code promo ${code}`, amount: -promoDiscount });
-      } else if (!firstBookingOk) {
-        promoRejectedReason = 'first_booking_only';
-      } else {
-        promoRejectedReason = 'invalid';
-      }
-    } else {
-      promoRejectedReason = 'invalid';
-    }
-  }
-
-  const total = Math.max(0, Math.round((subtotal - promoDiscount) * 100) / 100);
-
-  return {
-    days,
-    basePrice,
-    vehicleSurcharge,
-    washPrice,
-    washSurcharge,
-    timeSurcharges,
-    optionsTotal,
-    promoCode: promoApplied,
-    promoDiscount,
-    promoRejectedReason,
-    total,
-    surchargesDetail: detail,
-  };
+/**
+ * calculatePrice(input, { cached })
+ * cached:true uniquement pour le devis public (/api/pricing). Par défaut la
+ * grille est relue en base : réservation, paiement et back-office restent
+ * exacts à la seconde près.
+ * Renvoie en plus `promoRule` (code validé) pour que le navigateur puisse
+ * recalculer la remise localement sans redemander au serveur.
+ */
+export async function calculatePrice(input, { cached = false } = {}) {
+  const [ref, promo] = await Promise.all([
+    cached ? getPricingRefCached() : loadPricingRef(),
+    resolvePromo(input.promoCode, input.customerEmail),
+  ]);
+  const price = computePrice(input, ref, promo);
+  price.promoRule = promo ? promo.rule : null;
+  return price;
 }
 
 // ─── Véhicules refusés (marque + modèle) ───
