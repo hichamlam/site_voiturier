@@ -800,12 +800,17 @@ function initPromoBanner(cfg) {
   // Number() : une valeur numérique Postgres peut revenir en « 10.00 », qu'on
   // n'affiche pas tel quel dans une accroche commerciale.
   const valeur = Number(promo.discount_val);
-  const remise = promo.discount_type === 'fixed' ? `${valeur}€` : `${valeur}%`;
+  const remise = promo.discount_type === 'fixed' ? `${valeur}\u00A0€` : `${valeur}\u00A0%`;
 
   const text = document.getElementById('promoBannerText');
   if (text) {
     text.textContent = '';
-    text.append('Code ');
+    // Deux blocs : l'offre, puis le code (2 lignes nettes sur mobile, 1 ligne sur ordinateur).
+    const offre = document.createElement('span');
+    offre.className = 'promo-banner-offer';
+    offre.textContent = `-${remise} sur ${cible}`;
+    const ligneCode = document.createElement('span');
+    ligneCode.className = 'promo-banner-code';
     const strong = document.createElement('strong');
     strong.textContent = promo.code;
     // Bouton copier collé au code : icône presse-papier + « Copier ».
@@ -815,7 +820,8 @@ function initPromoBanner(cfg) {
     copy.id = 'promoBannerCopy';
     copy.setAttribute('aria-label', 'Copier le code ' + promo.code);
     copy.addEventListener('click', promoBannerCopy);
-    text.append(strong, ' ', copy, ` : -${remise} sur ${cible}`);
+    ligneCode.append('avec le code ', strong, ' ', copy);
+    text.append(offre, ' ', ligneCode);
     promoCopyLabel(copy, false);
   }
 
