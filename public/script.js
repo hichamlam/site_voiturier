@@ -1012,6 +1012,14 @@ function trackPurchase(ref, value) {
     const r = await _bkConfirm.apply(this, arguments);
     if (STATE.booking.payment !== 'stripe' && STATE.booking.step === 4) {
       trackEvent('reservation_sur_place', { value: total, currency: 'EUR' });
+      // Réservation payée sur place = vraie réservation : conversion avec le montant (une seule fois par référence)
+      const surPlaceRef = ((document.getElementById('bk-confirm-ref') || {}).textContent || '').replace(/^RÉF\s*—\s*/, '').trim();
+      let surPlaceDone = null;
+      try { surPlaceDone = sessionStorage.getItem('vo_paid_' + surPlaceRef); } catch {}
+      if (surPlaceRef && !surPlaceDone) {
+        try { sessionStorage.setItem('vo_paid_' + surPlaceRef, '1'); } catch {}
+        trackPurchase(surPlaceRef, total);
+      }
     }
     return r;
   };

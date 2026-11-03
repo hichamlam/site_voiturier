@@ -94,7 +94,11 @@ function cookieChoice(accepted) {
 function trackEvent(name, params) {
   try {
     var A = window.VO_ANALYTICS || {};
-    if (A.GTM_ID) dataLayer.push(Object.assign({ event: name }, params || {}));
-    else gtag('event', name, params || {});
+    if (A.GTM_ID) {
+      dataLayer.push(Object.assign({ event: name }, params || {}));
+      // GTM n'a pas de balise qui écoute l'événement "purchase" : sans cet envoi direct,
+      // la conversion n'arrivait jamais dans GA4 ni Google Ads. gtag() est relayé par la balise Google de GTM.
+      if (name === 'purchase') gtag('event', name, params || {});
+    } else gtag('event', name, params || {});
   } catch (e) {}
 }
