@@ -4,6 +4,7 @@
  *   POST ?action=otp     { email }          → envoie un code à 6 chiffres par email
  *   POST ?action=verify  { email, code }    → { token, adminToken|null } (client 30 j, admin 7 j si ADMIN_EMAIL)
  *   GET  ?action=me                         (Bearer client) → profil, passages, voitures, réservations
+ *   POST ?action=landed  { reference }      (Bearer client) → prévient l'équipe que le client a atterri
  *   GET  ?action=admin-today                (Bearer admin, cf. /api/admin/login) → mouvements du jour
  *
  * Une seule fonction serverless (limite de 12 fonctions du plan Vercel Hobby :
@@ -13,7 +14,7 @@
  */
 import crypto from 'crypto';
 import { Resend } from 'resend';
-import { supabase, requireAdmin } from './_lib.js';
+import { supabase, requireAdmin, getNotificationEmail } from './_lib.js';
 
 const SECRET = process.env.ADMIN_SESSION_SECRET || 'dev-secret-change-me';
 const FROM = () => process.env.FROM_EMAIL || 'Direct Voiturier <contact@directvoiturier.com>';
@@ -145,7 +146,8 @@ async function me(req, res) {
 
   const today = parisToday();
   const active = list.filter((b) => b.status !== 'cancelled' && b.status !== 'returned' && b.return_date >= today);
-  const next = active.sort((a, b) => a.departure_date.localeCompare(b.departure_date))[0] || null;
+  active.sort((a, b) => a.departure_date.localeCompare(b.departure_date));
+  const next = active[0] || null;
 
   return res.status(200).json({
     profile: client ? { firstname: client.firstname, lastname: client.lastname, phone: client.phone, since: client.created_at } : null,
@@ -154,6 +156,7 @@ async function me(req, res) {
     passages: list.filter((b) => b.status === 'returned').length,
     cars,
     next,
+    upcoming: active,
     history: list.filter((b) => b.status === 'returned').slice(0, 10),
   });
 }
@@ -162,7 +165,7 @@ async function adminToday(req, res) {
   if (!requireAdmin(req, res)) return;
   const today = parisToday();
   const { data, error } = await supabase.from('bookings')
-    .select('reference, status, payment_method, payment_status, customer_firstname, customer_lastname, customer_phone, customer_flight, departure_date, departure_time, departure_terminal, return_date, return_time, car_brand, car_model, car_color, car_plate, total_price')
+    .select('id, reference, status, payment_method, payment_status, customer_firstname, customer_lastname, customer_phone, customer_flight, departure_date, departure_time, departure_terminal, return_date, return_time, car_brand, car_model, car_color, car_plate, total_price')
     .neq('status', 'cancelled')
     .or(`departure_date.eq.${today},return_date.eq.${today}`);
   if (error) throw error;
@@ -173,7 +176,10 @@ async function adminToday(req, res) {
   const moves = [];
   for (const b of data || []) {
     const base = {
+      id: b.id,
       reference: b.reference,
+      paymentMethod: b.payment_method,
+      paymentStatus: b.payment_status,
       name: `${b.customer_firstname} ${b.customer_lastname}`.trim(),
       phone: b.customer_phone,
       car: carOf(b),
@@ -197,8 +203,38 @@ async function adminToday(req, res) {
   });
 }
 
-const routes = { otp, verify, me, 'admin-today': adminToday };
-const methods = { otp: 'POST', verify: 'POST', me: 'GET', 'admin-today': 'GET' };
+async function landed(req, res) {
+  const session = verifyClient(req);
+  if (!session) return res.status(401).json({ error: 'Unauthorized' });
+  const reference = String(req.body?.reference || '').trim().toUpperCase().slice(0, 40);
+  if (!reference) return res.status(400).json({ error: 'Référence requise' });
+  if (limited(`landed:${reference}`, 3, 30 * 60 * 1000)) return res.status(429).json({ error: 'Déjà signalé, l’équipe est prévenue' });
+
+  const { data: b } = await supabase.from('bookings')
+    .select('id, reference, status, customer_email, customer_firstname, customer_lastname, customer_phone, customer_flight, return_terminal, departure_terminal, car_brand, car_model, car_plate, internal_notes')
+    .eq('reference', reference).maybeSingle();
+  if (!b || normEmail(b.customer_email) !== session.email) return res.status(404).json({ error: 'Réservation introuvable' });
+  if (!['taken', 'in_storage', 'confirmed'].includes(b.status)) return res.status(409).json({ error: 'Cette réservation n’attend pas de restitution' });
+
+  const time = new Intl.DateTimeFormat('fr-FR', { timeZone: 'Europe/Paris', hour: '2-digit', minute: '2-digit' }).format(new Date());
+  await supabase.from('bookings').update({
+    internal_notes: `${b.internal_notes ? b.internal_notes + '\n' : ''}[App] Client atterri à ${time}`,
+  }).eq('id', b.id);
+
+  const resend = new Resend(process.env.RESEND_API_KEY);
+  const esc = (v) => String(v ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  await resend.emails.send({
+    from: FROM(),
+    to: await getNotificationEmail(),
+    subject: `🛬 ${b.customer_firstname} ${b.customer_lastname} a atterri — ${b.reference}`,
+    html: `<p><b>${esc(b.customer_firstname)} ${esc(b.customer_lastname)}</b> vient d'atterrir (${time}).</p>
+<p>${esc(b.car_brand)} ${esc(b.car_model)} · ${esc(b.car_plate)}<br>Vol ${esc(b.customer_flight) || '—'} · ${esc(b.return_terminal || b.departure_terminal) || 'terminal non précisé'}<br>Tél. ${esc(b.customer_phone)}</p>`,
+  });
+  return res.status(200).json({ ok: true, at: time });
+}
+
+const routes = { otp, verify, me, landed, 'admin-today': adminToday };
+const methods = { otp: 'POST', verify: 'POST', me: 'GET', landed: 'POST', 'admin-today': 'GET' };
 
 export default async function handler(req, res) {
   const action = String(req.query?.action || '');
