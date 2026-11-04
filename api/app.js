@@ -81,9 +81,13 @@ const carOf = (b) => ({
   brand: b.car_brand, model: b.car_model, color: b.car_color || '', plate: b.car_plate,
 });
 
+// Compte de test pour les équipes de validation Google / Apple (aucun email envoyé).
+const isReviewEmail = (email) => !!process.env.REVIEW_EMAIL && normEmail(process.env.REVIEW_EMAIL) === email;
+
 async function otp(req, res) {
   const email = normEmail(req.body?.email);
   if (!isEmail(email)) return res.status(400).json({ error: 'Email invalide' });
+  if (isReviewEmail(email)) return res.status(200).json({ ok: true });
   const ip = String(req.headers['x-forwarded-for'] || '').split(',')[0];
   if (limited(`otp:${email}`, 3, WINDOW_MS) || limited(`otp-ip:${ip}`, 10, WINDOW_MS)) {
     return res.status(429).json({ error: 'Trop de demandes, réessayez dans quelques minutes' });
@@ -107,6 +111,11 @@ async function verify(req, res) {
   if (!isEmail(email) || code.length !== 6) return res.status(400).json({ error: 'Code invalide' });
   if (limited(`verify:${email}`, 5, WINDOW_MS)) {
     return res.status(429).json({ error: 'Trop d’essais, redemandez un code dans quelques minutes' });
+  }
+  if (isReviewEmail(email) && process.env.REVIEW_CODE && process.env.REVIEW_CODE.length === 6) {
+    if (crypto.timingSafeEqual(Buffer.from(process.env.REVIEW_CODE), Buffer.from(code))) {
+      return res.status(200).json({ token: signClient(email), adminToken: null });
+    }
   }
   const w = Math.floor(Date.now() / WINDOW_MS);
   const ok = [w, w - 1].some((i) => {
