@@ -1,6 +1,8 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "regions": ["cdg1"],
+  "regions": [
+    "cdg1"
+  ],
   "cleanUrls": true,
   "trailingSlash": false,
   "redirects": [
@@ -21,6 +23,15 @@
     }
   ],
   "headers": [
+    {
+      "source": "/app-demo/(.*)",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    },
     {
       "source": "/(.*)",
       "headers": [
@@ -69,6 +80,10 @@
     {
       "source": "/admin",
       "destination": "/admin/index.html"
+    },
+    {
+      "source": "/app-demo/:path((?!_expo|assets|favicon).*)",
+      "destination": "/app-demo/index.html"
     }
   ],
   "functions": {
