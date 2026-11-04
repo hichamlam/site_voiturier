@@ -1,0 +1,203 @@
+/**
+ * /api/app — API de l'application mobile Direct Voiturier
+ *
+ *   POST ?action=otp     { email }          → envoie un code à 6 chiffres par email
+ *   POST ?action=verify  { email, code }    → { token } (jeton client, 30 jours)
+ *   GET  ?action=me                         (Bearer client) → profil, passages, voitures, réservations
+ *   GET  ?action=admin-today                (Bearer admin, cf. /api/admin/login) → mouvements du jour
+ *
+ * Une seule fonction serverless (limite de 12 fonctions du plan Vercel Hobby :
+ * c'est la 12e). Aucune clé n'est exposée à l'app : elle ne parle qu'à cette API.
+ * Le code de connexion est sans état (HMAC de l'email + fenêtre de 10 min),
+ * donc pas de table à créer.
+ */
+import crypto from 'crypto';
+import { Resend } from 'resend';
+import { supabase, requireAdmin } from './_lib.js';
+
+const SECRET = process.env.ADMIN_SESSION_SECRET || 'dev-secret-change-me';
+const FROM = () => process.env.FROM_EMAIL || 'Direct Voiturier <contact@directvoiturier.com>';
+const WINDOW_MS = 10 * 60 * 1000;
+const CLIENT_TTL = 30 * 24 * 3600 * 1000;
+
+const hmac = (purpose, data) =>
+  crypto.createHmac('sha256', `${SECRET}:${purpose}`).update(data).digest();
+
+const normEmail = (e) => String(e || '').trim().toLowerCase();
+const isEmail = (e) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e) && e.length <= 254;
+
+function otpFor(email, windowIndex) {
+  const n = hmac('otp', `${email}|${windowIndex}`).readUInt32BE(0) % 1_000_000;
+  return String(n).padStart(6, '0');
+}
+
+function signClient(email) {
+  const body = Buffer.from(JSON.stringify({ client: true, email, exp: Date.now() + CLIENT_TTL })).toString('base64url');
+  return `${body}.${hmac('client', body).toString('base64url')}`;
+}
+
+function verifyClient(req) {
+  const auth = req.headers.authorization || '';
+  const token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
+  const [body, sig] = token.split('.');
+  if (!body || !sig) return null;
+  const expected = hmac('client', body).toString('base64url');
+  try {
+    if (sig.length !== expected.length || !crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expected))) return null;
+    const data = JSON.parse(Buffer.from(body, 'base64url').toString());
+    if (!data.client || !data.email || data.exp < Date.now()) return null;
+    return data;
+  } catch { return null; }
+}
+
+/* Anti-abus best effort (mémoire de l'instance) */
+const hits = new Map();
+function limited(key, max, windowMs) {
+  const now = Date.now();
+  const list = (hits.get(key) || []).filter((t) => now - t < windowMs);
+  list.push(now);
+  hits.set(key, list);
+  return list.length > max;
+}
+
+function parisToday() {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Paris' }).format(new Date());
+}
+
+const hhmm = (t) => String(t || '').slice(0, 5);
+const carOf = (b) => ({
+  brand: b.car_brand, model: b.car_model, color: b.car_color || '', plate: b.car_plate,
+});
+
+async function otp(req, res) {
+  const email = normEmail(req.body?.email);
+  if (!isEmail(email)) return res.status(400).json({ error: 'Email invalide' });
+  const ip = String(req.headers['x-forwarded-for'] || '').split(',')[0];
+  if (limited(`otp:${email}`, 3, WINDOW_MS) || limited(`otp-ip:${ip}`, 10, WINDOW_MS)) {
+    return res.status(429).json({ error: 'Trop de demandes, réessayez dans quelques minutes' });
+  }
+  const code = otpFor(email, Math.floor(Date.now() / WINDOW_MS));
+  const resend = new Resend(process.env.RESEND_API_KEY);
+  await resend.emails.send({
+    from: FROM(),
+    to: email,
+    subject: `Votre code Direct Voiturier : ${code}`,
+    html: `<p>Bonjour,</p><p>Votre code de connexion à l'application Direct Voiturier :</p>
+<p style="font-size:28px;font-weight:700;letter-spacing:6px">${code}</p>
+<p>Il est valable 10 minutes. Si vous n'êtes pas à l'origine de cette demande, ignorez cet email.</p>`,
+  });
+  return res.status(200).json({ ok: true });
+}
+
+async function verify(req, res) {
+  const email = normEmail(req.body?.email);
+  const code = String(req.body?.code || '').replace(/\D/g, '');
+  if (!isEmail(email) || code.length !== 6) return res.status(400).json({ error: 'Code invalide' });
+  if (limited(`verify:${email}`, 5, WINDOW_MS)) {
+    return res.status(429).json({ error: 'Trop d’essais, redemandez un code dans quelques minutes' });
+  }
+  const w = Math.floor(Date.now() / WINDOW_MS);
+  const ok = [w, w - 1].some((i) => {
+    const expected = otpFor(email, i);
+    return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(code));
+  });
+  if (!ok) {
+    await new Promise((r) => setTimeout(r, 800));
+    return res.status(401).json({ error: 'Code incorrect ou expiré' });
+  }
+  return res.status(200).json({ token: signClient(email) });
+}
+
+async function me(req, res) {
+  const session = verifyClient(req);
+  if (!session) return res.status(401).json({ error: 'Unauthorized' });
+  const email = session.email;
+
+  const [{ data: client }, { data: bookings, error }] = await Promise.all([
+    supabase.from('clients').select('firstname, lastname, phone, created_at').ilike('email', email).maybeSingle(),
+    supabase.from('bookings')
+      .select('reference, status, payment_status, departure_date, departure_time, departure_terminal, return_date, return_time, customer_flight, car_brand, car_model, car_color, car_plate, total_price, taken_at, stored_at, returned_at, created_at')
+      .ilike('customer_email', email)
+      .order('departure_date', { ascending: false })
+      .limit(50),
+  ]);
+  if (error) throw error;
+
+  const list = bookings || [];
+  const cars = [];
+  const seen = new Set();
+  for (const b of list) {
+    const key = String(b.car_plate || '').replace(/[\s-]/g, '').toUpperCase();
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    cars.push(carOf(b));
+  }
+
+  const today = parisToday();
+  const active = list.filter((b) => b.status !== 'cancelled' && b.status !== 'returned' && b.return_date >= today);
+  const next = active.sort((a, b) => a.departure_date.localeCompare(b.departure_date))[0] || null;
+
+  return res.status(200).json({
+    profile: client ? { firstname: client.firstname, lastname: client.lastname, phone: client.phone, since: client.created_at } : null,
+    email,
+    passages: list.filter((b) => b.status === 'returned').length,
+    cars,
+    next,
+    history: list.filter((b) => b.status === 'returned').slice(0, 10),
+  });
+}
+
+async function adminToday(req, res) {
+  if (!requireAdmin(req, res)) return;
+  const today = parisToday();
+  const { data, error } = await supabase.from('bookings')
+    .select('reference, status, payment_method, payment_status, customer_firstname, customer_lastname, customer_phone, customer_flight, departure_date, departure_time, departure_terminal, return_date, return_time, car_brand, car_model, car_color, car_plate, total_price')
+    .neq('status', 'cancelled')
+    .or(`departure_date.eq.${today},return_date.eq.${today}`);
+  if (error) throw error;
+
+  const toCollect = (b) =>
+    ['cash', 'onsite'].includes(b.payment_method) && b.payment_status !== 'paid' ? Number(b.total_price) : null;
+
+  const moves = [];
+  for (const b of data || []) {
+    const base = {
+      reference: b.reference,
+      name: `${b.customer_firstname} ${b.customer_lastname}`.trim(),
+      phone: b.customer_phone,
+      car: carOf(b),
+      status: b.status,
+    };
+    if (b.departure_date === today) {
+      moves.push({ ...base, type: 'dep', time: hhmm(b.departure_time), terminal: b.departure_terminal || '', cash: toCollect(b) });
+    }
+    if (b.return_date === today) {
+      moves.push({ ...base, type: 'ret', time: hhmm(b.return_time), flight: b.customer_flight || '', cash: b.departure_date === today ? null : toCollect(b) });
+    }
+  }
+  moves.sort((a, b) => a.time.localeCompare(b.time));
+
+  return res.status(200).json({
+    date: today,
+    departures: moves.filter((m) => m.type === 'dep').length,
+    returns: moves.filter((m) => m.type === 'ret').length,
+    cashTotal: moves.reduce((s, m) => s + (m.cash || 0), 0),
+    moves,
+  });
+}
+
+const routes = { otp, verify, me, 'admin-today': adminToday };
+const methods = { otp: 'POST', verify: 'POST', me: 'GET', 'admin-today': 'GET' };
+
+export default async function handler(req, res) {
+  const action = String(req.query?.action || '');
+  const route = routes[action];
+  if (!route) return res.status(404).json({ error: 'Action inconnue' });
+  if (req.method !== methods[action]) return res.status(405).json({ error: `${methods[action]} only` });
+  try {
+    return await route(req, res);
+  } catch (e) {
+    console.error('[api/app]', action, e);
+    return res.status(500).json({ error: 'Erreur serveur' });
+  }
+}
