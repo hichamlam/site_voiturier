@@ -14,6 +14,7 @@ window.VO_ANALYTICS = Object.assign({
   GA4_ID: '',                 // ex: 'G-XXXXXXXXXX' (inutile si GTM)
   ADS_ID: '',                 // ex: 'AW-XXXXXXXXXXX' (inutile si GTM)
   ADS_CONVERSION_LABEL: '',
+  ADS_SEND_TO: 'AW-18428083985', // compte Google Ads : conversion « Achat » envoyée à chaque réservation (via GTM)
 }, window.VO_ANALYTICS || {});
 
 window.dataLayer = window.dataLayer || [];
@@ -106,6 +107,14 @@ function trackEvent(name, params) {
           if (Object.prototype.hasOwnProperty.call(src, k) && src[k] !== undefined && src[k] !== null && src[k] !== '') p[k] = src[k];
         }
         gtag('event', name, p);
+        // Conversion Google Ads directe (« Achat », balise Google reliée au compte Ads).
+        // Même règle : sans send_to, la balise de GTM ignorerait l'événement.
+        if (A.ADS_SEND_TO) {
+          var c = {};
+          for (var j in p) if (j !== 'send_to') c[j] = p[j];
+          c.send_to = A.ADS_SEND_TO;
+          gtag('event', 'conversion_event_purchase', c);
+        }
       }
     } else gtag('event', name, params || {});
   } catch (e) {}
