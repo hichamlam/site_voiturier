@@ -97,8 +97,16 @@ function trackEvent(name, params) {
     if (A.GTM_ID) {
       dataLayer.push(Object.assign({ event: name }, params || {}));
       // GTM n'a pas de balise qui écoute l'événement "purchase" : sans cet envoi direct,
-      // la conversion n'arrivait jamais dans GA4 ni Google Ads. gtag() est relayé par la balise Google de GTM.
-      if (name === 'purchase') gtag('event', name, params || {});
+      // la conversion n'arrivait jamais dans GA4 ni Google Ads. gtag() est relayé par la balise Google de GTM,
+      // MAIS seulement avec « send_to » : sans lui, la balise de GTM ignore l'événement (vérifié le 04/11/2026).
+      if (name === 'purchase') {
+        var p = { send_to: A.GA4_SEND_TO || 'G-WD7DE0K2QT' };
+        var src = params || {};
+        for (var k in src) {
+          if (Object.prototype.hasOwnProperty.call(src, k) && src[k] !== undefined && src[k] !== null && src[k] !== '') p[k] = src[k];
+        }
+        gtag('event', name, p);
+      }
     } else gtag('event', name, params || {});
   } catch (e) {}
 }
