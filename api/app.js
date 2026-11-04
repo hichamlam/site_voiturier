@@ -5,6 +5,8 @@
  *   POST ?action=verify  { email, code }    → { token, adminToken|null } (client 30 j, admin 7 j si ADMIN_EMAIL)
  *   GET  ?action=me                         (Bearer client) → profil, passages, voitures, réservations
  *   POST ?action=landed  { reference }      (Bearer client) → prévient l'équipe que le client a atterri
+ *   POST ?action=admin-refresh              (Bearer admin) → nouveau jeton admin 7 j (renouvellement glissant)
+ *   POST ?action=delete-account             (Bearer client) → demande de suppression du compte (exigence stores)
  *   GET  ?action=admin-today                (Bearer admin, cf. /api/admin/login) → mouvements du jour
  *
  * Une seule fonction serverless (limite de 12 fonctions du plan Vercel Hobby :
@@ -233,8 +235,34 @@ async function landed(req, res) {
   return res.status(200).json({ ok: true, at: time });
 }
 
-const routes = { otp, verify, me, landed, 'admin-today': adminToday };
-const methods = { otp: 'POST', verify: 'POST', me: 'GET', landed: 'POST', 'admin-today': 'GET' };
+async function adminRefresh(req, res) {
+  if (!requireAdmin(req, res)) return;
+  return res.status(200).json({ adminToken: signAdmin() });
+}
+
+async function deleteAccount(req, res) {
+  const session = verifyClient(req);
+  if (!session) return res.status(401).json({ error: 'Unauthorized' });
+  if (limited(`del:${session.email}`, 2, 24 * 3600 * 1000)) return res.status(200).json({ ok: true });
+  const resend = new Resend(process.env.RESEND_API_KEY);
+  const esc = (v) => String(v ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  await Promise.all([
+    resend.emails.send({
+      from: FROM(), to: await getNotificationEmail(),
+      subject: `Demande de suppression de compte — ${session.email}`,
+      html: `<p>Le client <b>${esc(session.email)}</b> demande la suppression de son compte depuis l'application.</p><p>À traiter sous 30 jours (RGPD). Les factures restent conservées pour la comptabilité.</p>`,
+    }),
+    resend.emails.send({
+      from: FROM(), to: session.email,
+      subject: 'Votre demande de suppression de compte',
+      html: `<p>Bonjour,</p><p>Nous avons bien reçu votre demande de suppression de compte Direct Voiturier. Elle sera traitée sous 30 jours. Les factures restent conservées comme la loi l'exige.</p>`,
+    }),
+  ]);
+  return res.status(200).json({ ok: true });
+}
+
+const routes = { otp, verify, me, landed, 'admin-refresh': adminRefresh, 'delete-account': deleteAccount, 'admin-today': adminToday };
+const methods = { otp: 'POST', verify: 'POST', me: 'GET', landed: 'POST', 'admin-refresh': 'POST', 'delete-account': 'POST', 'admin-today': 'GET' };
 
 export default async function handler(req, res) {
   const action = String(req.query?.action || '');
