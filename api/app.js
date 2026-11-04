@@ -8,6 +8,12 @@
  *   POST ?action=admin-refresh              (Bearer admin) → nouveau jeton admin 7 j (renouvellement glissant)
  *   POST ?action=delete-account             (Bearer client) → demande de suppression du compte (exigence stores)
  *   GET  ?action=admin-today                (Bearer admin, cf. /api/admin/login) → mouvements du jour
+ *   POST ?action=push-register { token, platform } (Bearer client) → enregistre le téléphone pour les notifs
+ *   GET  ?action=chat                       (Bearer client) → messages du client avec l'équipe
+ *   POST ?action=chat-send { body }         (Bearer client) → envoie un message à l'équipe
+ *   GET  ?action=admin-threads              (Bearer admin) → conversations (dernier message, non lus)
+ *   GET  ?action=admin-thread&email=        (Bearer admin) → une conversation
+ *   POST ?action=admin-reply { email, body } (Bearer admin) → répond au client
  *
  * Une seule fonction serverless (limite de 12 fonctions du plan Vercel Hobby :
  * c'est la 12e). Aucune clé n'est exposée à l'app : elle ne parle qu'à cette API.
@@ -16,7 +22,8 @@
  */
 import crypto from 'crypto';
 import { Resend } from 'resend';
-import { supabase, requireAdmin, getNotificationEmail } from './_lib.js';
+import { supabase, requireAdmin, getNotificationEmail, getContactPhone } from './_lib.js';
+import { pushAdmin, pushClient, saveToken } from './_push.js';
 
 const SECRET = process.env.ADMIN_SESSION_SECRET || 'dev-secret-change-me';
 const FROM = () => process.env.FROM_EMAIL || 'Direct Voiturier <contact@directvoiturier.com>';
@@ -135,13 +142,14 @@ async function me(req, res) {
   if (!session) return res.status(401).json({ error: 'Unauthorized' });
   const email = session.email;
 
-  const [{ data: client }, { data: bookings, error }] = await Promise.all([
+  const [{ data: client }, { data: bookings, error }, contactPhone] = await Promise.all([
     supabase.from('clients').select('firstname, lastname, phone, created_at').ilike('email', email).maybeSingle(),
     supabase.from('bookings')
       .select('reference, status, payment_status, departure_date, departure_time, departure_terminal, return_date, return_time, customer_flight, car_brand, car_model, car_color, car_plate, total_price, taken_at, stored_at, returned_at, created_at')
       .ilike('customer_email', email)
       .order('departure_date', { ascending: false })
       .limit(50),
+    getContactPhone().catch(() => null),
   ]);
   if (error) throw error;
 
@@ -164,6 +172,7 @@ async function me(req, res) {
     profile: client ? { firstname: client.firstname, lastname: client.lastname, phone: client.phone, since: client.created_at } : null,
     email,
     isAdmin: isAdminEmail(email),
+    contactPhone: contactPhone || null,
     passages: list.filter((b) => b.status === 'returned').length,
     cars,
     next,
@@ -234,6 +243,11 @@ async function landed(req, res) {
 
   const resend = new Resend(process.env.RESEND_API_KEY);
   const esc = (v) => String(v ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  await pushAdmin({
+    title: `🛬 ${b.customer_firstname} ${b.customer_lastname} a atterri`,
+    body: `${b.car_brand || ''} ${b.car_model || ''} · ${b.car_plate || ''} · ${b.return_terminal || b.departure_terminal || 'terminal ?'}`,
+    data: { url: '/compte/admin' },
+  });
   await resend.emails.send({
     from: FROM(),
     to: await getNotificationEmail(),
@@ -270,8 +284,97 @@ async function deleteAccount(req, res) {
   return res.status(200).json({ ok: true });
 }
 
-const routes = { otp, verify, me, landed, 'admin-refresh': adminRefresh, 'delete-account': deleteAccount, 'admin-today': adminToday };
-const methods = { otp: 'POST', verify: 'POST', me: 'GET', landed: 'POST', 'admin-refresh': 'POST', 'delete-account': 'POST', 'admin-today': 'GET' };
+async function pushRegister(req, res) {
+  const session = verifyClient(req);
+  if (!session) return res.status(401).json({ error: 'Unauthorized' });
+  const ok = await saveToken({
+    token: String(req.body?.token || ''), email: session.email,
+    isAdmin: isAdminEmail(session.email), platform: req.body?.platform,
+  });
+  return ok ? res.status(200).json({ ok: true }) : res.status(400).json({ error: 'Jeton invalide' });
+}
+
+const MSG_COLS = 'id, sender, body, created_at, read_at';
+const cleanBody = (v) => String(v || '').replace(/\r/g, '').trim().slice(0, 2000);
+
+async function chat(req, res) {
+  const session = verifyClient(req);
+  if (!session) return res.status(401).json({ error: 'Unauthorized' });
+  const { data, error } = await supabase.from('support_messages').select(MSG_COLS)
+    .eq('client_email', session.email).order('created_at', { ascending: true }).limit(200);
+  if (error) throw error;
+  if ((data || []).some((m) => m.sender === 'admin' && !m.read_at)) {
+    await supabase.from('support_messages').update({ read_at: new Date().toISOString() })
+      .eq('client_email', session.email).eq('sender', 'admin').is('read_at', null);
+  }
+  return res.status(200).json({ messages: data || [] });
+}
+
+async function chatSend(req, res) {
+  const session = verifyClient(req);
+  if (!session) return res.status(401).json({ error: 'Unauthorized' });
+  const body = cleanBody(req.body?.body);
+  if (!body) return res.status(400).json({ error: 'Message vide' });
+  if (limited(`chat:${session.email}`, 20, 10 * 60 * 1000)) return res.status(429).json({ error: 'Trop de messages, patientez un peu' });
+  const { data, error } = await supabase.from('support_messages')
+    .insert({ client_email: session.email, sender: 'client', body }).select(MSG_COLS).single();
+  if (error) throw error;
+  const { data: c } = await supabase.from('clients').select('firstname, lastname').ilike('email', session.email).maybeSingle();
+  const who = c ? `${c.firstname || ''} ${c.lastname || ''}`.trim() : session.email;
+  await pushAdmin({ title: `💬 ${who || session.email}`, body, data: { url: `/compte/chat-admin?email=${encodeURIComponent(session.email)}` } });
+  return res.status(200).json({ message: data });
+}
+
+async function adminThreads(req, res) {
+  if (!requireAdmin(req, res)) return;
+  const { data, error } = await supabase.from('support_messages')
+    .select('client_email, sender, body, created_at, read_at').order('created_at', { ascending: false }).limit(1000);
+  if (error) throw error;
+  const map = new Map();
+  for (const m of data || []) {
+    const t = map.get(m.client_email) || { email: m.client_email, last: m.body, lastSender: m.sender, at: m.created_at, unread: 0 };
+    if (m.sender === 'client' && !m.read_at) t.unread += 1;
+    map.set(m.client_email, t);
+  }
+  const threads = [...map.values()];
+  if (threads.length) {
+    const { data: cl } = await supabase.from('clients').select('email, firstname, lastname').in('email', threads.map((t) => t.email));
+    const names = new Map((cl || []).map((c) => [normEmail(c.email), `${c.firstname || ''} ${c.lastname || ''}`.trim()]));
+    threads.forEach((t) => { t.name = names.get(t.email) || ''; });
+  }
+  return res.status(200).json({ threads });
+}
+
+async function adminThread(req, res) {
+  if (!requireAdmin(req, res)) return;
+  const email = normEmail(req.query?.email);
+  if (!isEmail(email)) return res.status(400).json({ error: 'Email invalide' });
+  const { data, error } = await supabase.from('support_messages').select(MSG_COLS)
+    .eq('client_email', email).order('created_at', { ascending: true }).limit(300);
+  if (error) throw error;
+  if ((data || []).some((m) => m.sender === 'client' && !m.read_at)) {
+    await supabase.from('support_messages').update({ read_at: new Date().toISOString() })
+      .eq('client_email', email).eq('sender', 'client').is('read_at', null);
+  }
+  return res.status(200).json({ messages: data || [] });
+}
+
+async function adminReply(req, res) {
+  if (!requireAdmin(req, res)) return;
+  const email = normEmail(req.body?.email);
+  const body = cleanBody(req.body?.body);
+  if (!isEmail(email) || !body) return res.status(400).json({ error: 'Message vide' });
+  const { data, error } = await supabase.from('support_messages')
+    .insert({ client_email: email, sender: 'admin', body }).select(MSG_COLS).single();
+  if (error) throw error;
+  await pushClient(email, { title: '💬 Direct Voiturier', body, data: { url: '/compte/chat' } });
+  return res.status(200).json({ message: data });
+}
+
+const routes = { otp, verify, me, landed, 'admin-refresh': adminRefresh, 'delete-account': deleteAccount, 'admin-today': adminToday,
+  'push-register': pushRegister, chat, 'chat-send': chatSend, 'admin-threads': adminThreads, 'admin-thread': adminThread, 'admin-reply': adminReply };
+const methods = { otp: 'POST', verify: 'POST', me: 'GET', landed: 'POST', 'admin-refresh': 'POST', 'delete-account': 'POST', 'admin-today': 'GET',
+  'push-register': 'POST', chat: 'GET', 'chat-send': 'POST', 'admin-threads': 'GET', 'admin-thread': 'GET', 'admin-reply': 'POST' };
 
 export default async function handler(req, res) {
   const action = String(req.query?.action || '');

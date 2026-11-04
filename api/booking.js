@@ -5,6 +5,7 @@ import { Resend } from 'resend';
 import { supabase, calculatePrice, checkDatesAvailable, checkVehicleAllowed, upsertClient, getNotificationEmail, getContactPhone } from './_lib.js';
 import { clientEmailHTML, adminEmailHTML } from './_emails.js';
 import { magicToken, manageUrl } from './_manage.js';
+import { pushAdmin } from './_push.js';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -126,6 +127,12 @@ export default async function handler(req, res) {
         else if (r.value?.error) console.error('[booking] email:', r.value.error);
       });
     }
+
+    await pushAdmin({
+      title: `🚗 Nouvelle résa ${reference}`,
+      body: `${customer.firstname} ${customer.lastname || ''} · ${departure.date} ${departure.time} · ${price.total} € sur place`,
+      data: { url: '/compte/admin' },
+    });
 
     return res.status(200).json({ success: true, reference, total: price.total, manageToken: magicToken(inserted) });
 

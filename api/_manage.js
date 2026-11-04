@@ -17,6 +17,7 @@ import { Resend } from 'resend';
 import { supabase, calculatePrice, checkDatesAvailable, getNotificationEmail, isRealEmail } from './_lib.js';
 import { WASH_PRICES } from '../public/pricing-engine.js';
 import { modificationEmailHTML } from './_emails.js';
+import { pushAdmin } from './_push.js';
 
 export const MODIFICATION_FEE = 20;           // € ajoutés dès qu'une modification coûte plus cher
 export const MIN_HOURS_BEFORE = 24;           // délai mini avant le rendez-vous concerné
@@ -467,6 +468,11 @@ export function compactChanges(c = {}) {
 }
 
 export async function notifyModification(booking, q, { paidOnline, adminOnly = false }) {
+  await pushAdmin({
+    title: `✏️ Modif ${booking.reference}${q.toPay > 0 ? ` (+${q.toPay} €)` : ''}`,
+    body: (q.summary || []).join(' · ') || `${booking.customer_firstname || ''} ${booking.customer_lastname || ''}`,
+    data: { url: '/compte/admin' },
+  });
   if (!process.env.RESEND_API_KEY) return;
   const resend = new Resend(process.env.RESEND_API_KEY);
   const FROM = process.env.FROM_EMAIL || 'Direct Voiturier <contact@directvoiturier.com>';

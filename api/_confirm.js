@@ -18,6 +18,7 @@ import { Resend } from 'resend';
 import { supabase, getNotificationEmail, getContactPhone } from './_lib.js';
 import { clientEmailHTML, adminEmailHTML } from './_emails.js';
 import { manageUrl } from './_manage.js';
+import { pushAdmin } from './_push.js';
 
 const FROM = () => process.env.FROM_EMAIL || 'Direct Voiturier <contact@directvoiturier.com>';
 
@@ -98,6 +99,11 @@ async function sendConfirmationEmails(booking) {
   } catch (err) {
     console.error('[confirm] email:', err);
   }
+  await pushAdmin({
+    title: `💳 Nouvelle résa payée ${booking.reference}`,
+    body: `${booking.customer_firstname || ''} ${booking.customer_lastname || ''} · ${booking.departure_date} ${String(booking.departure_time || '').slice(0, 5)} · ${booking.total_price} €`,
+    data: { url: '/compte/admin' },
+  });
 }
 
 /**

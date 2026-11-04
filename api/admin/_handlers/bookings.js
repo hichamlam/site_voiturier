@@ -7,6 +7,7 @@
  * DELETE ?id= : suppression
  */
 import { supabase, requireAdmin, calculatePrice, upsertClient, calculateLateFee } from '../../_lib.js';
+import { pushClient, CLIENT_STATUS_PUSH } from '../../_push.js';
 
 export default async function handler(req, res) {
   if (!requireAdmin(req, res)) return;
@@ -188,8 +189,15 @@ async function update(req, res) {
   if (updates.status === 'returned') updates.returned_at = new Date().toISOString();
   if (updates.status === 'cancelled') updates.cancelled_at = new Date().toISOString();
 
+  const { data: before } = CLIENT_STATUS_PUSH[updates.status]
+    ? await supabase.from('bookings').select('status').eq('id', id).maybeSingle()
+    : { data: null };
   const { data, error } = await supabase.from('bookings').update(updates).eq('id', id).select().single();
   if (error) return res.status(500).json({ error: error.message });
+  const msg = CLIENT_STATUS_PUSH[updates.status];
+  if (msg && before && before.status !== updates.status && data?.customer_email) {
+    await pushClient(data.customer_email, { ...msg, data: { url: `/voiture/${data.reference}` } });
+  }
   return res.status(200).json({ booking: data });
 }
 
