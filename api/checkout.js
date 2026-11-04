@@ -17,7 +17,8 @@ export default async function handler(req, res) {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2024-06-20' });
 
   try {
-    const { reference, data } = req.body;
+    const { reference, data, source } = req.body;
+    const fromApp = source === 'app';
     if (!reference || !data) return res.status(400).json({ error: 'Missing fields' });
 
     const { customer, car, departure, return: ret, wash, options = {}, promoCode } = data;
@@ -112,8 +113,11 @@ export default async function handler(req, res) {
       }],
       metadata: { booking_id: booking.id, reference },
       // Page de confirmation avec récap (lit la résa via l'id de session, jamais via l'URL seule)
-      success_url: `${process.env.SITE_URL}/reservation-confirmee?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.SITE_URL}/?canceled=1&ref=${reference}`,
+      // Depuis l'app mobile : la page de confirmation renvoie vers l'app (directvoiturier://)
+      success_url: `${process.env.SITE_URL}/reservation-confirmee?session_id={CHECKOUT_SESSION_ID}${fromApp ? '&app=1' : ''}`,
+      cancel_url: fromApp
+        ? `${process.env.SITE_URL}/reservation-confirmee?app=1&canceled=1`
+        : `${process.env.SITE_URL}/?canceled=1&ref=${reference}`,
       locale: 'fr',
     });
 

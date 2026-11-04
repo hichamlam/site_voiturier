@@ -2,7 +2,7 @@
  * /api/app — API de l'application mobile Direct Voiturier
  *
  *   POST ?action=otp     { email }          → envoie un code à 6 chiffres par email
- *   POST ?action=verify  { email, code }    → { token } (jeton client, 30 jours)
+ *   POST ?action=verify  { email, code }    → { token, adminToken|null } (client 30 j, admin 7 j si ADMIN_EMAIL)
  *   GET  ?action=me                         (Bearer client) → profil, passages, voitures, réservations
  *   GET  ?action=admin-today                (Bearer admin, cf. /api/admin/login) → mouvements du jour
  *
@@ -19,6 +19,15 @@ const SECRET = process.env.ADMIN_SESSION_SECRET || 'dev-secret-change-me';
 const FROM = () => process.env.FROM_EMAIL || 'Direct Voiturier <contact@directvoiturier.com>';
 const WINDOW_MS = 10 * 60 * 1000;
 const CLIENT_TTL = 30 * 24 * 3600 * 1000;
+const ADMIN_TTL = 7 * 24 * 3600 * 1000;
+const isAdminEmail = (email) => !!process.env.ADMIN_EMAIL && normEmail(process.env.ADMIN_EMAIL) === email;
+
+// Jeton admin au format de _lib.js (lu par requireAdmin), durée 7 jours pour l'app.
+function signAdmin() {
+  const body = Buffer.from(JSON.stringify({ admin: true, via: 'app', exp: Date.now() + ADMIN_TTL })).toString('base64url');
+  const sig = crypto.createHmac('sha256', SECRET).update(body).digest('base64url');
+  return `${body}.${sig}`;
+}
 
 const hmac = (purpose, data) =>
   crypto.createHmac('sha256', `${SECRET}:${purpose}`).update(data).digest();
@@ -105,7 +114,8 @@ async function verify(req, res) {
     await new Promise((r) => setTimeout(r, 800));
     return res.status(401).json({ error: 'Code incorrect ou expiré' });
   }
-  return res.status(200).json({ token: signClient(email) });
+  // Le propriétaire (ADMIN_EMAIL) reçoit aussi un jeton admin : même sécurité que son email.
+  return res.status(200).json({ token: signClient(email), adminToken: isAdminEmail(email) ? signAdmin() : null });
 }
 
 async function me(req, res) {
@@ -140,6 +150,7 @@ async function me(req, res) {
   return res.status(200).json({
     profile: client ? { firstname: client.firstname, lastname: client.lastname, phone: client.phone, since: client.created_at } : null,
     email,
+    isAdmin: isAdminEmail(email),
     passages: list.filter((b) => b.status === 'returned').length,
     cars,
     next,
