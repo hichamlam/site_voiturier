@@ -1,0 +1,28 @@
+# Règles UI/UX : bibliothèques de composants à utiliser d'abord
+
+## Principe
+Avant de coder un composant UI à la main (bouton, modale, formulaire, tableau, animation, loader, upload, etc.),
+**toujours chercher d'abord s'il existe déjà dans les bibliothèques gratuites ci-dessous**, puis l'installer ou
+l'adapter. Ne pas réinventer ce qui existe.
+
+Penser aussi à chercher proactivement (WebSearch) s'il existe un composant ou un pattern intéressant pour
+améliorer l'UX du projet en cours, même si je ne l'ai pas demandé. Proposer en une ligne, sans bloquer le travail.
+
+## Web (Next.js / React + Tailwind)
+- **shadcn/ui** : base par défaut (boutons, formulaires, dialogs, tables). Install : `npx shadcn@latest add <composant>`
+- **Origin UI** : grosse collection gratuite en plus de shadcn
+- **Magic UI** / **Aceternity UI** / **Motion Primitives** : composants animés (landing pages, effets, micro-interactions)
+- **Kibo UI** / **ReUI** / **Cult UI** : blocs plus avancés (dashboards, apps)
+- **dqnamo.com/kitchen** : expériences de composants (Receipt Printer, Hold to Confirm, Dynamic Button, Magnetic Drop Zone...).
+  Source d'inspiration uniquement : aucune licence trouvée, ne pas copier tel quel en production sans accord.
+
+## Mobile (Expo / React Native)
+- **HeroUI Native**, **React Native Paper**, **Tamagui**, **Gluestack UI**, **NativeWind UI**
+- Choisir selon la stack du projet (NativeWind => HeroUI Native / NativeWind UI).
+
+## Règles
+1. Vérifier la licence avant usage dans un produit (la plupart sont MIT, mais certaines ont une partie Pro payante).
+2. Suivre la doc d'installation officielle de chaque bibliothèque (elles évoluent).
+3. Garder le style cohérent avec le design du projet (couleurs, thème sombre/clair, accessibilité).
+4. Si plusieurs options conviennent, en choisir une et expliquer en une phrase pourquoi.
+5. Citer d'où vient le composant (nom de la lib) dans le résumé de fin de tâche.
