@@ -198,3 +198,51 @@ a.h-trust-i:hover { border-color:var(--blue-light); box-shadow:0 8px 20px rgba(7
 /* Héros : le H1 SEO est plus long (« Voiturier à l'aéroport Paris-Orly : »).
    Même style, taille ajustée pour que la 1re ligne tienne sur une ligne dès 600 px. */
 @media (min-width:600px) { .h-hero h1 { font-size:min(6vw, 4.15rem); } }
+
+/* ═══ Comparatif accueil, version simple (nov. 2026) ═══ */
+.cx .h-head { margin-bottom:28px; }
+.cx-tw { overflow-x:auto; border-radius:18px; background:#fff; box-shadow:0 0 0 1px #E2E8F0; }
+.cx table { width:100%; border-collapse:collapse; font-size:16px; min-width:540px; }
+.cx th, .cx td { text-align:left; padding:16px 22px; border-bottom:1px solid #E2E8F0; }
+.cx tbody tr:last-child th, .cx tbody tr:last-child td { border-bottom:0; }
+.cx thead th { font-size:14px; font-weight:600; color:#64748B; padding-top:20px; }
+.cx thead th.cx-us { color:#0A6CC2; }
+.cx .cx-us { background:#EAF5FD; }
+.cx td.cx-us { font-weight:700; color:#0F172A; }
+.cx td.cx-big { font-size:20px; }
+.cx tbody th { font-weight:500; color:#334155; }
+.cx td { color:#475569; }
+.cx-y, .cx-n { display:inline-flex; align-items:center; gap:6px; }
+.cx-y svg, .cx-n svg { width:18px; height:18px; fill:none; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; }
+.cx-y svg { stroke:#059669; }
+.cx-n, .cx-n svg { color:#94A3B8; stroke:#94A3B8; }
+.cx-fn { font-size:13px; color:#64748B; margin-top:14px; max-width:52rem; line-height:1.55; }
+.cx-flows { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:32px; align-items:start; }
+.cx-flow { border-radius:18px; padding:24px; background:#fff; box-shadow:0 0 0 1px #E2E8F0; }
+.cx-flow-us { background:#EAF5FD; box-shadow:0 0 0 1px #B9DCF7; }
+.cx-flow h3 { font-size:17px; font-weight:700; color:#0F172A; display:flex; justify-content:space-between; align-items:baseline; gap:12px; margin:0; }
+.cx-flow h3 span { font-size:13px; font-weight:600; color:#64748B; background:#F1F5F9; padding:3px 10px; border-radius:99px; white-space:nowrap; }
+.cx-flow-us h3 span { color:#0A6CC2; background:#fff; }
+.cx-flow ol { list-style:none; margin:16px 0 0; padding:0; display:grid; gap:10px; }
+.cx-flow li { display:flex; gap:12px; align-items:center; font-size:15px; color:#475569; }
+.cx-flow li i { width:8px; height:8px; border-radius:50%; background:#CBD5E1; flex:none; }
+.cx-flow-us li i { background:#0A6CC2; }
+.cx-flow li.cx-g { font-size:13px; font-weight:600; color:#94A3B8; margin-top:4px; }
+.cx-res { margin-top:16px; padding-top:14px; border-top:1px solid #E2E8F0; font-weight:700; color:#0F172A; }
+.cx-flow-us .cx-res { border-color:#B9DCF7; color:#0A6CC2; }
+.cx-why { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:32px; }
+.cx-why > div { display:flex; gap:12px; align-items:flex-start; }
+.cx-why i { width:40px; height:40px; border-radius:12px; background:#EAF5FD; display:grid; place-items:center; flex:none; }
+.cx-why i svg { width:20px; height:20px; fill:none; stroke:#0A6CC2; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+.cx-why b { display:block; color:#0F172A; }
+.cx-why span { color:#64748B; font-size:15px; }
+.cx-cta { display:flex; gap:20px; align-items:center; justify-content:center; flex-wrap:wrap; margin-top:36px; }
+@media (max-width:760px) {
+  .cx-flows, .cx-why { grid-template-columns:1fr; }
+  .cx th, .cx td { padding:11px 8px; }
+  .cx th:first-child, .cx td:first-child { padding-left:12px; }
+  .cx table { font-size:13px; min-width:0; }
+  .cx td.cx-big { font-size:16px; }
+  .cx thead th { font-size:12px; }
+  .cx-y svg, .cx-n svg { width:15px; height:15px; }
+}
