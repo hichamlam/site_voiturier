@@ -75,6 +75,7 @@ async function sendConfirmationEmails(booking) {
       email: booking.customer_email,
       phone: booking.customer_phone,
       flight: booking.customer_flight,
+      notes: (String(booking.internal_notes || '').match(/Remarque client : (.*)/) || [])[1] || '',
     },
     car: {
       brand: booking.car_brand, model: booking.car_model,

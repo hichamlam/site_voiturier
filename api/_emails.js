@@ -173,6 +173,7 @@ export function adminEmailHTML(ctx) {
   <p style="margin:0 0 4px;font-size:14px;">Aller : <strong>${fmtDate(dep.date)} ${dep.time}</strong>${dep.terminal ? ' · ' + escapeHtml(dep.terminal) : ''}</p>
   <p style="margin:0 0 4px;font-size:14px;">Retour : <strong>${fmtDate(ret.date)} ${ret.time}</strong>${ret.terminal ? ' · ' + escapeHtml(ret.terminal) : ''}</p>
   ${customer.flight ? `<p style="margin:0;font-size:14px;">Vol : <strong>${escapeHtml(customer.flight)}</strong></p>` : ''}
+  ${customer.notes ? `<p style="margin:8px 0 0;font-size:14px;background:#FFF7E6;padding:10px 12px;border-radius:8px;">💬 Remarque : <strong>${escapeHtml(customer.notes)}</strong></p>` : ''}
 
   <h2 style="margin:18px 0 10px;font-size:14px;color:#475569;text-transform:uppercase;letter-spacing:0.1em;">Véhicule</h2>
   <p style="margin:0 0 4px;font-size:14px;">${escapeHtml(car.brand)} ${escapeHtml(car.model)}${car.color ? ' ' + escapeHtml(car.color) : ''} · <strong>${escapeHtml(car.plate)}</strong></p>

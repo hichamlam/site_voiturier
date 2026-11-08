@@ -14,6 +14,7 @@
  *   GET  ?action=admin-threads              (Bearer admin) → conversations (dernier message, non lus)
  *   GET  ?action=admin-thread&email=        (Bearer admin) → une conversation
  *   POST ?action=admin-reply { email, body } (Bearer admin) → répond au client
+ *   POST ?action=profile-update { firstname, lastname, phone } (Bearer client) → met à jour ses infos
  *
  * Une seule fonction serverless (limite de 12 fonctions du plan Vercel Hobby :
  * c'est la 12e). Aucune clé n'est exposée à l'app : elle ne parle qu'à cette API.
@@ -371,10 +372,30 @@ async function adminReply(req, res) {
   return res.status(200).json({ message: data });
 }
 
+/** Le client modifie ses infos depuis l'app : elles pré-remplissent ses prochaines réservations. */
+async function profileUpdate(req, res) {
+  const session = verifyClient(req);
+  if (!session) return res.status(401).json({ error: 'Unauthorized' });
+  const clean = (v, n) => String(v || '').trim().slice(0, n);
+  const firstname = clean(req.body?.firstname, 60);
+  const lastname = clean(req.body?.lastname, 60);
+  const phone = clean(req.body?.phone, 30);
+  if (!firstname || !lastname) return res.status(400).json({ error: 'Prénom et nom requis' });
+  if (phone && !/^(?:\+33\s?|0)[1-9](?:[\s.-]?\d{2}){4}$/.test(phone)) return res.status(400).json({ error: 'Numéro de téléphone invalide' });
+  const email = session.email.toLowerCase();
+  const { data: existing } = await supabase.from('clients').select('id').ilike('email', email).maybeSingle();
+  const fields = { firstname, lastname, phone, updated_at: new Date().toISOString() };
+  const { error } = existing
+    ? await supabase.from('clients').update(fields).eq('id', existing.id)
+    : await supabase.from('clients').insert({ email, ...fields });
+  if (error) throw error;
+  return res.status(200).json({ ok: true });
+}
+
 const routes = { otp, verify, me, landed, 'admin-refresh': adminRefresh, 'delete-account': deleteAccount, 'admin-today': adminToday,
-  'push-register': pushRegister, chat, 'chat-send': chatSend, 'admin-threads': adminThreads, 'admin-thread': adminThread, 'admin-reply': adminReply };
+  'push-register': pushRegister, chat, 'chat-send': chatSend, 'admin-threads': adminThreads, 'admin-thread': adminThread, 'admin-reply': adminReply, 'profile-update': profileUpdate };
 const methods = { otp: 'POST', verify: 'POST', me: 'GET', landed: 'POST', 'admin-refresh': 'POST', 'delete-account': 'POST', 'admin-today': 'GET',
-  'push-register': 'POST', chat: 'GET', 'chat-send': 'POST', 'admin-threads': 'GET', 'admin-thread': 'GET', 'admin-reply': 'POST' };
+  'push-register': 'POST', chat: 'GET', 'chat-send': 'POST', 'admin-threads': 'GET', 'admin-thread': 'GET', 'admin-reply': 'POST', 'profile-update': 'POST' };
 
 export default async function handler(req, res) {
   const action = String(req.query?.action || '');

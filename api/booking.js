@@ -16,7 +16,10 @@ export default async function handler(req, res) {
     const { reference, data } = req.body;
     if (!reference || !data) return res.status(400).json({ error: 'Missing fields' });
 
-    const { customer, car, departure, return: ret, wash, options = {}, promoCode } = data;
+    const { customer, car, departure, return: ret, options = {}, promoCode } = data;
+    // L'app envoyait `wash: 'premium'` (texte), le site `wash: { type }` : on accepte les deux.
+    const wash = typeof data.wash === 'string' ? { type: data.wash } : data.wash;
+    const remark = String(customer?.notes || '').trim().slice(0, 500);
 
     if (!customer?.email || !customer?.firstname || !car?.brand || !car?.plate || !departure?.date || !ret?.date) {
       return res.status(400).json({ error: 'Champs requis manquants' });
@@ -61,6 +64,7 @@ export default async function handler(req, res) {
       customer_email: customer.email.toLowerCase(),
       customer_phone: customer.phone,
       customer_flight: customer.flight || '',
+      ...(remark ? { internal_notes: `Remarque client : ${remark}` } : {}),
       departure_date: departure.date,
       departure_time: departure.time,
       departure_terminal: departure.terminal || '',
