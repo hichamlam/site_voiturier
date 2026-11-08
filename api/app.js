@@ -14,6 +14,8 @@
  *   GET  ?action=admin-threads              (Bearer admin) → conversations (dernier message, non lus)
  *   GET  ?action=admin-thread&email=        (Bearer admin) → une conversation
  *   POST ?action=admin-reply { email, body } (Bearer admin) → répond au client
+ *   GET  ?action=admin-valets / POST admin-valet-save { id?, name, phone } / admin-valet-delete { id } (Bearer admin)
+ *   POST ?action=admin-assign { bookingId, valetId|null } (Bearer admin) → attribue un voiturier + notif client
  *   POST ?action=profile-update { firstname, lastname, phone } (Bearer client) → met à jour ses infos
  *
  * Une seule fonction serverless (limite de 12 fonctions du plan Vercel Hobby :
@@ -146,7 +148,7 @@ async function me(req, res) {
   const [{ data: client }, { data: bookings, error }, contactPhone] = await Promise.all([
     supabase.from('clients').select('firstname, lastname, phone, created_at').ilike('email', email).maybeSingle(),
     supabase.from('bookings')
-      .select('reference, status, payment_status, departure_date, departure_time, departure_terminal, return_date, return_time, customer_flight, car_brand, car_model, car_color, car_plate, total_price, taken_at, stored_at, returned_at, created_at')
+      .select('id, reference, status, payment_status, departure_date, departure_time, departure_terminal, return_date, return_time, customer_flight, car_brand, car_model, car_color, car_plate, total_price, taken_at, stored_at, returned_at, created_at')
       .ilike('customer_email', email)
       .order('departure_date', { ascending: false })
       .limit(50),
@@ -165,6 +167,8 @@ async function me(req, res) {
   }
 
   const today = parisToday();
+  const valets = await valetsByBooking(list.filter((b) => b.return_date >= today).map((b) => b.id));
+  for (const b of list) { b.valet = valets.get(b.id) || null; delete b.id; }
   const active = list.filter((b) => b.status !== 'cancelled' && b.status !== 'returned' && b.return_date >= today);
   active.sort((a, b) => a.departure_date.localeCompare(b.departure_date));
   const next = active[0] || null;
@@ -182,6 +186,66 @@ async function me(req, res) {
   });
 }
 
+// ---- voituriers -------------------------------------------------------------
+// Tables créées par supabase/migrations/2026-11-08_valets.sql. Tant qu'elles n'existent pas,
+// ces lectures renvoient du vide au lieu de casser l'app.
+async function valetsByBooking(ids) {
+  if (!ids.length) return new Map();
+  try {
+    const { data, error } = await supabase.from('bookings').select('id, valet_id').in('id', ids).not('valet_id', 'is', null);
+    if (error || !data?.length) return new Map();
+    const { data: vs } = await supabase.from('valets').select('id, name, phone').in('id', [...new Set(data.map((b) => b.valet_id))]);
+    const byId = new Map((vs || []).map((v) => [v.id, { id: v.id, name: v.name, phone: v.phone }]));
+    return new Map(data.map((b) => [b.id, byId.get(b.valet_id) || null]));
+  } catch { return new Map(); }
+}
+
+async function adminValets(req, res) {
+  if (!requireAdmin(req, res)) return;
+  const { data, error } = await supabase.from('valets').select('id, name, phone').eq('active', true).order('name');
+  if (error) return res.status(503).json({ error: 'Liste des voituriers pas encore créée' });
+  return res.status(200).json({ valets: data || [] });
+}
+
+async function adminValetSave(req, res) {
+  if (!requireAdmin(req, res)) return;
+  const name = String(req.body?.name || '').trim().slice(0, 60);
+  const phone = String(req.body?.phone || '').trim().slice(0, 30);
+  const id = req.body?.id ? String(req.body.id) : null;
+  if (!name || !/^(?:\+33\s?|0)[1-9](?:[\s.-]?\d{2}){4}$/.test(phone)) return res.status(400).json({ error: 'Nom et numéro valides requis' });
+  const q = id
+    ? supabase.from('valets').update({ name, phone }).eq('id', id).select('id, name, phone').single()
+    : supabase.from('valets').insert({ name, phone }).select('id, name, phone').single();
+  const { data, error } = await q;
+  if (error) throw error;
+  return res.status(200).json({ valet: data });
+}
+
+async function adminValetDelete(req, res) {
+  if (!requireAdmin(req, res)) return;
+  const id = String(req.body?.id || '');
+  if (!id) return res.status(400).json({ error: 'id requis' });
+  // On garde la ligne (anciennes réservations) : elle disparaît juste de la liste.
+  const { error } = await supabase.from('valets').update({ active: false }).eq('id', id);
+  if (error) throw error;
+  return res.status(200).json({ ok: true });
+}
+
+async function adminAssign(req, res) {
+  if (!requireAdmin(req, res)) return;
+  const bookingId = String(req.body?.bookingId || '');
+  const valetId = req.body?.valetId ? String(req.body.valetId) : null;
+  if (!bookingId) return res.status(400).json({ error: 'Réservation requise' });
+  const { data: b, error } = await supabase.from('bookings').update({ valet_id: valetId }).eq('id', bookingId)
+    .select('reference, customer_email').single();
+  if (error) throw error;
+  if (valetId && b?.customer_email) {
+    const { data: v } = await supabase.from('valets').select('name').eq('id', valetId).maybeSingle();
+    if (v) await pushClient(b.customer_email, { title: '🚗 Votre voiturier', body: `${v.name} s'occupe de votre voiture. Son numéro est dans l'app.`, data: { url: '/' } });
+  }
+  return res.status(200).json({ ok: true });
+}
+
 async function adminToday(req, res) {
   if (!requireAdmin(req, res)) return;
   const today = parisToday();
@@ -194,9 +258,11 @@ async function adminToday(req, res) {
   const toCollect = (b) =>
     ['cash', 'onsite'].includes(b.payment_method) && b.payment_status !== 'paid' ? Number(b.total_price) : null;
 
+  const valets = await valetsByBooking((data || []).map((b) => b.id));
   const moves = [];
   for (const b of data || []) {
     const base = {
+      valet: valets.get(b.id) || null,
       id: b.id,
       reference: b.reference,
       paymentMethod: b.payment_method,
@@ -393,9 +459,11 @@ async function profileUpdate(req, res) {
 }
 
 const routes = { otp, verify, me, landed, 'admin-refresh': adminRefresh, 'delete-account': deleteAccount, 'admin-today': adminToday,
-  'push-register': pushRegister, chat, 'chat-send': chatSend, 'admin-threads': adminThreads, 'admin-thread': adminThread, 'admin-reply': adminReply, 'profile-update': profileUpdate };
+  'push-register': pushRegister, chat, 'chat-send': chatSend, 'admin-threads': adminThreads, 'admin-thread': adminThread, 'admin-reply': adminReply, 'profile-update': profileUpdate,
+  'admin-valets': adminValets, 'admin-valet-save': adminValetSave, 'admin-valet-delete': adminValetDelete, 'admin-assign': adminAssign };
 const methods = { otp: 'POST', verify: 'POST', me: 'GET', landed: 'POST', 'admin-refresh': 'POST', 'delete-account': 'POST', 'admin-today': 'GET',
-  'push-register': 'POST', chat: 'GET', 'chat-send': 'POST', 'admin-threads': 'GET', 'admin-thread': 'GET', 'admin-reply': 'POST', 'profile-update': 'POST' };
+  'push-register': 'POST', chat: 'GET', 'chat-send': 'POST', 'admin-threads': 'GET', 'admin-thread': 'GET', 'admin-reply': 'POST', 'profile-update': 'POST',
+  'admin-valets': 'GET', 'admin-valet-save': 'POST', 'admin-valet-delete': 'POST', 'admin-assign': 'POST' };
 
 export default async function handler(req, res) {
   const action = String(req.query?.action || '');
