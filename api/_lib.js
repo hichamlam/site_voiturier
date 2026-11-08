@@ -52,7 +52,21 @@ export function requireAdmin(req, res) {
 // charger la grille depuis Supabase — en PARALLÈLE (avant : 6 à 9 requêtes
 // enchaînées l'une après l'autre) — puis valider le code promo.
 // Toute la grille publique en une seule vague de requêtes parallèles.
+// Supabase renvoie parfois « JWT issued at future » (décalage d'horloge de
+// quelques secondes entre ses serveurs) : on réessaie au lieu d'échouer.
+const isClockSkew = (e) => /issued at future/i.test(String(e?.message || e));
+
 export async function loadPricingRef() {
+  for (let attempt = 0; ; attempt++) {
+    try { return await loadPricingRefOnce(); }
+    catch (e) {
+      if (attempt >= 3 || !isClockSkew(e)) throw e;
+      await new Promise((r) => setTimeout(r, 400 * (attempt + 1)));
+    }
+  }
+}
+
+async function loadPricingRefOnce() {
   // Pas de filtre de date ici : le back-office peut recalculer une réservation
   // passée. /api/pricing-data élague ce qui est révolu avant de publier.
   const [rules, categories, specials, surcharges, holidays, blocked] = await Promise.all([
