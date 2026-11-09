@@ -44,6 +44,8 @@ const FIELDS = {
   late_first_hour_eur: { label: 'Frais de retard, 1re heure (€)', type: 'number', maxLen: 6 },
   late_per_hour_eur: { label: 'Frais de retard, heure suivante (€)', type: 'number', maxLen: 6 },
   google_ads_id: { label: 'Identifiant Google Ads', type: 'text', maxLen: 50 },
+  referral_referee_pct: { label: 'Parrainage : remise du filleul (%)', type: 'number', maxLen: 4 },
+  referral_referrer_pct: { label: 'Parrainage : remise du parrain (%)', type: 'number', maxLen: 4 },
 };
 
 function emptySettings() {

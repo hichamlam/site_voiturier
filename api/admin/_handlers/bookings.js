@@ -6,6 +6,7 @@
  * PATCH ?id=  : maj (incluant pénalités retard)
  * DELETE ?id= : suppression
  */
+import { grantReferralReward } from '../../_referral.js';
 import { supabase, requireAdmin, calculatePrice, upsertClient, calculateLateFee, getLateFeeConfig } from '../../_lib.js';
 import { pushClient, CLIENT_STATUS_PUSH } from '../../_push.js';
 
@@ -195,6 +196,7 @@ async function update(req, res) {
     : { data: null };
   const { data, error } = await supabase.from('bookings').update(updates).eq('id', id).select().single();
   if (error) return res.status(500).json({ error: error.message });
+  if (updates.status === 'returned' && before && before.status !== 'returned' && data) await grantReferralReward(data, { pushClient });
   const msg = CLIENT_STATUS_PUSH[updates.status];
   if (msg && before && before.status !== updates.status && data?.customer_email) {
     await pushClient(data.customer_email, { ...msg, data: { url: `/voiture/${data.reference}` } });

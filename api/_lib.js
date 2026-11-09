@@ -120,7 +120,16 @@ async function resolvePromo(promoCode, customerEmail) {
     .eq('code', code)
     .eq('active', true)
     .maybeSingle();
-  if (!promo) return { rule: null, rejectedReason: 'invalid' };
+  if (!promo) {
+    // Pas un code promo : peut-être le code de parrainage d'un client.
+    const { resolveReferral } = await import('./_referral.js');
+    return (await resolveReferral(code, customerEmail)) || { rule: null, rejectedReason: 'invalid' };
+  }
+  // Code « merci » de parrainage : réservé à l'email du parrain.
+  if (customerEmail) {
+    const { promoOwnerMismatch } = await import('./_referral.js');
+    if (await promoOwnerMismatch(code, customerEmail)) return { rule: null, rejectedReason: 'not_yours' };
+  }
 
   const today = new Date().toISOString().slice(0, 10);
   const validFrom = !promo.valid_from || promo.valid_from <= today;

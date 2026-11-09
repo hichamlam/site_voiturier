@@ -673,8 +673,10 @@ async function bkApplyPromo() {
   } else {
     STATE.booking.data.promoCode = null;
     msg.style.color = 'var(--error)';
-    msg.textContent = (sp && sp.promoRejectedReason === 'first_booking_only')
-      ? '✕ Ce code est réservé à une première réservation.'
+    const why = sp && sp.promoRejectedReason;
+    msg.textContent = why === 'first_booking_only' ? '✕ Ce code est réservé à une première réservation.'
+      : why === 'own_referral' ? '✕ Vous ne pouvez pas utiliser votre propre code de parrainage.'
+      : why === 'not_yours' ? '✕ Ce code est personnel : il ne marche qu’avec l’email de son titulaire.'
       : '✕ Code invalide ou expiré';
   }
 }

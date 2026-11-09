@@ -9,6 +9,7 @@
  * « take » = valider la prise en charge : signature du client, frais de retard
  * éventuels, statut « pris en charge » et création du reçu.
  */
+import { grantReferralReward } from './_referral.js';
 import { supabase, requireAdmin, getLateFeeConfig, lateFeeForMinutes } from './_lib.js';
 import { pushClient, CLIENT_STATUS_PUSH } from './_push.js';
 import { amountDue, cleanSignature, getCheckin, invoiceLines, saveCheckin } from './_invoice.js';
@@ -197,6 +198,7 @@ export async function adminStep(req, res) {
 
   const { data, error } = await supabase.from('bookings').update(updates).eq('id', b.id).select('*').single();
   if (error) throw error;
+  if (updates.status === 'returned') await grantReferralReward(data, { pushClient });
   const msg = CLIENT_STATUS_PUSH[updates.status];
   if (msg && data.customer_email) {
     const body = updates.status === 'taken' ? `${msg.body} Votre reçu est disponible dans l'app.` : msg.body;

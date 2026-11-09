@@ -19,6 +19,7 @@
  *   POST ?action=profile-update { firstname, lastname, phone } (Bearer client) → met à jour ses infos
  *   GET  admin-board / admin-resa · POST admin-step / admin-fee (Bearer admin) → cf. api/_adminapp.js
  *   POST ?action=invoice-link { reference } (Bearer client) → lien 1 h vers son reçu (après prise en charge)
+ *   POST ?action=manage-token { reference } (Bearer client) → jeton 2 h pour modifier SA réservation (/api/reservation)
  *
  * Une seule fonction serverless (limite de 12 fonctions du plan Vercel Hobby :
  * c'est la 12e). Aucune clé n'est exposée à l'app : elle ne parle qu'à cette API.
@@ -32,6 +33,7 @@ import { pushAdmin, pushClient, saveToken } from './_push.js';
 import { adminBoard, adminResa, adminStep, adminFee } from './_adminapp.js';
 import { invoicedIds } from './_invoice.js';
 import { signManageToken } from './_manage.js';
+import { referralSummary } from './_referral.js';
 
 const SECRET = SESSION_SECRET;
 const FROM = () => process.env.FROM_EMAIL || 'Direct Voiturier <contact@directvoiturier.com>';
@@ -203,7 +205,9 @@ async function me(req, res) {
   active.sort((a, b) => a.departure_date.localeCompare(b.departure_date));
   const next = active[0] || null;
 
+  const referral = await referralSummary(email, client?.firstname).catch(() => null);
   return res.status(200).json({
+    referral,
     profile: client ? { firstname: client.firstname, lastname: client.lastname, phone: client.phone, since: client.created_at } : null,
     email,
     isAdmin: isAdminEmail(email),
@@ -500,14 +504,25 @@ async function invoiceLink(req, res) {
   return res.status(200).json({ url: `${site}/api/reservation?action=invoice&t=${encodeURIComponent(signManageToken(b.id, 3600 * 1000))}` });
 }
 
+// Jeton « Gérer ma réservation » (2 h) pour SA réservation : l'app modifie via /api/reservation
+// (mêmes règles que le site : 24 h avant, supplément + frais si plus cher).
+async function manageToken(req, res) {
+  const session = verifyClient(req);
+  if (!session) return res.status(401).json({ error: 'Unauthorized' });
+  const reference = String(req.body?.reference || '').trim().toUpperCase().slice(0, 40);
+  const { data: b } = await supabase.from('bookings').select('id, customer_email, status').eq('reference', reference).maybeSingle();
+  if (!b || normEmail(b.customer_email) !== session.email || b.status === 'pending') return res.status(404).json({ error: 'Réservation introuvable' });
+  return res.status(200).json({ token: signManageToken(b.id, 2 * 3600 * 1000) });
+}
+
 const routes = { otp, verify, me, landed, 'admin-refresh': adminRefresh, 'delete-account': deleteAccount, 'admin-today': adminToday,
   'push-register': pushRegister, chat, 'chat-send': chatSend, 'admin-threads': adminThreads, 'admin-thread': adminThread, 'admin-reply': adminReply, 'profile-update': profileUpdate,
   'admin-valets': adminValets, 'admin-valet-save': adminValetSave, 'admin-valet-delete': adminValetDelete, 'admin-assign': adminAssign,
-  'admin-board': adminBoard, 'admin-resa': adminResa, 'admin-step': adminStep, 'admin-fee': adminFee, 'invoice-link': invoiceLink };
+  'admin-board': adminBoard, 'admin-resa': adminResa, 'admin-step': adminStep, 'admin-fee': adminFee, 'invoice-link': invoiceLink, 'manage-token': manageToken };
 const methods = { otp: 'POST', verify: 'POST', me: 'GET', landed: 'POST', 'admin-refresh': 'POST', 'delete-account': 'POST', 'admin-today': 'GET',
   'push-register': 'POST', chat: 'GET', 'chat-send': 'POST', 'admin-threads': 'GET', 'admin-thread': 'GET', 'admin-reply': 'POST', 'profile-update': 'POST',
   'admin-valets': 'GET', 'admin-valet-save': 'POST', 'admin-valet-delete': 'POST', 'admin-assign': 'POST',
-  'admin-board': 'GET', 'admin-resa': 'GET', 'admin-step': 'POST', 'admin-fee': 'POST', 'invoice-link': 'POST' };
+  'admin-board': 'GET', 'admin-resa': 'GET', 'admin-step': 'POST', 'admin-fee': 'POST', 'invoice-link': 'POST', 'manage-token': 'POST' };
 
 export default async function handler(req, res) {
   const action = String(req.query?.action || '');
