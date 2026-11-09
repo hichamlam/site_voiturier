@@ -109,8 +109,8 @@ export default async function handler(req, res) {
         const intent = await stripe.paymentIntents.create({
           amount: Math.round(price.total * 100),
           currency: 'eur',
-          // Carte uniquement : Google Pay (et Apple Pay) passent par « card ». Pas de Klarna, Bancontact, etc.
-          payment_method_types: ['card'],
+          // Carte (inclut Google Pay / Apple Pay) + Klarna. Pas de Bancontact, MB WAY, Link, etc.
+          payment_method_types: ['card', 'klarna'],
           receipt_email: customer.email,
           description: `Direct Voiturier — ${reference} · ${departure.date} → ${ret.date} · ${car.brand} ${car.model} (${car.plate})`.substring(0, 500),
           metadata: { booking_id: booking.id, reference },
