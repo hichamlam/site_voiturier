@@ -18,7 +18,7 @@
  *   POST ?action=admin-assign { bookingId, valetId|null } (Bearer admin) → attribue un voiturier + notif client
  *   POST ?action=profile-update { firstname, lastname, phone } (Bearer client) → met à jour ses infos
  *   GET  admin-board / admin-resa · POST admin-step / admin-fee (Bearer admin) → cf. api/_adminapp.js
- *   POST ?action=invoice-link { reference } (Bearer client) → lien 1 h vers sa facture (après prise en charge)
+ *   POST ?action=invoice-link { reference } (Bearer client) → lien 1 h vers son reçu (après prise en charge)
  *
  * Une seule fonction serverless (limite de 12 fonctions du plan Vercel Hobby :
  * c'est la 12e). Aucune clé n'est exposée à l'app : elle ne parle qu'à cette API.
@@ -488,14 +488,14 @@ async function profileUpdate(req, res) {
   return res.status(200).json({ ok: true });
 }
 
-// Lien de facture (valable 1 h) : uniquement pour SA réservation, et seulement une fois la prise en charge validée.
+// Lien du reçu (valable 1 h) : uniquement pour SA réservation, et seulement une fois la prise en charge validée.
 async function invoiceLink(req, res) {
   const session = verifyClient(req);
   if (!session) return res.status(401).json({ error: 'Unauthorized' });
   const reference = String(req.body?.reference || '').trim().toUpperCase().slice(0, 40);
   const { data: b } = await supabase.from('bookings').select('id, customer_email').eq('reference', reference).maybeSingle();
   if (!b || normEmail(b.customer_email) !== session.email) return res.status(404).json({ error: 'Réservation introuvable' });
-  if (!(await invoicedIds([b.id])).has(b.id)) return res.status(409).json({ error: 'La facture sera disponible dès la prise en charge de votre voiture' });
+  if (!(await invoicedIds([b.id])).has(b.id)) return res.status(409).json({ error: 'Le reçu sera disponible dès la prise en charge de votre voiture' });
   const site = (process.env.SITE_URL || 'https://www.directvoiturier.com').replace(/\/$/, '');
   return res.status(200).json({ url: `${site}/api/reservation?action=invoice&t=${encodeURIComponent(signManageToken(b.id, 3600 * 1000))}` });
 }

@@ -1,14 +1,13 @@
 /**
- * Prise en charge signée + facture.
+ * Prise en charge signée + reçu (simple reçu, pas une facture).
  *
- * Règle métier : la facture n'existe qu'à partir du moment où le voiturier
+ * Règle métier : le reçu n'existe qu'à partir du moment où le voiturier
  * VALIDE LA PRISE EN CHARGE (le service a commencé). Valider un paiement seul
- * ne crée pas de facture.
+ * ne crée pas de reçu.
  *
  * Aucune migration : tout vit dans la table clé/valeur `settings`, déjà utilisée
  * ainsi par le reste de l'API.
- *   checkin:<booking_id>  → { paths, signedAt, invoiceNo, invoicedAt }
- *   invoice_seq           → dernier numéro de facture attribué (suite continue)
+ *   checkin:<booking_id>  → { paths, signedAt, invoiceNo (= référence de la résa), invoicedAt }
  * Ces clés ne sortent jamais par /api/config (liste blanche) ni par
  * /api/admin/settings (liste blanche FIELDS).
  */
@@ -38,7 +37,7 @@ export async function getCheckin(bookingId) {
   } catch { return null; }
 }
 
-/** Réservations (parmi `ids`) qui ont une facture — sans charger les signatures. */
+/** Réservations (parmi `ids`) qui ont un reçu — sans charger les signatures. */
 export async function invoicedIds(ids) {
   if (!ids.length) return new Set();
   try {
@@ -47,28 +46,13 @@ export async function invoicedIds(ids) {
   } catch { return new Set(); }
 }
 
-async function nextInvoiceNo() {
-  // Numérotation continue. Volume faible : on relit juste avant d'écrire puis on
-  // vérifie qu'aucun autre appel n'a pris le même numéro (rare, on réessaie).
-  for (let attempt = 0; attempt < 5; attempt++) {
-    const { data } = await supabase.from('settings').select('value').eq('key', 'invoice_seq').maybeSingle();
-    const n = (parseInt(data?.value, 10) || 0) + 1;
-    const q = supabase.from('settings');
-    const { error, count } = data
-      ? await q.update({ value: String(n), updated_at: new Date().toISOString() }, { count: 'exact' }).eq('key', 'invoice_seq').eq('value', data.value)
-      : await q.insert({ key: 'invoice_seq', value: String(n) }, { count: 'exact' });
-    if (!error && count !== 0) return `F${new Date().getFullYear()}-${String(n).padStart(5, '0')}`;
-  }
-  throw new Error('Numéro de facture indisponible, réessayez');
-}
-
-/** Enregistre la signature et attribue le numéro de facture (une seule fois). */
-export async function saveCheckin(bookingId, paths) {
+/** Enregistre la signature et ouvre le reçu (une seule fois). Le n° du reçu = la référence. */
+export async function saveCheckin(bookingId, paths, reference) {
   const prev = await getCheckin(bookingId);
   const value = {
     paths: paths || prev?.paths || [],
     signedAt: paths ? new Date().toISOString() : prev?.signedAt || null,
-    invoiceNo: prev?.invoiceNo || (await nextInvoiceNo()),
+    invoiceNo: prev?.invoiceNo || reference,
     invoicedAt: prev?.invoicedAt || new Date().toISOString(),
   };
   const { error } = await supabase.from('settings')
@@ -101,7 +85,7 @@ export function invoiceLines(b) {
   return lines;
 }
 
-/* ─── Facture HTML (imprimable / « Enregistrer en PDF ») ────────────── */
+/* ─── Reçu HTML (imprimable / « Enregistrer en PDF ») ───────────────── */
 export async function companyInfo() {
   const keys = ['company_name', 'company_siret', 'contact_address', 'contact_email', 'contact_phone', 'invoice_mention'];
   const { data } = await supabase.from('settings').select('key, value').in('key', keys);
@@ -117,7 +101,7 @@ export function invoiceHtml(b, checkin, co) {
   const total = amountDue(b);
   const paid = b.payment_status === 'paid';
   return `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="robots" content="noindex"><title>Facture ${esc(checkin.invoiceNo)}</title>
+<meta name="robots" content="noindex"><title>Reçu ${esc(b.reference)}</title>
 <style>
 body{font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#0A1B2E;margin:0;background:#EEF4FA}
 .page{max-width:720px;margin:24px auto;background:#fff;border-radius:16px;padding:32px}
@@ -129,14 +113,15 @@ td:last-child{text-align:right;white-space:nowrap}.tot td{font-weight:800;font-s
 .btn{display:inline-block;margin-top:24px;padding:12px 20px;border-radius:99px;background:#1E6FD9;color:#fff;font-weight:700;border:none;font-size:15px;cursor:pointer}
 @media print{body{background:#fff}.page{margin:0;border-radius:0}.btn{display:none}}
 </style></head><body><div class="page">
-<div class="row" style="margin-top:0"><div><h1>Facture</h1><div class="muted">N° ${esc(checkin.invoiceNo)} · ${esc(frDate(checkin.invoicedAt))}</div></div>
+<div class="row" style="margin-top:0"><div><h1>Reçu</h1><div class="muted">Réservation ${esc(b.reference)} · ${esc(frDate(checkin.invoicedAt))}</div></div>
 <div style="text-align:right"><b>${esc(co.company_name || 'Direct Voiturier')}</b><div class="muted">${esc(co.contact_address || '')}${co.company_siret ? `<br>SIRET ${esc(co.company_siret)}` : ''}${co.contact_email ? `<br>${esc(co.contact_email)}` : ''}</div></div></div>
 <div class="row"><div><div class="muted">Client</div><b>${esc(`${b.customer_firstname} ${b.customer_lastname}`.trim())}</b><div class="muted">${esc(b.customer_email && !/@sans-email\.invalid$/i.test(b.customer_email) ? b.customer_email : '')}</div></div>
 <div><div class="muted">Réservation</div><b>${esc(b.reference)}</b><div class="muted">${esc(b.car_brand)} ${esc(b.car_model)} · ${esc(b.car_plate)}<br>Du ${esc(frDate(b.departure_date))} au ${esc(frDate(b.return_date))}</div></div></div>
 <table>${lines.map((l) => `<tr><td>${esc(l.label)}</td><td>${esc(eur(l.amount))}</td></tr>`).join('')}
-<tr class="tot"><td>Total TTC</td><td>${esc(eur(total))}</td></tr></table>
+<tr class="tot"><td>Total</td><td>${esc(eur(total))}</td></tr></table>
 <p><span class="badge" style="background:${paid ? '#DDF4EA;color:#0E7C52' : '#FFE9D1;color:#A14E00'}">${paid ? 'Payée' : 'À régler sur place'}</span></p>
 ${co.invoice_mention ? `<p class="muted">${esc(co.invoice_mention)}</p>` : ''}
+<p class="muted">Ce reçu confirme la prise en charge de votre voiture. Il ne vaut pas facture.</p>
 ${checkin.paths?.length ? `<div class="muted" style="margin-top:20px">Prise en charge signée par le client le ${esc(frDate(checkin.signedAt))}</div>${signatureSvg(checkin.paths, 180, 90)}` : ''}
 <button class="btn" onclick="window.print()">Enregistrer en PDF / imprimer</button>
 </div></body></html>`;

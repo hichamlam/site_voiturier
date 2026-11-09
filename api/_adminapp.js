@@ -2,12 +2,12 @@
  * Espace admin de l'application (routes branchées dans api/app.js, Bearer admin).
  *
  *   GET  admin-board?from=AAAA-MM-JJ&to=AAAA-MM-JJ  → décollages, atterrissages, stock, espèces
- *   GET  admin-resa?id=                              → fiche complète (frais, retard, facture)
+ *   GET  admin-resa?id=                              → fiche complète (frais, retard, reçu)
  *   POST admin-step { id, step, … }                  → take | park | return | cash
  *   POST admin-fee  { id, label, amount } | { id, removeIndex }
  *
  * « take » = valider la prise en charge : signature du client, frais de retard
- * éventuels, statut « pris en charge » et création de la facture.
+ * éventuels, statut « pris en charge » et création du reçu.
  */
 import { supabase, requireAdmin, getLateFeeConfig, lateFeeForMinutes } from './_lib.js';
 import { pushClient, CLIENT_STATUS_PUSH } from './_push.js';
@@ -175,8 +175,8 @@ export async function adminStep(req, res) {
     const paths = req.body?.signature == null ? null : cleanSignature(req.body.signature);
     if (req.body?.signature != null && !paths) return res.status(400).json({ error: 'Signature illisible, recommencez' });
     updates = { status: 'taken', taken_at: now, ...lateFields(b, 'late_dep', b.departure_time, req.body?.late, cfg) };
-    // Facture d'abord : si elle échoue, la voiture n'est pas marquée prise en charge.
-    await saveCheckin(b.id, paths);
+    // Reçu d'abord : s'il échoue, la voiture n'est pas marquée prise en charge.
+    await saveCheckin(b.id, paths, b.reference);
   } else if (step === 'park') {
     if (!['taken', 'confirmed'].includes(b.status)) return res.status(409).json({ error: 'Étape impossible pour cette réservation' });
     updates = { status: 'in_storage', stored_at: now, parking_spot: String(req.body?.spot || b.parking_spot || '').trim().slice(0, 20) };
@@ -199,7 +199,7 @@ export async function adminStep(req, res) {
   if (error) throw error;
   const msg = CLIENT_STATUS_PUSH[updates.status];
   if (msg && data.customer_email) {
-    const body = updates.status === 'taken' ? `${msg.body} Votre facture est disponible dans l'app.` : msg.body;
+    const body = updates.status === 'taken' ? `${msg.body} Votre reçu est disponible dans l'app.` : msg.body;
     await pushClient(data.customer_email, { ...msg, body, data: { url: `/voiture/${data.reference}` } });
   }
   return res.status(200).json({ resa: await resaView(data) });

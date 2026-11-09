@@ -21,14 +21,14 @@ import {
   optionCatalog, ChangeError, ConflictError, compactChanges, notifyModification, applyPaidModification,
 } from './_manage.js';
 
-/* Facture (HTML imprimable) : jeton signé lié à UNE réservation, émis après la prise en charge. */
+/* Reçu (HTML imprimable) : jeton signé lié à UNE réservation, émis après la prise en charge. */
 async function invoice(req, res) {
   if (req.method !== 'GET') return res.status(405).end();
   const tok = verifyManageToken(String(req.query.t || ''));
-  if (!tok) return res.status(401).send('Lien expiré. Rouvrez la facture depuis votre espace.');
+  if (!tok) return res.status(401).send('Lien expiré. Rouvrez le reçu depuis votre espace.');
   const b = await loadBooking(tok.b);
   const checkin = b ? await getCheckin(b.id) : null;
-  if (!b || !checkin?.invoiceNo) return res.status(404).send('Facture pas encore disponible.');
+  if (!b || !checkin?.invoiceNo) return res.status(404).send('Reçu pas encore disponible.');
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.setHeader('Cache-Control', 'private, no-store');
   res.setHeader('X-Robots-Tag', 'noindex');
@@ -90,7 +90,7 @@ async function authed(req, res) {
 
 async function fullView(b) {
   const [catalog, contactPhone, checkin] = await Promise.all([optionCatalog(), getContactPhone(), getCheckin(b.id)]);
-  // Facture : seulement après la prise en charge, lien signé valable 1 h.
+  // Reçu : seulement après la prise en charge, lien signé valable 1 h.
   const invoiceUrl = checkin?.invoiceNo ? `/api/reservation?action=invoice&t=${encodeURIComponent(signManageToken(b.id, 3600 * 1000))}` : null;
   return publicView(b, { rules: rulesFor(b), catalog, contactPhone, invoiceUrl });
 }
