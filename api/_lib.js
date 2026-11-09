@@ -13,7 +13,15 @@ export const supabase = createClient(
 );
 
 // ─── Auth admin (token signé HMAC, 24h) ───
-const SECRET = process.env.ADMIN_SESSION_SECRET || 'dev-secret-change-me';
+// En production, PAS de secret de secours : sans ADMIN_SESSION_SECRET n'importe qui
+// pourrait fabriquer des jetons admin/client. On refuse plutôt de démarrer (fail closed).
+export const SESSION_SECRET = (() => {
+  const v = process.env.ADMIN_SESSION_SECRET;
+  if (v && v.length >= 16) return v;
+  if (process.env.VERCEL_ENV === 'production') throw new Error('ADMIN_SESSION_SECRET manquant ou trop court');
+  return 'dev-secret-change-me';
+})();
+const SECRET = SESSION_SECRET;
 
 export function signToken(payload) {
   const data = { ...payload, exp: Date.now() + 24 * 60 * 60 * 1000 };

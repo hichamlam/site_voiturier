@@ -14,7 +14,7 @@
  */
 import crypto from 'crypto';
 import { Resend } from 'resend';
-import { supabase, calculatePrice, checkDatesAvailable, getNotificationEmail, isRealEmail } from './_lib.js';
+import { supabase, calculatePrice, checkDatesAvailable, getNotificationEmail, isRealEmail, SESSION_SECRET } from './_lib.js';
 import { WASH_PRICES } from '../public/pricing-engine.js';
 import { modificationEmailHTML } from './_emails.js';
 import { pushAdmin } from './_push.js';
@@ -30,7 +30,7 @@ const r2 = (n) => Math.round(Number(n || 0) * 100) / 100;
 
 /* ─── Jetons d'accès (distincts des jetons admin) ─────────────────────── */
 function key() {
-  const base = process.env.ADMIN_SESSION_SECRET || 'dev-secret-change-me';
+  const base = SESSION_SECRET;
   return crypto.createHmac('sha256', base).update('dv-manage-booking-v1').digest();
 }
 

@@ -25,10 +25,10 @@
  */
 import crypto from 'crypto';
 import { Resend } from 'resend';
-import { supabase, requireAdmin, getNotificationEmail, getContactPhone } from './_lib.js';
+import { supabase, requireAdmin, getNotificationEmail, getContactPhone, SESSION_SECRET } from './_lib.js';
 import { pushAdmin, pushClient, saveToken } from './_push.js';
 
-const SECRET = process.env.ADMIN_SESSION_SECRET || 'dev-secret-change-me';
+const SECRET = SESSION_SECRET;
 const FROM = () => process.env.FROM_EMAIL || 'Direct Voiturier <contact@directvoiturier.com>';
 const WINDOW_MS = 10 * 60 * 1000;
 const CLIENT_TTL = 30 * 24 * 3600 * 1000;
@@ -72,6 +72,27 @@ function verifyClient(req) {
   } catch { return null; }
 }
 
+/*
+ * Anti-force-brute PARTAGÉ entre toutes les instances (table auth_attempts).
+ * Le compteur en mémoire seul ne suffit pas : Vercel lance plusieurs instances,
+ * un attaquant pourrait multiplier ses essais sur le code à 6 chiffres.
+ * Si la table n'existe pas encore, on retombe sur le compteur en mémoire.
+ */
+async function tooMany(key, max, windowMs) {
+  const local = limited(key, max, windowMs);
+  try {
+    const since = new Date(Date.now() - windowMs).toISOString();
+    const { data, error } = await supabase.from('auth_attempts').select('count, window_start').eq('key', key).maybeSingle();
+    if (error) return local;
+    if (!data || data.window_start < since) {
+      await supabase.from('auth_attempts').upsert({ key, count: 1, window_start: new Date().toISOString() });
+      return local;
+    }
+    await supabase.from('auth_attempts').update({ count: data.count + 1 }).eq('key', key);
+    return local || data.count + 1 > max;
+  } catch { return local; }
+}
+
 /* Anti-abus best effort (mémoire de l'instance) */
 const hits = new Map();
 function limited(key, max, windowMs) {
@@ -99,7 +120,7 @@ async function otp(req, res) {
   if (!isEmail(email)) return res.status(400).json({ error: 'Email invalide' });
   if (isReviewEmail(email)) return res.status(200).json({ ok: true });
   const ip = String(req.headers['x-forwarded-for'] || '').split(',')[0];
-  if (limited(`otp:${email}`, 3, WINDOW_MS) || limited(`otp-ip:${ip}`, 10, WINDOW_MS)) {
+  if ((await tooMany(`otp:${email}`, 3, WINDOW_MS)) || (await tooMany(`otp-ip:${ip}`, 10, WINDOW_MS))) {
     return res.status(429).json({ error: 'Trop de demandes, réessayez dans quelques minutes' });
   }
   const code = otpFor(email, Math.floor(Date.now() / WINDOW_MS));
@@ -119,7 +140,8 @@ async function verify(req, res) {
   const email = normEmail(req.body?.email);
   const code = String(req.body?.code || '').replace(/\D/g, '');
   if (!isEmail(email) || code.length !== 6) return res.status(400).json({ error: 'Code invalide' });
-  if (limited(`verify:${email}`, 5, WINDOW_MS)) {
+  // 5 essais / 10 min / e-mail, et 30 essais / heure / e-mail au total (toutes instances confondues).
+  if ((await tooMany(`verify:${email}`, 5, WINDOW_MS)) || (await tooMany(`verify-h:${email}`, 30, 60 * 60 * 1000))) {
     return res.status(429).json({ error: 'Trop d’essais, redemandez un code dans quelques minutes' });
   }
   if (isReviewEmail(email) && process.env.REVIEW_CODE && process.env.REVIEW_CODE.length === 6) {
