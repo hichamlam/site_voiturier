@@ -106,15 +106,25 @@ export default async function handler(req, res) {
       // Si Stripe refuse (ex. clé limitée sans le droit « PaymentIntents »), on ne bloque
       // jamais le client : on retombe sur la page de paiement Stripe ci-dessous.
       try {
-        const intent = await stripe.paymentIntents.create({
+        // Moyens proposés : carte (inclut Google Pay / Apple Pay), Klarna, PayPal.
+        // Jamais Link, Bancontact, MB WAY… Si un moyen n'est pas activé sur le compte
+        // Stripe, on réessaie sans lui plutôt que de perdre le paiement dans l'app.
+        const params = {
           amount: Math.round(price.total * 100),
           currency: 'eur',
-          // Carte (inclut Google Pay / Apple Pay) + Klarna. Pas de Bancontact, MB WAY, Link, etc.
-          payment_method_types: ['card', 'klarna'],
           receipt_email: customer.email,
           description: `Direct Voiturier — ${reference} · ${departure.date} → ${ret.date} · ${car.brand} ${car.model} (${car.plate})`.substring(0, 500),
           metadata: { booking_id: booking.id, reference },
-        });
+        };
+        let intent = null;
+        for (const types of [['card', 'klarna', 'paypal'], ['card', 'klarna'], ['card']]) {
+          try { intent = await stripe.paymentIntents.create({ ...params, payment_method_types: types }); break; }
+          catch (err) {
+            if (err?.code !== 'parameter_invalid_empty' && err?.type !== 'StripeInvalidRequestError') throw err;
+            console.warn('[checkout] moyen de paiement non activé, on réessaie sans :', types.at(-1), err?.message);
+          }
+        }
+        if (!intent) throw new Error('aucun moyen de paiement disponible');
         // La colonne s'appelle stripe_session_id mais accepte aussi un pi_… (voir _confirm.js).
         await supabase.from('bookings').update({ stripe_session_id: intent.id }).eq('id', booking.id);
         return res.status(200).json({
