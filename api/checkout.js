@@ -97,28 +97,34 @@ export default async function handler(req, res) {
 
     if (bookingErr) {
       console.error('[checkout]', bookingErr);
-      return res.status(500).json({ error: bookingErr.message });
+      return res.status(500).json({ error: 'Réservation impossible pour le moment, réessayez.' });
     }
 
     // App mobile : paiement DANS l'app (Stripe PaymentSheet : carte, Google Pay, Apple Pay).
     // Il faut la clé publique côté serveur ; sans elle on retombe sur la page Stripe.
     if (fromApp && req.body.ui === 'sheet' && process.env.STRIPE_PUBLISHABLE_KEY) {
-      const intent = await stripe.paymentIntents.create({
-        amount: Math.round(price.total * 100),
-        currency: 'eur',
-        automatic_payment_methods: { enabled: true },
-        receipt_email: customer.email,
-        description: `Direct Voiturier — ${reference} · ${departure.date} → ${ret.date} · ${car.brand} ${car.model} (${car.plate})`.substring(0, 500),
-        metadata: { booking_id: booking.id, reference },
-      });
-      // La colonne s'appelle stripe_session_id mais accepte aussi un pi_… (voir _confirm.js).
-      await supabase.from('bookings').update({ stripe_session_id: intent.id }).eq('id', booking.id);
-      return res.status(200).json({
-        reference,
-        paymentIntentId: intent.id,
-        clientSecret: intent.client_secret,
-        publishableKey: process.env.STRIPE_PUBLISHABLE_KEY,
-      });
+      // Si Stripe refuse (ex. clé limitée sans le droit « PaymentIntents »), on ne bloque
+      // jamais le client : on retombe sur la page de paiement Stripe ci-dessous.
+      try {
+        const intent = await stripe.paymentIntents.create({
+          amount: Math.round(price.total * 100),
+          currency: 'eur',
+          automatic_payment_methods: { enabled: true },
+          receipt_email: customer.email,
+          description: `Direct Voiturier — ${reference} · ${departure.date} → ${ret.date} · ${car.brand} ${car.model} (${car.plate})`.substring(0, 500),
+          metadata: { booking_id: booking.id, reference },
+        });
+        // La colonne s'appelle stripe_session_id mais accepte aussi un pi_… (voir _confirm.js).
+        await supabase.from('bookings').update({ stripe_session_id: intent.id }).eq('id', booking.id);
+        return res.status(200).json({
+          reference,
+          paymentIntentId: intent.id,
+          clientSecret: intent.client_secret,
+          publishableKey: process.env.STRIPE_PUBLISHABLE_KEY,
+        });
+      } catch (e) {
+        console.error('[checkout] paiement dans l\'app indisponible, repli sur la page Stripe :', e?.type || '', e?.code || '', e?.message || e);
+      }
     }
 
     const session = await stripe.checkout.sessions.create({
@@ -151,6 +157,7 @@ export default async function handler(req, res) {
     return res.status(200).json({ url: session.url, reference });
   } catch (err) {
     console.error('[checkout]', err);
-    return res.status(500).json({ error: err.message });
+    // Jamais le message brut de Stripe/Supabase au client (il peut contenir des identifiants).
+    return res.status(500).json({ error: 'Paiement momentanément indisponible. Réessayez ou choisissez « Payer sur place ».' });
   }
 }

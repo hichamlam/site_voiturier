@@ -96,7 +96,7 @@ export default async function handler(req, res) {
 
     if (bookingErr) {
       console.error('[booking] supabase err:', bookingErr);
-      return res.status(500).json({ error: 'Erreur enregistrement: ' + bookingErr.message });
+      return res.status(500).json({ error: 'Réservation impossible pour le moment, réessayez.' });
     }
 
     if (price.promoCode) {
@@ -142,6 +142,6 @@ export default async function handler(req, res) {
 
   } catch (err) {
     console.error('[booking]', err);
-    return res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: 'Réservation impossible pour le moment, réessayez ou appelez-nous.' });
   }
 }

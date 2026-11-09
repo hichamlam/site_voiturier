@@ -42,6 +42,6 @@ export default async function handler(req, res) {
     return res.status(200).json({ ...price, dateBlocked: false });
   } catch (err) {
     console.error('[pricing]', err);
-    return res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: 'Prix indisponible pour le moment, réessayez.' });
   }
 }
