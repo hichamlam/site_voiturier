@@ -21,7 +21,7 @@ import { pushAdmin } from './_push.js';
 
 export const MODIFICATION_FEE = 20;           // € ajoutés dès qu'une modification coûte plus cher
 export const MIN_HOURS_BEFORE = 24;           // délai mini avant le rendez-vous concerné
-export const TERMINALS = ['', 'Orly 1-2', 'Orly 3', 'Orly 4'];
+export const TERMINALS = ['', 'Orly 1-2', 'Orly 3', 'Orly 4', 'Orly 1-2-3']; // « Orly 1-2-3 » : réservations faites dans l'app
 export const WASH_ORDER = ['none', 'exterieur', 'interieur', 'complet', 'premium'];
 export const WASH_LABELS = { none: 'Aucun lavage', exterieur: 'Lavage extérieur', interieur: 'Lavage intérieur', complet: 'Lavage complet', premium: 'Lavage premium' };
 const ACTIVE = ['confirmed', 'taken', 'in_storage'];
@@ -453,7 +453,7 @@ export async function optionCatalog() {
     wash: WASH_ORDER.map((code) => ({ code, label: WASH_LABELS[code], price: WASH_PRICES[code] || 0 })),
     options: (data || []).filter((o) => ['covered_parking', 'priority_access'].includes(o.option_code))
       .map((o) => ({ code: o.option_code === 'covered_parking' ? 'coveredParking' : 'priorityAccess', label: o.name, description: o.description || '', price: Number(o.amount_eur) })),
-    terminals: TERMINALS.filter(Boolean),
+    terminals: TERMINALS.filter((t) => t && t !== 'Orly 1-2-3'),
     fee: MODIFICATION_FEE,
     minHours: MIN_HOURS_BEFORE,
   };
