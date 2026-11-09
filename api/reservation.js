@@ -13,7 +13,7 @@
  */
 import Stripe from 'stripe';
 import { supabase, getContactPhone, isRealEmail } from './_lib.js';
-import { confirmFromSession } from './_confirm.js';
+import { confirmFromSession, confirmFromPaymentIntent } from './_confirm.js';
 import {
   signManageToken, verifyManageToken, magicToken, publicView, rulesFor,
   normalizeReference, identifierMatches, quoteChanges, applyChanges, loadBooking,
@@ -117,7 +117,7 @@ async function confirmation(req, res) {
   let paidNow = false;
 
   if (sessionId) {
-    if (!/^cs_[A-Za-z0-9_]+$/.test(sessionId)) return res.status(400).json({ error: 'Lien invalide.' });
+    if (!/^(cs|pi)_[A-Za-z0-9_]+$/.test(sessionId)) return res.status(400).json({ error: 'Lien invalide.' });
     const { data } = await supabase.from('bookings').select('*').eq('stripe_session_id', sessionId).maybeSingle();
     b = data;
     if (!b) return res.status(404).json({ error: 'Réservation introuvable.' });
@@ -132,13 +132,20 @@ async function confirmation(req, res) {
       const stripe = stripeClient();
       if (stripe) {
         try {
-          const s = await stripe.checkout.sessions.retrieve(sessionId);
-          paidNow = s.payment_status === 'paid' && s.metadata?.booking_id === b.id;
-          // Filet de sécurité : si Stripe dit « payé », on ENREGISTRE la
-          // confirmation et on envoie les e-mails (sans doublon si le webhook
-          // passe en même temps). Avant, on se contentait de l'afficher : si le
-          // webhook était en panne, la résa restait « pending » pour toujours.
-          if (paidNow) await confirmFromSession(s, { source: 'retour client' });
+          if (sessionId.startsWith('pi_')) {
+            // Paiement dans l'app : l'app appelle cette route juste après la feuille Stripe.
+            const pi = await stripe.paymentIntents.retrieve(sessionId);
+            paidNow = pi.status === 'succeeded' && pi.metadata?.booking_id === b.id;
+            if (paidNow) await confirmFromPaymentIntent(pi, { source: 'app' });
+          } else {
+            const s = await stripe.checkout.sessions.retrieve(sessionId);
+            paidNow = s.payment_status === 'paid' && s.metadata?.booking_id === b.id;
+            // Filet de sécurité : si Stripe dit « payé », on ENREGISTRE la
+            // confirmation et on envoie les e-mails (sans doublon si le webhook
+            // passe en même temps). Avant, on se contentait de l'afficher : si le
+            // webhook était en panne, la résa restait « pending » pour toujours.
+            if (paidNow) await confirmFromSession(s, { source: 'retour client' });
+          }
         } catch (e) { console.error('[reservation] stripe retrieve/confirm', e.message); }
       }
       if (!paidNow) return res.status(200).json({ state: 'processing', reference: b.reference });

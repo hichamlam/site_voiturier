@@ -3,7 +3,7 @@
  */
 import Stripe from 'stripe';
 import { supabase } from './_lib.js';
-import { confirmFromSession } from './_confirm.js';
+import { confirmFromSession, confirmFromPaymentIntent } from './_confirm.js';
 import { applyPaidModification } from './_manage.js';
 
 
@@ -70,6 +70,17 @@ export default async function handler(req, res) {
     } catch (err) {
       console.error('[webhook]', err.message);
       return res.status(500).json({ error: 'confirm failed' }); // Stripe rejouera
+    }
+  }
+
+  // Paiement fait dans l'app mobile (PaymentSheet).
+  if (event.type === 'payment_intent.succeeded' && event.data.object.metadata?.booking_id) {
+    try {
+      const r = await confirmFromPaymentIntent(event.data.object, { source: 'webhook' });
+      if (!r.confirmed) console.log('[webhook] PI non confirmé :', r.reason);
+    } catch (err) {
+      console.error('[webhook]', err.message);
+      return res.status(500).json({ error: 'confirm failed' });
     }
   }
 

@@ -34,7 +34,7 @@ const REQUIRED = [
 
 // Sans celles-ci, seul le paiement en ligne est indisponible : le site
 // continue de prendre des réservations réglées sur place.
-const STRIPE_VARS = ['STRIPE_SECRET_KEY', 'STRIPE_WEBHOOK_SECRET'];
+const STRIPE_VARS = ['STRIPE_SECRET_KEY', 'STRIPE_WEBHOOK_SECRET', 'STRIPE_PUBLISHABLE_KEY'];
 
 const PLACEHOLDER = /^(COLLER_ICI|TON_|change_moi|ton-email@)/i;
 

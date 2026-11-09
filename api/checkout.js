@@ -100,6 +100,27 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: bookingErr.message });
     }
 
+    // App mobile : paiement DANS l'app (Stripe PaymentSheet : carte, Google Pay, Apple Pay).
+    // Il faut la clé publique côté serveur ; sans elle on retombe sur la page Stripe.
+    if (fromApp && req.body.ui === 'sheet' && process.env.STRIPE_PUBLISHABLE_KEY) {
+      const intent = await stripe.paymentIntents.create({
+        amount: Math.round(price.total * 100),
+        currency: 'eur',
+        automatic_payment_methods: { enabled: true },
+        receipt_email: customer.email,
+        description: `Direct Voiturier — ${reference} · ${departure.date} → ${ret.date} · ${car.brand} ${car.model} (${car.plate})`.substring(0, 500),
+        metadata: { booking_id: booking.id, reference },
+      });
+      // La colonne s'appelle stripe_session_id mais accepte aussi un pi_… (voir _confirm.js).
+      await supabase.from('bookings').update({ stripe_session_id: intent.id }).eq('id', booking.id);
+      return res.status(200).json({
+        reference,
+        paymentIntentId: intent.id,
+        clientSecret: intent.client_secret,
+        publishableKey: process.env.STRIPE_PUBLISHABLE_KEY,
+      });
+    }
+
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       payment_method_types: ['card'],

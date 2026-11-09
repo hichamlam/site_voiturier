@@ -63,6 +63,17 @@ export async function confirmFromSession(session, { source = 'webhook' } = {}) {
   return { confirmed: true, reference: booking.reference };
 }
 
+/**
+ * Paiement fait DANS l'app (PaymentSheet) : même bascule atomique, à partir
+ * d'un PaymentIntent. « succeeded » = argent encaissé.
+ */
+export function confirmFromPaymentIntent(intent, opts) {
+  return confirmFromSession({
+    metadata: intent?.metadata || {},
+    payment_status: intent?.status === 'succeeded' ? 'paid' : `pi:${intent?.status}`,
+  }, opts);
+}
+
 async function sendConfirmationEmails(booking) {
   const resend = new Resend(process.env.RESEND_API_KEY);
   const ADMIN = await getNotificationEmail();
@@ -148,6 +159,18 @@ export async function reconcilePendingPayments(stripe, { days = 7, source = 'cro
   const rescued = [];
   for (const b of pending || []) {
     try {
+      if (b.stripe_session_id.startsWith('pi_')) {
+        const intent = await stripe.paymentIntents.retrieve(b.stripe_session_id);
+        const r = await confirmFromPaymentIntent(intent, { source });
+        if (r.confirmed) rescued.push(r.reference);
+        // Paiement dans l'app abandonné depuis plus d'un jour : on libère la ligne
+        // (équivalent de « checkout.session.expired » pour Checkout).
+        else if (intent.status !== 'succeeded' && intent.status !== 'processing'
+          && Date.now() / 1000 - intent.created > 24 * 3600) {
+          await supabase.from('bookings').update({ status: 'cancelled' }).eq('id', b.id).eq('payment_status', 'pending');
+        }
+        continue;
+      }
       const session = await stripe.checkout.sessions.retrieve(b.stripe_session_id);
       const r = await confirmFromSession(session, { source });
       if (r.confirmed) rescued.push(r.reference);
