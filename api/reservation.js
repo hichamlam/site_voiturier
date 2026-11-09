@@ -14,11 +14,27 @@
 import Stripe from 'stripe';
 import { supabase, getContactPhone, isRealEmail } from './_lib.js';
 import { confirmFromSession, confirmFromPaymentIntent } from './_confirm.js';
+import { getCheckin, companyInfo, invoiceHtml } from './_invoice.js';
 import {
   signManageToken, verifyManageToken, magicToken, publicView, rulesFor,
   normalizeReference, identifierMatches, quoteChanges, applyChanges, loadBooking,
   optionCatalog, ChangeError, ConflictError, compactChanges, notifyModification, applyPaidModification,
 } from './_manage.js';
+
+/* Facture (HTML imprimable) : jeton signé lié à UNE réservation, émis après la prise en charge. */
+async function invoice(req, res) {
+  if (req.method !== 'GET') return res.status(405).end();
+  const tok = verifyManageToken(String(req.query.t || ''));
+  if (!tok) return res.status(401).send('Lien expiré. Rouvrez la facture depuis votre espace.');
+  const b = await loadBooking(tok.b);
+  const checkin = b ? await getCheckin(b.id) : null;
+  if (!b || !checkin?.invoiceNo) return res.status(404).send('Facture pas encore disponible.');
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.setHeader('Cache-Control', 'private, no-store');
+  res.setHeader('X-Robots-Tag', 'noindex');
+  res.setHeader('Content-Security-Policy', "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:");
+  return res.status(200).send(invoiceHtml(b, checkin, await companyInfo()));
+}
 
 const SESSION_TTL = 2 * 3600 * 1000; // connexion par référence + nom : 2 h
 const CONFIRM_LINK_TTL = 7 * 86400000; // lien de retour Stripe : 7 jours
@@ -73,8 +89,10 @@ async function authed(req, res) {
 }
 
 async function fullView(b) {
-  const [catalog, contactPhone] = await Promise.all([optionCatalog(), getContactPhone()]);
-  return publicView(b, { rules: rulesFor(b), catalog, contactPhone });
+  const [catalog, contactPhone, checkin] = await Promise.all([optionCatalog(), getContactPhone(), getCheckin(b.id)]);
+  // Facture : seulement après la prise en charge, lien signé valable 1 h.
+  const invoiceUrl = checkin?.invoiceNo ? `/api/reservation?action=invoice&t=${encodeURIComponent(signManageToken(b.id, 3600 * 1000))}` : null;
+  return publicView(b, { rules: rulesFor(b), catalog, contactPhone, invoiceUrl });
 }
 
 export default async function handler(req, res) {
@@ -100,6 +118,7 @@ export default async function handler(req, res) {
       }
       case 'modify': return await modify(req, res);
       case 'modstatus': return await modstatus(req, res);
+      case 'invoice': return await invoice(req, res);
       default: return res.status(404).json({ error: 'Action inconnue' });
     }
   } catch (err) {

@@ -6,7 +6,9 @@
  * PATCH /?id=xxx       : maj
  * DELETE /?id=xxx      : suppression
  */
-import { supabase, requireAdmin } from '../../_lib.js';
+import { supabase, requireAdmin, pick } from '../../_lib.js';
+
+const COLS = ['code', 'discount_type', 'discount_val', 'max_uses', 'uses_count', 'valid_from', 'valid_until', 'active', 'show_banner', 'first_booking_only'];
 
 export default async function handler(req, res) {
   if (!requireAdmin(req, res)) return;
@@ -20,7 +22,7 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'POST') {
-      const body = req.body;
+      const body = pick(req.body, COLS);
       if (!body.code || !body.discount_type || body.discount_val == null) {
         return res.status(400).json({ error: 'Champs requis : code, discount_type, discount_val' });
       }
@@ -36,7 +38,7 @@ export default async function handler(req, res) {
     const { id } = req.query;
     if (req.method === 'PATCH') {
       if (!id) return res.status(400).json({ error: 'id requis' });
-      const updates = { ...req.body };
+      const updates = pick(req.body, COLS);
       if (updates.code) updates.code = updates.code.toUpperCase().trim();
       const { data, error } = await supabase
         .from('promo_codes').update(updates).eq('id', id).select().single();

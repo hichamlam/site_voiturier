@@ -6,7 +6,10 @@
  * PATCH ?id=    : maj
  * DELETE ?id=   : suppression
  */
-import { supabase, requireAdmin } from '../../_lib.js';
+import { supabase, requireAdmin, pick } from '../../_lib.js';
+
+const SUR = ['kind', 'name', 'description', 'amount_eur', 'time_start', 'time_end', 'applies_to', 'option_code', 'active', 'display_order'];
+const HOL = ['date', 'name', 'surcharge_eur', 'active'];
 
 export default async function handler(req, res) {
   if (!requireAdmin(req, res)) return;
@@ -22,14 +25,13 @@ export default async function handler(req, res) {
       });
     }
     if (req.method === 'POST') {
-      const body = { ...req.body };
+      const body = req.body || {};
       if (body._table === 'holidays') {
-        delete body._table;
-        const { data, error } = await supabase.from('holidays').insert(body).select().single();
+        const { data, error } = await supabase.from('holidays').insert(pick(body, HOL)).select().single();
         if (error) return res.status(500).json({ error: error.message });
         return res.status(200).json({ item: data });
       }
-      const { data, error } = await supabase.from('surcharges').insert(body).select().single();
+      const { data, error } = await supabase.from('surcharges').insert(pick(body, SUR)).select().single();
       if (error) return res.status(500).json({ error: error.message });
       return res.status(200).json({ item: data });
     }
@@ -37,7 +39,7 @@ export default async function handler(req, res) {
     if (req.method === 'PATCH') {
       if (!id) return res.status(400).json({ error: 'id requis' });
       const t = table === 'holiday' ? 'holidays' : 'surcharges';
-      const { data, error } = await supabase.from(t).update(req.body).eq('id', id).select().single();
+      const { data, error } = await supabase.from(t).update(pick(req.body, t === 'holidays' ? HOL : SUR)).eq('id', id).select().single();
       if (error) return res.status(500).json({ error: error.message });
       return res.status(200).json({ item: data });
     }

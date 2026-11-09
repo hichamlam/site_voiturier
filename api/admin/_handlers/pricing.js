@@ -6,7 +6,13 @@
  * PATCH ?type=rule|special|block&id  : maj
  * DELETE ?type=rule|special|block&id : suppression
  */
-import { supabase, requireAdmin } from '../../_lib.js';
+import { supabase, requireAdmin, pick } from '../../_lib.js';
+
+const COLS = {
+  rule: ['days_min', 'days_max', 'price_eur', 'label', 'extra_per_day_eur'],
+  special: ['name', 'date_start', 'date_end', 'multiplier', 'flat_extra', 'active'],
+  block: ['date_start', 'date_end', 'reason'],
+};
 
 const TABLES = {
   rule:    'pricing_rules',
@@ -36,13 +42,13 @@ export default async function handler(req, res) {
     if (!table) return res.status(400).json({ error: 'type invalide (rule, special, block)' });
 
     if (req.method === 'POST') {
-      const { data, error } = await supabase.from(table).insert(req.body).select().single();
+      const { data, error } = await supabase.from(table).insert(pick(req.body, COLS[type])).select().single();
       if (error) return res.status(500).json({ error: error.message });
       return res.status(200).json({ item: data });
     }
     if (req.method === 'PATCH') {
       if (!id) return res.status(400).json({ error: 'id requis' });
-      const { data, error } = await supabase.from(table).update(req.body).eq('id', id).select().single();
+      const { data, error } = await supabase.from(table).update(pick(req.body, COLS[type])).eq('id', id).select().single();
       if (error) return res.status(500).json({ error: error.message });
       return res.status(200).json({ item: data });
     }

@@ -37,6 +37,12 @@ const FIELDS = {
   insurance_company: { label: "Nom de l'assureur", type: 'text', maxLen: 200 },
   insurance_policy_number: { label: 'Numéro de contrat RC pro', type: 'text', maxLen: 100 },
   ga4_id: { label: 'Identifiant GA4', type: 'text', maxLen: 50 },
+  company_name: { label: 'Nom de la société (factures)', type: 'text', maxLen: 200 },
+  company_siret: { label: 'SIRET (factures)', type: 'text', maxLen: 30 },
+  invoice_mention: { label: 'Mention légale des factures', type: 'text', maxLen: 300 },
+  late_grace_min: { label: 'Retard toléré (minutes)', type: 'number', maxLen: 4 },
+  late_first_hour_eur: { label: 'Frais de retard, 1re heure (€)', type: 'number', maxLen: 6 },
+  late_per_hour_eur: { label: 'Frais de retard, heure suivante (€)', type: 'number', maxLen: 6 },
   google_ads_id: { label: 'Identifiant Google Ads', type: 'text', maxLen: 50 },
 };
 
@@ -66,6 +72,10 @@ function validateField(key, rawValue) {
   if (def.type === 'email' && !EMAIL_RE.test(value)) {
     return { error: `${def.label} : adresse email invalide` };
   }
+  if (def.type === 'number' && !(/^\d+(?:[.,]\d{1,2})?$/.test(value))) {
+    return { error: `${def.label} : nombre attendu` };
+  }
+  if (def.type === 'number') return { value: value.replace(',', '.') };
   if (def.type === 'url' && !isHttpsUrl(value)) {
     return { error: `${def.label} : doit être un lien https:// valide` };
   }

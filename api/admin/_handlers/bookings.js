@@ -6,7 +6,7 @@
  * PATCH ?id=  : maj (incluant pénalités retard)
  * DELETE ?id= : suppression
  */
-import { supabase, requireAdmin, calculatePrice, upsertClient, calculateLateFee } from '../../_lib.js';
+import { supabase, requireAdmin, calculatePrice, upsertClient, calculateLateFee, getLateFeeConfig } from '../../_lib.js';
 import { pushClient, CLIENT_STATUS_PUSH } from '../../_push.js';
 
 export default async function handler(req, res) {
@@ -161,7 +161,7 @@ async function update(req, res) {
       // Les frais de modification payés par le client (espace client) ne font
       // pas partie de la grille : on les conserve lors d'un recalcul.
       const fees = (Array.isArray(existing.surcharges_detail) ? existing.surcharges_detail : [])
-        .filter((d) => d && d.kind === 'modification_fee');
+        .filter((d) => d && (d.kind === 'modification_fee' || d.kind === 'manual_fee'));
       const feeSum = fees.reduce((s, d) => s + Number(d.amount || 0), 0);
       updates.total_price = Math.round((Number(price.total) + feeSum) * 100) / 100;
       updates.surcharges_detail = [...(price.surchargesDetail || []), ...fees];
@@ -172,12 +172,13 @@ async function update(req, res) {
   if (req.body.compute_late_fees) {
     const { data: existing } = await supabase.from('bookings').select('*').eq('id', id).single();
     if (existing) {
+      const cfg = await getLateFeeConfig();
       if (updates.late_dep_active && updates.late_dep_actual_time && existing.departure_time) {
-        const fee = calculateLateFee(existing.departure_time, updates.late_dep_actual_time);
+        const fee = calculateLateFee(existing.departure_time, updates.late_dep_actual_time, cfg);
         updates.late_dep_fee = fee.fee;
       }
       if (updates.late_ret_active && updates.late_ret_actual_time && existing.return_time) {
-        const fee = calculateLateFee(existing.return_time, updates.late_ret_actual_time);
+        const fee = calculateLateFee(existing.return_time, updates.late_ret_actual_time, cfg);
         updates.late_ret_fee = fee.fee;
       }
     }

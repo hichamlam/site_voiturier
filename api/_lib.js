@@ -223,20 +223,45 @@ export async function upsertClient(customer) {
   return inserted ? inserted.id : null;
 }
 
+/** Garde uniquement les colonnes autorisées (évite qu'une requête modifie id, created_at…). */
+export function pick(body, keys) {
+  const out = {};
+  const src = body && typeof body === 'object' ? body : {};
+  for (const k of keys) if (src[k] !== undefined) out[k] = src[k];
+  return out;
+}
+
 export const isRealEmail = e => !!e && !/@sans-email\.invalid$/i.test(e);
 
 // ─── Calcul des pénalités de retard ───
-export function calculateLateFee(scheduledTime, actualTime) {
+// Réglables dans l'admin (Prix et frais → Retard) : tolérance, 1re heure, heure suivante.
+export const LATE_DEFAULTS = { grace: 30, firstHour: 10, perHour: 15 };
+export async function getLateFeeConfig() {
+  try {
+    const { data } = await supabase.from('settings').select('key, value').in('key', ['late_grace_min', 'late_first_hour_eur', 'late_per_hour_eur']);
+    const m = Object.fromEntries((data || []).map((r) => [r.key, r.value]));
+    const num = (v, d) => (v !== undefined && v !== '' && Number.isFinite(Number(v)) ? Number(v) : d);
+    return { grace: num(m.late_grace_min, LATE_DEFAULTS.grace), firstHour: num(m.late_first_hour_eur, LATE_DEFAULTS.firstHour), perHour: num(m.late_per_hour_eur, LATE_DEFAULTS.perHour) };
+  } catch { return { ...LATE_DEFAULTS }; }
+}
+
+/** Frais pour un retard en minutes : gratuit sous la tolérance, puis 1re heure, puis par heure entamée. */
+export function lateFeeForMinutes(lateMinutes, cfg = LATE_DEFAULTS) {
+  const m = Math.max(0, Math.round(Number(lateMinutes) || 0));
+  if (m <= cfg.grace) return 0;
+  if (m <= 60) return cfg.firstHour;
+  return cfg.firstHour + Math.ceil((m - 60) / 60) * cfg.perHour;
+}
+
+const timeToMinutes = (t) => { const [h, m] = String(t || '0:0').split(':').map(Number); return (h || 0) * 60 + (m || 0); };
+
+export function calculateLateFee(scheduledTime, actualTime, cfg = LATE_DEFAULTS) {
   if (!scheduledTime || !actualTime) return { lateMinutes: 0, fee: 0 };
   const sched = timeToMinutes(scheduledTime);
   const actual = timeToMinutes(actualTime);
   let lateMinutes = actual - sched;
   if (lateMinutes < 0) lateMinutes += 24 * 60; // après minuit
-  if (lateMinutes <= 30) return { lateMinutes, fee: 0 };
-  if (lateMinutes <= 60) return { lateMinutes, fee: 10 };
-  // Au-delà : 10€ pour la 1ère heure puis 15€/h
-  const extraHours = Math.ceil((lateMinutes - 60) / 60);
-  return { lateMinutes, fee: 10 + extraHours * 15 };
+  return { lateMinutes, fee: lateFeeForMinutes(lateMinutes, cfg) };
 }
 
 // Téléphone affiché dans les mails clients (réglage admin « Téléphone service client »).

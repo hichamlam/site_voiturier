@@ -17,6 +17,8 @@
  *   GET  ?action=admin-valets / POST admin-valet-save { id?, name, phone } / admin-valet-delete { id } (Bearer admin)
  *   POST ?action=admin-assign { bookingId, valetId|null } (Bearer admin) → attribue un voiturier + notif client
  *   POST ?action=profile-update { firstname, lastname, phone } (Bearer client) → met à jour ses infos
+ *   GET  admin-board / admin-resa · POST admin-step / admin-fee (Bearer admin) → cf. api/_adminapp.js
+ *   POST ?action=invoice-link { reference } (Bearer client) → lien 1 h vers sa facture (après prise en charge)
  *
  * Une seule fonction serverless (limite de 12 fonctions du plan Vercel Hobby :
  * c'est la 12e). Aucune clé n'est exposée à l'app : elle ne parle qu'à cette API.
@@ -27,6 +29,9 @@ import crypto from 'crypto';
 import { Resend } from 'resend';
 import { supabase, requireAdmin, getNotificationEmail, getContactPhone, SESSION_SECRET } from './_lib.js';
 import { pushAdmin, pushClient, saveToken } from './_push.js';
+import { adminBoard, adminResa, adminStep, adminFee } from './_adminapp.js';
+import { invoicedIds } from './_invoice.js';
+import { signManageToken } from './_manage.js';
 
 const SECRET = SESSION_SECRET;
 const FROM = () => process.env.FROM_EMAIL || 'Direct Voiturier <contact@directvoiturier.com>';
@@ -189,8 +194,11 @@ async function me(req, res) {
   }
 
   const today = parisToday();
-  const valets = await valetsByBooking(list.filter((b) => b.return_date >= today).map((b) => b.id));
-  for (const b of list) { b.valet = valets.get(b.id) || null; delete b.id; }
+  const [valets, invoiced] = await Promise.all([
+    valetsByBooking(list.filter((b) => b.return_date >= today).map((b) => b.id)),
+    invoicedIds(list.map((b) => b.id)),
+  ]);
+  for (const b of list) { b.valet = valets.get(b.id) || null; b.invoiced = invoiced.has(b.id); delete b.id; }
   const active = list.filter((b) => b.status !== 'cancelled' && b.status !== 'returned' && b.return_date >= today);
   active.sort((a, b) => a.departure_date.localeCompare(b.departure_date));
   const next = active[0] || null;
@@ -480,12 +488,26 @@ async function profileUpdate(req, res) {
   return res.status(200).json({ ok: true });
 }
 
+// Lien de facture (valable 1 h) : uniquement pour SA réservation, et seulement une fois la prise en charge validée.
+async function invoiceLink(req, res) {
+  const session = verifyClient(req);
+  if (!session) return res.status(401).json({ error: 'Unauthorized' });
+  const reference = String(req.body?.reference || '').trim().toUpperCase().slice(0, 40);
+  const { data: b } = await supabase.from('bookings').select('id, customer_email').eq('reference', reference).maybeSingle();
+  if (!b || normEmail(b.customer_email) !== session.email) return res.status(404).json({ error: 'Réservation introuvable' });
+  if (!(await invoicedIds([b.id])).has(b.id)) return res.status(409).json({ error: 'La facture sera disponible dès la prise en charge de votre voiture' });
+  const site = (process.env.SITE_URL || 'https://www.directvoiturier.com').replace(/\/$/, '');
+  return res.status(200).json({ url: `${site}/api/reservation?action=invoice&t=${encodeURIComponent(signManageToken(b.id, 3600 * 1000))}` });
+}
+
 const routes = { otp, verify, me, landed, 'admin-refresh': adminRefresh, 'delete-account': deleteAccount, 'admin-today': adminToday,
   'push-register': pushRegister, chat, 'chat-send': chatSend, 'admin-threads': adminThreads, 'admin-thread': adminThread, 'admin-reply': adminReply, 'profile-update': profileUpdate,
-  'admin-valets': adminValets, 'admin-valet-save': adminValetSave, 'admin-valet-delete': adminValetDelete, 'admin-assign': adminAssign };
+  'admin-valets': adminValets, 'admin-valet-save': adminValetSave, 'admin-valet-delete': adminValetDelete, 'admin-assign': adminAssign,
+  'admin-board': adminBoard, 'admin-resa': adminResa, 'admin-step': adminStep, 'admin-fee': adminFee, 'invoice-link': invoiceLink };
 const methods = { otp: 'POST', verify: 'POST', me: 'GET', landed: 'POST', 'admin-refresh': 'POST', 'delete-account': 'POST', 'admin-today': 'GET',
   'push-register': 'POST', chat: 'GET', 'chat-send': 'POST', 'admin-threads': 'GET', 'admin-thread': 'GET', 'admin-reply': 'POST', 'profile-update': 'POST',
-  'admin-valets': 'GET', 'admin-valet-save': 'POST', 'admin-valet-delete': 'POST', 'admin-assign': 'POST' };
+  'admin-valets': 'GET', 'admin-valet-save': 'POST', 'admin-valet-delete': 'POST', 'admin-assign': 'POST',
+  'admin-board': 'GET', 'admin-resa': 'GET', 'admin-step': 'POST', 'admin-fee': 'POST', 'invoice-link': 'POST' };
 
 export default async function handler(req, res) {
   const action = String(req.query?.action || '');

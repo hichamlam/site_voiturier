@@ -328,6 +328,7 @@
       '<div class="ec-actions ec-noprint" style="margin:0 0 16px">' +
         '<button class="ec-btn ec-btn-ghost" type="button" id="ec-ics">' + ico('cal') + 'Ajouter à mon agenda</button>' +
         '<button class="ec-btn ec-btn-ghost" type="button" onclick="window.print()">' + ico('print') + 'Imprimer / PDF</button>' +
+        (b.invoiceUrl ? '<a class="ec-btn ec-btn-ghost" href="' + esc(b.invoiceUrl) + '" target="_blank" rel="noopener">' + ico('print') + 'Télécharger ma facture</a>' : '') +
       '</div>' + helpCard(b);
 
     $('#ec-copy').addEventListener('click', function () { copyRef(this, b.reference); });
