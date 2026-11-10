@@ -54,3 +54,25 @@ graphify update .                                  # reconstruit la carte, 0 tok
 - Commit + push sur `main`.
 - Résumé final à Alex : 2-3 lignes max, visuel si utile, en français simple.
 - Site : le push sur `main` déclenche le déploiement Vercel en prod automatiquement. Vérifier ensuite que le déploiement est "Ready" (outils Vercel).
+
+---
+
+# Carte du projet (où est quoi)
+
+Les règles complètes (style de réponse, niveau de tâche → modèle, ne rien casser) sont dans le doc du projet claude.ai « Instructions Direct Voiturier ». Résumé : réponses courtes + bloc « À faire / Rien à faire », changer le minimum, vérifier avant prod.
+
+| Sujet | Où |
+|---|---|
+| Pages du site (HTML statique) | `public/*.html`, styles `public/*.css`, JS `public/script.js` |
+| SEO (en-têtes, FAQ, avis, JSON-LD, sitemap, llms.txt) | sources `config/seoFacts.mjs`, `content/*.mjs` → générer avec `npm run seo`. ⚠️ Ne pas éditer à la main entre les balises `<!--seo:...-->` |
+| Calcul des prix | `public/pricing-engine.js` (partagé site + API), `api/pricing.js`, `api/_lib.js` |
+| Réservation + paiement Stripe | `api/checkout.js`, `api/webhook.js`, `api/booking.js`, `api/_confirm.js` |
+| Gérer ma réservation (client) | `public/gerer-ma-reservation.html`, `public/espace-client.js`, `api/reservation.js`, `api/_manage.js` |
+| API de l'app mobile | `api/app.js` (liste des actions en tête du fichier) |
+| Back-office admin web | `public/admin/`, `api/admin/[...slug].js` + `api/admin/_handlers/` |
+| Emails / reçus / parrainage / push | `api/_emails.js`, `_autoemails.js`, `_invoice.js`, `_referral.js`, `_push.js`, tâches planifiées `api/cron.js` |
+| Base de données (Supabase) | `supabase/schema.sql`, migrations `supabase/migrations/` |
+| Redirections / en-têtes | `vercel.json` |
+| Démo de l'app (compilée, ne pas éditer) | `public/app-demo/` |
+
+⚠️ `api/` sert aussi l'app mobile (repo `direct-voiturier-app`, fichier `src/data/api.ts`). Ne jamais casser une action existante : rester compatible avec les apps déjà installées.
