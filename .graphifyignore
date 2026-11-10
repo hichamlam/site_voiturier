@@ -1,0 +1,5 @@
+# Fichiers exclus de la carte Graphify (code compilé, pas utile)
+public/app-demo/
+node_modules/
+*.min.js
+graphify-out/

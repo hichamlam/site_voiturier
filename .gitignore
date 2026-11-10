@@ -20,3 +20,6 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
+
+# Graphify (carte du code, refaite à chaque session)
+graphify-out/

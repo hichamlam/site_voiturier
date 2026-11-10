@@ -26,3 +26,31 @@ améliorer l'UX du projet en cours, même si je ne l'ai pas demandé. Proposer e
 3. Garder le style cohérent avec le design du projet (couleurs, thème sombre/clair, accessibilité).
 4. Si plusieurs options conviennent, en choisir une et expliquer en une phrase pourquoi.
 5. Citer d'où vient le composant (nom de la lib) dans le résumé de fin de tâche.
+
+---
+
+# Économie de tokens : Graphify (À FAIRE AU DÉBUT DE CHAQUE CONVERSATION)
+
+Alex travaille depuis son téléphone : **1 conversation = 1 tâche**, finie et mise en prod.
+Graphify construit une "carte" du code (fonctions, fichiers, qui appelle qui) en ~1 seconde, **sans aucun token IA**.
+But : ne jamais fouiller le code à l'aveugle.
+
+## Démarrage (obligatoire, avant toute lecture de code)
+```bash
+pip install --break-system-packages -q graphifyy   # si `graphify` absent
+graphify update .                                  # reconstruit la carte, 0 token
+```
+1. Lire `graphify-out/GRAPH_REPORT.md` (court) pour s'orienter.
+2. Pour trouver où toucher : `graphify query "<mots-clés de la tâche>"` puis `graphify explain "<fonction>"`.
+3. Ensuite seulement, ouvrir les 2-3 fichiers indiqués par la carte.
+
+## Interdits
+- Ne JAMAIS lire `graphify-out/graph.json` ni `graph.html` en entier (énormes, ça brûle des tokens).
+- Pas de Glob/Grep large sur tout le repo si la carte donne déjà la réponse.
+- `graphify-out/` n'est pas versionné (dans .gitignore) : la carte est refaite à chaque conversation, donc toujours à jour.
+
+## Fin de tâche = en prod
+- Vérifier (lint / typecheck / test rapide) avant de livrer.
+- Commit + push sur `main`.
+- Résumé final à Alex : 2-3 lignes max, visuel si utile, en français simple.
+- Site : le push sur `main` déclenche le déploiement Vercel en prod automatiquement. Vérifier ensuite que le déploiement est "Ready" (outils Vercel).
