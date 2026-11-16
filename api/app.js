@@ -246,7 +246,7 @@ async function adminValetSave(req, res) {
   const name = String(req.body?.name || '').trim().slice(0, 60);
   const phone = String(req.body?.phone || '').trim().slice(0, 30);
   const id = req.body?.id ? String(req.body.id) : null;
-  if (!name || !/^(?:\+33\s?|0)[1-9](?:[\s.-]?\d{2}){4}$/.test(phone)) return res.status(400).json({ error: 'Nom et numéro valides requis' });
+  if (!name || !phone) return res.status(400).json({ error: 'Nom et numéro requis' });
   const q = id
     ? supabase.from('valets').update({ name, phone }).eq('id', id).select('id, name, phone').single()
     : supabase.from('valets').insert({ name, phone }).select('id, name, phone').single();
@@ -481,7 +481,6 @@ async function profileUpdate(req, res) {
   const lastname = clean(req.body?.lastname, 60);
   const phone = clean(req.body?.phone, 30);
   if (!firstname || !lastname) return res.status(400).json({ error: 'Prénom et nom requis' });
-  if (phone && !/^(?:\+33\s?|0)[1-9](?:[\s.-]?\d{2}){4}$/.test(phone)) return res.status(400).json({ error: 'Numéro de téléphone invalide' });
   const email = session.email.toLowerCase();
   const { data: existing } = await supabase.from('clients').select('id').ilike('email', email).maybeSingle();
   const fields = { firstname, lastname, phone, updated_at: new Date().toISOString() };

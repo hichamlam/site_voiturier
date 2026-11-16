@@ -259,7 +259,7 @@ export function validateChanges(b, input, now = Date.now()) {
   }
   if (want('phone') && String(input.phone).trim() !== String(cur.customer.phone || '').trim()) {
     const p = String(input.phone).trim();
-    if (p.replace(/\D/g, '').length < 8 || p.length > 25 || !/^[+0-9 ().-]+$/.test(p)) throw new ChangeError('Téléphone invalide.');
+    if (!p || p.length > 30) throw new ChangeError('Téléphone invalide.');
     if (!rules.contact) throw new ChangeError(rules.reason || 'Réservation non modifiable.', 409);
     fields.customer_phone = p;
     summary.push(`Téléphone : ${cur.customer.phone} → ${p}`);
